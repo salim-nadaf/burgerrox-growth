@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Menu, Phone, MapPin, User, LogOut } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import AuthForm from "./AuthForm";
 import Cart from "./Cart";
@@ -9,18 +10,25 @@ import Cart from "./Cart";
 const Header = () => {
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const { user, signOut, profile } = useAuth();
+  const location = useLocation();
   return (
     <header className="bg-background border-b border-border shadow-warm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-8">
-            <h1 className="font-bebas text-4xl text-foreground tracking-wider">
+            <Link to="/" className="font-bebas text-4xl text-foreground tracking-wider hover:text-primary transition-colors">
               BURGER ROX
-            </h1>
+            </Link>
             <nav className="hidden md:flex space-x-6">
-              <a href="#menu" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
-                Menu
-              </a>
+              {location.pathname === '/menu' ? (
+                <Link to="/" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
+                  Home
+                </Link>
+              ) : (
+                <a href="#menu" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
+                  Menu
+                </a>
+              )}
               <a href="#about" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
                 About
               </a>

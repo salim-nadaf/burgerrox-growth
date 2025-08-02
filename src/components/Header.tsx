@@ -1,7 +1,14 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, Phone, MapPin } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Menu, Phone, MapPin, User, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import AuthForm from "./AuthForm";
+import Cart from "./Cart";
 
 const Header = () => {
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const { user, signOut, profile } = useAuth();
   return (
     <header className="bg-background border-b border-border shadow-warm">
       <div className="container mx-auto px-4 py-4">
@@ -35,6 +42,30 @@ const Header = () => {
           </div>
 
           <div className="flex items-center space-x-4">
+            <Cart />
+            
+            {user ? (
+              <div className="flex items-center space-x-2">
+                <span className="hidden md:inline text-sm">
+                  {profile?.name || 'User'}
+                </span>
+                <Button variant="ghost" size="icon" onClick={signOut}>
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <User className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <AuthForm onClose={() => setAuthDialogOpen(false)} />
+                </DialogContent>
+              </Dialog>
+            )}
+            
             <Button 
               variant="brand" 
               size="lg" 
@@ -43,6 +74,7 @@ const Header = () => {
             >
               Order Now
             </Button>
+            
             <Button variant="ghost" size="icon" className="md:hidden">
               <Menu size={20} />
             </Button>

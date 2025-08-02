@@ -1,37 +1,48 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import burgerTrio from "@/assets/burger-trio.jpg";
+import { useCart } from "@/hooks/useCart";
+import { useAuth } from "@/hooks/useAuth";
 
 const MenuHighlights = () => {
+  const { addToCart } = useCart();
+  const { user } = useAuth();
+
   const burgers = [
     {
-      name: "Burger Rox Zinger",
-      description: "Premium bun, signature sauce, and liquid cheese",
-      price: "₹259",
+      name: "Paneer Tikka Burger",
+      description: "Spiced paneer tikka with mint chutney, onions, and fresh vegetables",
+      price: 180,
       popular: true
     },
     {
-      name: "Chicken Classic",
-      description: "Classic burger with our signature twist",
-      price: "₹89",
+      name: "Chicken Tikka Burger", 
+      description: "Tender chicken tikka with special sauce, lettuce, and tomato",
+      price: 200,
+      popular: true
+    },
+    {
+      name: "Veg Patty Burger",
+      description: "Crispy vegetable patty with lettuce, tomato, and tangy sauce", 
+      price: 140,
       popular: false
     },
     {
-      name: "Veggie Blaze Crisp",
-      description: "Crispy patty, fresh veggies",
-      price: "₹79",
+      name: "Chicken Cheese Burger",
+      description: "Juicy chicken patty with melted cheese and special mayo",
+      price: 220,
+      popular: true
+    },
+    {
+      name: "Aloo Tikki Burger",
+      description: "Traditional potato patty with chutneys and fresh vegetables",
+      price: 120,
       popular: false
     },
     {
-      name: "Aloo Tikki",
-      description: "Crispy Aloo Tikki, soft bun, and signature sauce",
-      price: "₹79",
-      popular: false
-    },
-    {
-      name: "Chicken Blaze Crisp",
-      description: "Crispy chicken, fresh veggies",
-      price: "₹99",
+      name: "Egg Burger", 
+      description: "Fried egg with vegetables and special burger sauce",
+      price: 100,
       popular: false
     }
   ];
@@ -69,12 +80,19 @@ const MenuHighlights = () => {
                       )}
                     </div>
                     <span className="font-bebas text-2xl text-primary">
-                      {burger.price}
+                      ₹{burger.price}
                     </span>
                   </div>
-                  <p className="font-montserrat text-muted-foreground leading-relaxed">
+                  <p className="font-montserrat text-muted-foreground leading-relaxed mb-4">
                     {burger.description}
                   </p>
+                  <Button 
+                    onClick={() => addToCart(burger.name, burger.price)}
+                    className="w-full"
+                    disabled={!user}
+                  >
+                    {user ? 'Add to Cart' : 'Login to Add'}
+                  </Button>
                 </CardContent>
               </Card>
             ))}
@@ -98,7 +116,7 @@ const MenuHighlights = () => {
               className="w-full rounded-2xl shadow-brand"
             />
             <div className="absolute -bottom-4 -right-4 bg-primary text-primary-foreground p-4 rounded-full font-bebas text-xl tracking-wider shadow-lg">
-              STARTS AT ₹79!
+              STARTS AT ₹100!
             </div>
           </div>
         </div>

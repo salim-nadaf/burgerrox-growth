@@ -102,7 +102,8 @@ export default function AuthForm({ onClose }: AuthFormProps) {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <div className="w-full max-w-md mx-auto max-h-[80vh] overflow-y-auto">
+      <Card className="w-full">
       <CardHeader>
         <CardTitle>{isLogin ? 'Login' : 'Sign Up'}</CardTitle>
         <CardDescription>
@@ -203,5 +204,6 @@ export default function AuthForm({ onClose }: AuthFormProps) {
         </form>
       </CardContent>
     </Card>
+    </div>
   );
 }

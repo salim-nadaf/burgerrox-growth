@@ -8,76 +8,45 @@ import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
 
 const allMenuItems = [
-  {
-    name: "Paneer Tikka Burger",
-    description: "Spiced paneer tikka with mint chutney, onions, and fresh vegetables",
-    price: 180,
-    popular: true,
-    category: "Vegetarian"
-  },
-  {
-    name: "Chicken Tikka Burger", 
-    description: "Tender chicken tikka with special sauce, lettuce, and tomato",
-    price: 200,
-    popular: true,
-    category: "Non-Vegetarian"
-  },
-  {
-    name: "Veg Patty Burger",
-    description: "Crispy vegetable patty with lettuce, tomato, and tangy sauce", 
-    price: 140,
-    popular: false,
-    category: "Vegetarian"
-  },
-  {
-    name: "Chicken Cheese Burger",
-    description: "Juicy chicken patty with melted cheese and special mayo",
-    price: 220,
-    popular: true,
-    category: "Non-Vegetarian"
-  },
-  {
-    name: "Aloo Tikki Burger",
-    description: "Traditional potato patty with chutneys and fresh vegetables",
-    price: 120,
-    popular: false,
-    category: "Vegetarian"
-  },
-  {
-    name: "Egg Burger", 
-    description: "Fried egg with vegetables and special burger sauce",
-    price: 100,
-    popular: false,
-    category: "Vegetarian"
-  },
-  {
-    name: "Chicken Crispy Burger",
-    description: "Crispy fried chicken with lettuce and special mayo",
-    price: 190,
-    popular: false,
-    category: "Non-Vegetarian"
-  },
-  {
-    name: "Veg Cheese Burger",
-    description: "Vegetable patty with melted cheese and fresh vegetables",
-    price: 160,
-    popular: false,
-    category: "Vegetarian"
-  },
-  {
-    name: "Chicken BBQ Burger",
-    description: "Grilled chicken with BBQ sauce and onions",
-    price: 210,
-    popular: false,
-    category: "Non-Vegetarian"
-  },
-  {
-    name: "Mushroom Swiss Burger",
-    description: "Grilled mushrooms with Swiss cheese and herbs",
-    price: 170,
-    popular: false,
-    category: "Vegetarian"
-  }
+  // Fries
+  { name: "French Fries (Small)", description: "Golden crispy potato fries", price: 59, popular: true, category: "Fries" },
+  { name: "French Fries (Medium)", description: "Golden crispy potato fries", price: 109, popular: false, category: "Fries" },
+  { name: "French Fries (Large)", description: "Golden crispy potato fries", price: 129, popular: false, category: "Fries" },
+  { name: "Peri Peri French Fries (Small)", description: "Spicy peri peri seasoned fries", price: 69, popular: true, category: "Fries" },
+  { name: "Peri Peri French Fries (Medium)", description: "Spicy peri peri seasoned fries", price: 119, popular: false, category: "Fries" },
+  { name: "Peri Peri French Fries (Large)", description: "Spicy peri peri seasoned fries", price: 149, popular: false, category: "Fries" },
+  
+  // Sides
+  { name: "Nuggests", description: "Crispy chicken nuggets", price: 89, popular: true, category: "Sides" },
+  
+  // Burgers
+  { name: "Burger Rox Zinger", description: "Spicy zinger burger with crispy chicken", price: 259, popular: true, category: "Chicken" },
+  { name: "Chicken Classic", description: "Classic chicken burger", price: 89, popular: true, category: "Chicken" },
+  { name: "Chicken Blaze Crisp Single Patty", description: "Crispy chicken patty with spicy sauce", price: 99, popular: false, category: "Chicken" },
+  { name: "Chicken Blaze Crisp Double Patty", description: "Double crispy chicken patties with spicy sauce", price: 139, popular: false, category: "Chicken" },
+  { name: "Egg-cellent Fusion", description: "Delicious egg burger with special fusion", price: 169, popular: false, category: "Egg" },
+  { name: "Aloo Tikki", description: "Spiced potato patty burger", price: 79, popular: true, category: "Vegetarian" },
+  { name: "Veggie Blaze Crisp Single Patty", description: "Crispy veggie patty with spicy sauce", price: 79, popular: false, category: "Vegetarian" },
+  { name: "Veggie Blaze Crisp Double Patty", description: "Double crispy veggie patties with spicy sauce", price: 119, popular: false, category: "Vegetarian" },
+  
+  // Combos
+  { name: "Claasic Delight", description: "Classic combo meal", price: 199, popular: true, category: "Combos" },
+  { name: "Veggie Crisp Duo", description: "Veggie crisp combo meal", price: 249, popular: false, category: "Combos" },
+  { name: "Double Egg-stravagance", description: "Double egg special combo", price: 299, popular: false, category: "Combos" },
+  { name: "Crispy Chaos", description: "Ultimate crispy combo", price: 449, popular: true, category: "Combos" },
+  { name: "Rox Zinger Blast", description: "Zinger special blast combo", price: 499, popular: true, category: "Combos" },
+  { name: "Aloo Tikki Fiesta", description: "Aloo tikki special combo", price: 349, popular: false, category: "Combos" },
+  { name: "Classic Blaze Box", description: "Classic blaze combo box", price: 499, popular: false, category: "Combos" },
+  { name: "Rox Family Fiesta", description: "Family pack combo", price: 449, popular: true, category: "Combos" },
+  { name: "Rox Veggie Twist", description: "Veggie special twist combo", price: 274, popular: false, category: "Combos" },
+  { name: "Zinger Value meal", description: "Zinger value combo meal", price: 379, popular: false, category: "Combos" },
+  
+  // Beverages
+  { name: "Coke (Medium)", description: "Refreshing coca cola", price: 69, popular: true, category: "Beverages" },
+  { name: "Coke (Large)", description: "Refreshing coca cola large", price: 99, popular: false, category: "Beverages" },
+  
+  // Desserts
+  { name: "Molten Choco Lava Cake", description: "Hot chocolate lava cake", price: 79, popular: true, category: "Desserts" },
 ];
 
 interface MenuPageProps {
@@ -90,7 +59,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
   const displayItems = showAll ? allMenuItems : allMenuItems.slice(0, 6);
-  const categories = ['All', 'Vegetarian', 'Non-Vegetarian'];
+  const categories = ["All", "Fries", "Sides", "Chicken", "Egg", "Vegetarian", "Combos", "Beverages", "Desserts"];
   
   const filteredItems = selectedCategory === 'All' 
     ? displayItems 
@@ -199,8 +168,8 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                 alt="Burger Rox menu favorites" 
                 className="w-full rounded-2xl shadow-brand"
               />
-              <div className="absolute -bottom-4 -right-4 bg-primary text-primary-foreground p-4 rounded-full font-bebas text-xl tracking-wider shadow-lg">
-                STARTS AT ₹100!
+               <div className="absolute -bottom-4 -right-4 bg-primary text-primary-foreground p-4 rounded-full font-bebas text-xl tracking-wider shadow-lg">
+                STARTS AT ₹59!
               </div>
             </div>
           )}

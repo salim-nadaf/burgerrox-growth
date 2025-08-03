@@ -38,9 +38,9 @@ const Header = () => {
                   Home
                 </Link>
               ) : (
-                <a href="#menu" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
+                <Link to="/menu" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
                   Menu
-                </a>
+                </Link>
               )}
               <a href="#about" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
                 About

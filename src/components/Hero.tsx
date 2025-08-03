@@ -44,7 +44,7 @@ const Hero = () => {
                 Order Your Fix
               </Button>
               <Button variant="outline" size="xl" className="w-full sm:w-auto">
-                <a href="#menu">View Menu</a>
+                <a href="/menu">View Menu</a>
               </Button>
             </div>
 

@@ -92,13 +92,14 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
         </div>
 
         {showAll && (
-          <div className="flex justify-center mb-8">
-            <div className="flex space-x-2">
+          <div className="flex justify-center mb-8 px-4">
+            <div className="flex flex-wrap gap-2 justify-center max-w-4xl">
               {categories.map((category) => (
                 <Button
                   key={category}
                   variant={selectedCategory === category ? "default" : "outline"}
                   onClick={() => setSelectedCategory(category)}
+                  className="text-sm px-3 py-2"
                 >
                   {category}
                 </Button>

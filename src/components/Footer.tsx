@@ -17,7 +17,7 @@ const Footer = () => {
               © 2025 Burger Rox. All rights reserved.
             </p>
             <p className="font-montserrat text-xs text-white/60 mt-1">
-              Made with ❤️ for students, by students
+              Made with ❤️ by a caring homemaker mom
             </p>
           </div>
 

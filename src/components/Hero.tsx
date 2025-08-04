@@ -6,12 +6,12 @@ const Hero = () => {
     <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <img 
+         <img 
           src={heroImage} 
           alt="Delicious Burger Rox burger" 
-          className="w-full h-full object-cover opacity-20"
+          className="w-full h-full object-cover opacity-30"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/90 to-background/70"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-background/60"></div>
       </div>
 
       <div className="container mx-auto px-4 z-10">
@@ -43,7 +43,7 @@ const Hero = () => {
               >
                 Order Your Fix
               </Button>
-              <Button variant="outline" size="xl" className="w-full sm:w-auto">
+              <Button variant="outline" size="xl" className="w-full sm:w-auto" asChild>
                 <a href="/menu">View Menu</a>
               </Button>
             </div>

@@ -134,8 +134,8 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
           </div>
         )}
 
-        <div className="grid md:grid-cols-2 gap-12 items-start">
-          <div className="space-y-6">
+        <div className={showAll ? "max-w-4xl mx-auto" : "grid md:grid-cols-2 gap-12 items-start"}>
+          <div className={showAll ? "grid gap-6 md:grid-cols-2 lg:grid-cols-3" : "space-y-6"}>
             {filteredItems.map((burger, index) => (
               <Card key={index} className="border-2 border-border hover:border-primary transition-all duration-300 hover:shadow-brand">
                 <CardContent className="p-6">
@@ -186,9 +186,9 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                              ) : (
                                <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
                                  <DialogTrigger asChild>
-                                   <Button size="sm">
-                                     Login
-                                   </Button>
+                                    <Button size="sm">
+                                      Add to Cart
+                                    </Button>
                                  </DialogTrigger>
                                  <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
                                    <DialogTitle className="sr-only">Authentication</DialogTitle>
@@ -212,9 +212,9 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                      ) : (
                        <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
                          <DialogTrigger asChild>
-                           <Button className="w-full">
-                             Login to Add
-                           </Button>
+                            <Button className="w-full">
+                              Add to Cart
+                            </Button>
                          </DialogTrigger>
                          <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
                            <DialogTitle className="sr-only">Authentication</DialogTitle>
@@ -258,9 +258,6 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                 alt="Burger Rox menu favorites" 
                 className="w-full rounded-2xl shadow-brand"
               />
-               <div className="absolute -bottom-4 -right-4 bg-primary text-primary-foreground p-4 rounded-full font-bebas text-xl tracking-wider shadow-lg">
-                STARTS AT ₹59!
-              </div>
             </div>
           )}
         </div>

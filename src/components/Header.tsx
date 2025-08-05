@@ -42,12 +42,25 @@ const Header = () => {
                   Menu
                 </Link>
               )}
-              <a href="#about" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
-                About
-              </a>
-              <a href="#contact" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
-                Contact
-              </a>
+              {location.pathname === '/menu' ? (
+                <>
+                  <Link to="/#about" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
+                    About
+                  </Link>
+                  <Link to="/#contact" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
+                    Contact
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <a href="#about" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
+                    About
+                  </a>
+                  <a href="#contact" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
+                    Contact
+                  </a>
+                </>
+              )}
             </nav>
           </div>
           
@@ -174,20 +187,41 @@ const Header = () => {
                         </a>
                       </>
                     )}
-                    <a 
-                      href="#about" 
-                      className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      About
-                    </a>
-                    <a 
-                      href="#contact" 
-                      className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Contact
-                    </a>
+                    {location.pathname === '/menu' ? (
+                      <>
+                        <Link 
+                          to="/#about" 
+                          className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          About
+                        </Link>
+                        <Link 
+                          to="/#contact" 
+                          className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Contact
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        <a 
+                          href="#about" 
+                          className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          About
+                        </a>
+                        <a 
+                          href="#contact" 
+                          className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Contact
+                        </a>
+                      </>
+                    )}
                   </nav>
 
                   {/* Contact Info */}

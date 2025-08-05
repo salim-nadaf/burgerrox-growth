@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Phone, Clock, Instagram, Twitter, Mail } from "lucide-react";
+import { MapPin, Phone, Clock, Instagram, Facebook } from "lucide-react";
 
 const Contact = () => {
   return (
@@ -112,15 +112,24 @@ const Contact = () => {
                 Stay updated with the latest menu items, deals, and campus events.
               </p>
               <div className="flex justify-center space-x-4">
-                <Button variant="ghost" size="icon" className="bg-primary/10 hover:bg-primary hover:text-primary-foreground">
-                  <Instagram size={20} />
-                </Button>
-                <Button variant="ghost" size="icon" className="bg-primary/10 hover:bg-primary hover:text-primary-foreground">
-                  <Twitter size={20} />
-                </Button>
-                <Button variant="ghost" size="icon" className="bg-primary/10 hover:bg-primary hover:text-primary-foreground">
-                  <Mail size={20} />
-                </Button>
+                <a 
+                  href="https://www.instagram.com/burgerroxx" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="ghost" size="icon" className="bg-primary/10 hover:bg-primary hover:text-primary-foreground">
+                    <Instagram size={20} />
+                  </Button>
+                </a>
+                <a 
+                  href="https://www.facebook.com/burgerroxx/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="ghost" size="icon" className="bg-primary/10 hover:bg-primary hover:text-primary-foreground">
+                    <Facebook size={20} />
+                  </Button>
+                </a>
               </div>
             </div>
           </div>

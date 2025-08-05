@@ -134,7 +134,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
           </div>
         )}
 
-        <div className={showAll ? "max-w-4xl mx-auto" : "grid md:grid-cols-2 gap-12 items-start"}>
+        <div className={showAll ? "max-w-4xl mx-auto" : "max-w-4xl mx-auto"}>
           <div className={showAll ? "grid gap-6 md:grid-cols-2 lg:grid-cols-3" : "space-y-6"}>
             {filteredItems.map((burger, index) => (
               <Card key={index} className="border-2 border-border hover:border-primary transition-all duration-300 hover:shadow-brand">
@@ -147,21 +147,21 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                     />
                     <div className="flex-1">
                       <div className="flex justify-between items-start mb-3">
-                     <div className="flex items-center space-x-3">
-                       <h3 className="font-bebas text-2xl text-foreground tracking-wide">
-                         {burger.name}
-                       </h3>
-                       {burger.popular && (
-                         <Badge variant="default" className="bg-primary text-primary-foreground">
-                           POPULAR
-                         </Badge>
-                       )}
-                     </div>
-                     {!(burger as any).variants && (
-                       <span className="font-bebas text-2xl text-primary">
-                         ₹{burger.price}
-                       </span>
-                      )}
+                        <div className="flex items-center space-x-2 mb-2">
+                          <h3 className="font-bebas text-2xl text-foreground tracking-wide">
+                            {burger.name}
+                          </h3>
+                          {burger.popular && (
+                            <Badge variant="default" className="bg-primary text-primary-foreground">
+                              POPULAR
+                            </Badge>
+                          )}
+                        </div>
+                        {!(burger as any).variants && (
+                          <span className="font-bebas text-2xl text-primary">
+                            ₹{burger.price}
+                          </span>
+                        )}
                     </div>
                     </div>
                   </div>
@@ -251,15 +251,6 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
             </div>
           </div>
 
-          {!showAll && (
-            <div className="relative">
-              <img 
-                src={burgerTrio} 
-                alt="Burger Rox menu favorites" 
-                className="w-full rounded-2xl shadow-brand"
-              />
-            </div>
-          )}
         </div>
       </div>
     </section>

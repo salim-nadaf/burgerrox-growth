@@ -138,28 +138,28 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
           <div className={showAll ? "grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid gap-6 md:grid-cols-2 lg:grid-cols-3"}>
             {filteredItems.map((burger, index) => (
               <Card key={index} className="border-2 border-border hover:border-primary transition-all duration-300 hover:shadow-brand">
-                <CardContent className="p-6">
-                  <div className="flex gap-4 mb-4">
+                <CardContent className="p-4">
+                  <div className="flex gap-3 mb-4">
                     <img 
                       src={getItemImage(burger.name, burger.category)} 
                       alt={burger.name}
-                      className="w-20 h-20 rounded-lg object-cover"
+                      className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
                     />
-                    <div className="flex-1">
-                      <div className="flex flex-col gap-2 mb-3">
-                        <div className="flex items-center justify-between w-full">
-                          <div className="flex items-center space-x-2">
-                            <h3 className="font-bebas text-2xl text-foreground tracking-wide">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col gap-1 mb-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bebas text-lg sm:text-xl text-foreground tracking-wide leading-tight">
                               {burger.name}
                             </h3>
                             {burger.popular && (
-                              <Badge variant="default" className="bg-primary text-primary-foreground">
+                              <Badge variant="default" className="bg-primary text-primary-foreground text-xs mt-1">
                                 POPULAR
                               </Badge>
                             )}
                           </div>
                           {!(burger as any).variants && (
-                            <span className="font-bebas text-2xl text-primary">
+                            <span className="font-bebas text-lg sm:text-xl text-primary flex-shrink-0">
                               ₹{burger.price}
                             </span>
                           )}
@@ -167,28 +167,29 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                       </div>
                     </div>
                   </div>
-                  <p className="font-montserrat text-muted-foreground leading-relaxed mb-4">
+                  <p className="font-montserrat text-sm text-muted-foreground leading-relaxed mb-4">
                     {burger.description}
                   </p>
                    
                    {(burger as any).variants ? (
                      <div className="space-y-2">
                        {(burger as any).variants.map((variant: any, variantIndex: number) => (
-                         <div key={variantIndex} className="flex justify-between items-center p-3 border rounded-lg">
-                           <span className="font-montserrat text-foreground">{variant.size}</span>
-                           <div className="flex items-center space-x-3">
-                             <span className="font-bebas text-lg text-primary">₹{variant.price}</span>
+                         <div key={variantIndex} className="flex justify-between items-center p-2 border rounded-lg">
+                           <span className="font-montserrat text-sm text-foreground">{variant.size}</span>
+                           <div className="flex items-center space-x-2">
+                             <span className="font-bebas text-base text-primary">₹{variant.price}</span>
                              {user ? (
                                <Button 
                                  onClick={() => handleAddToCart(`${burger.name} (${variant.size})`, variant.price)}
                                  size="sm"
+                                 className="text-xs px-2 py-1"
                                >
                                  Add
                                </Button>
                              ) : (
                                <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
                                  <DialogTrigger asChild>
-                                    <Button size="sm">
+                                    <Button size="sm" className="text-xs px-2 py-1">
                                       Add to Cart
                                     </Button>
                                  </DialogTrigger>
@@ -208,13 +209,14 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                        <Button 
                          onClick={() => handleAddToCart(burger.name, burger.price)}
                          className="w-full"
+                         size="sm"
                        >
                          Add to Cart
                        </Button>
                      ) : (
                        <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
                          <DialogTrigger asChild>
-                            <Button className="w-full">
+                            <Button className="w-full" size="sm">
                               Add to Cart
                             </Button>
                          </DialogTrigger>

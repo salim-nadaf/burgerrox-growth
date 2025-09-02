@@ -9,6 +9,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, name: string, whatsapp: string, area: string) => Promise<{ error: any; needsConfirmation?: boolean; message?: string }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ error: any }>;
   loading: boolean;
 }
 
@@ -138,6 +139,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const resetPassword = async (email: string) => {
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl
+      });
+      return { error };
+    } catch (networkError) {
+      console.error('Network error during password reset:', networkError);
+      return { 
+        error: { message: "Network error. Please check your internet connection and try again." }
+      };
+    }
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
@@ -150,6 +166,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signUp,
       signIn,
       signOut,
+      resetPassword,
       loading
     }}>
       {children}

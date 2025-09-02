@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface AuthFormProps {
   onClose: () => void;
@@ -13,6 +14,9 @@ interface AuthFormProps {
 export default function AuthForm({ onClose }: AuthFormProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -21,7 +25,7 @@ export default function AuthForm({ onClose }: AuthFormProps) {
     area: ''
   });
 
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, resetPassword } = useAuth();
 
   const validateForm = () => {
     // Email validation - must end with .com
@@ -34,15 +38,18 @@ export default function AuthForm({ onClose }: AuthFormProps) {
       return false;
     }
 
-    // Password validation - 8 chars, uppercase, lowercase, special char
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
-    if (!passwordRegex.test(formData.password)) {
-      toast({
-        title: "Invalid Password",
-        description: "Password must be 8+ characters with uppercase, lowercase, and special character",
-        variant: "destructive"
-      });
-      return false;
+    // For login, skip password validation since we're checking credentials against database
+    if (!isLogin) {
+      // Password validation - 8 chars, uppercase, lowercase, special char
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+      if (!passwordRegex.test(formData.password)) {
+        toast({
+          title: "Invalid Password",
+          description: "Password must be 8+ characters with uppercase, lowercase, and special character",
+          variant: "destructive"
+        });
+        return false;
+      }
     }
 
     if (!isLogin) {
@@ -170,6 +177,45 @@ export default function AuthForm({ onClose }: AuthFormProps) {
     }));
   };
 
+  const handleForgotPassword = async () => {
+    if (!resetEmail) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!resetEmail.endsWith('.com')) {
+      toast({
+        title: "Invalid Email",
+        description: "Email must end with .com",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    const { error } = await resetPassword(resetEmail);
+    setLoading(false);
+
+    if (error) {
+      toast({
+        title: "Reset Failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Reset Email Sent",
+        description: "Check your email for password reset instructions",
+      });
+      setShowForgotPassword(false);
+      setResetEmail('');
+    }
+  };
+
   return (
     <div className="w-full">
       <div className="text-center mb-6">
@@ -198,16 +244,26 @@ export default function AuthForm({ onClose }: AuthFormProps) {
           
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              placeholder="Enter your password"
-              required
-              minLength={8}
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={handleInputChange}
+                placeholder="Enter your password"
+                required
+                minLength={isLogin ? 1 : 8}
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
 
           {!isLogin && (
@@ -274,12 +330,7 @@ export default function AuthForm({ onClose }: AuthFormProps) {
             {isLogin && (
               <button
                 type="button"
-                onClick={() => {
-                  toast({
-                    title: "Reset Password",
-                    description: "Please contact support at 9970078688 for password reset assistance.",
-                  });
-                }}
+                onClick={() => setShowForgotPassword(true)}
                 className="text-sm text-muted-foreground hover:underline block w-full"
               >
                 Forgot password?
@@ -287,6 +338,44 @@ export default function AuthForm({ onClose }: AuthFormProps) {
             )}
           </div>
         </form>
+
+        {/* Forgot Password Modal */}
+        {showForgotPassword && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-background p-6 rounded-lg shadow-lg w-full max-w-md mx-4">
+              <h3 className="text-lg font-semibold mb-4">Reset Password</h3>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="resetEmail">Email</Label>
+                  <Input
+                    id="resetEmail"
+                    type="email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    placeholder="your.email@example.com"
+                    required
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={handleForgotPassword} 
+                    disabled={loading}
+                    className="flex-1"
+                  >
+                    {loading ? 'Sending...' : 'Send Reset Email'}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowForgotPassword(false)}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 }

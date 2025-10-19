@@ -102,161 +102,170 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
   console.log('MenuPage - User authenticated:', !!user);
 
   return (
-    <section id="menu" className="py-20 bg-secondary/30">
+    <section id="menu" className="py-12 sm:py-20 bg-secondary/30" aria-labelledby="menu-heading">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="font-bebas text-6xl md:text-7xl text-foreground tracking-wider mb-4">
+        <header className="text-center mb-12 sm:mb-16">
+          <h2 id="menu-heading" className="font-bebas text-5xl sm:text-6xl md:text-7xl text-foreground tracking-wider mb-4">
             {showAll ? 'FULL MENU' : 'MENU FAVORITES'}
           </h2>
-          <p className="font-allura text-2xl md:text-3xl text-primary mb-6">
+          <p className="font-allura text-2xl md:text-3xl text-primary mb-6" role="doc-subtitle">
             Rockin' homemade flavor
           </p>
-          <p className="font-montserrat text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="font-montserrat text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
             We keep it simple with burgers that actually slap. No weird ingredients, 
             no pretentious names – just good food that won't break your budget.
           </p>
-        </div>
+        </header>
 
         {showAll && (
-          <div className="flex justify-center mb-8 px-4">
-            <div className="flex flex-wrap gap-2 justify-center max-w-4xl">
+          <nav className="flex justify-center mb-8 px-4" aria-label="Menu category filter">
+            <div className="flex flex-wrap gap-2 justify-center max-w-4xl" role="group">
               {categories.map((category) => (
                 <Button
                   key={category}
                   variant={selectedCategory === category ? "default" : "outline"}
                   onClick={() => setSelectedCategory(category)}
                   className="text-sm px-3 py-2"
+                  aria-pressed={selectedCategory === category}
+                  aria-label={`Filter by ${category}`}
                 >
                   {category}
                 </Button>
               ))}
             </div>
-          </div>
+          </nav>
         )}
 
         <div className="max-w-6xl mx-auto">
-          <div className={showAll ? "grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid gap-6 md:grid-cols-2 lg:grid-cols-3"}>
+          <div className={showAll ? "grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"} role="list" aria-label="Menu items">
             {filteredItems.map((burger, index) => (
-              <Card key={index} className="border-2 border-border hover:border-primary transition-all duration-300 hover:shadow-brand">
-                <CardContent className="p-4">
-                   <div className="flex gap-3 mb-4">
-                    <img 
-                      src={getItemImage(burger.name, burger.category)} 
-                      alt={burger.name}
-                      className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-col gap-1 mb-2">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-bebas text-lg sm:text-xl text-foreground tracking-wide leading-tight">
-                              {burger.name}
-                            </h3>
-                            {burger.popular && (
-                              <Badge variant="default" className="bg-primary text-primary-foreground text-xs mt-1">
-                                POPULAR
-                              </Badge>
+              <article key={`${burger.name}-${index}`} role="listitem">
+                <Card className="border-2 border-border hover:border-primary transition-all duration-300 hover:shadow-brand h-full">
+                  <CardContent className="p-4">
+                    <div className="flex gap-3 mb-4">
+                      <img 
+                        src={getItemImage(burger.name, burger.category)} 
+                        alt={`${burger.name} - ${burger.description}`}
+                        className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+                        width="64"
+                        height="64"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-col gap-1 mb-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-bebas text-lg sm:text-xl text-foreground tracking-wide leading-tight">
+                                {burger.name}
+                              </h3>
+                              {burger.popular && (
+                                <Badge variant="default" className="bg-primary text-primary-foreground text-xs mt-1" aria-label="Popular item">
+                                  POPULAR
+                                </Badge>
+                              )}
+                            </div>
+                            {!(burger as any).variants && (
+                              <span className="font-bebas text-lg sm:text-xl text-primary flex-shrink-0" aria-label={`Price ${burger.price} rupees`}>
+                                ₹{burger.price}
+                              </span>
                             )}
                           </div>
-                          {!(burger as any).variants && (
-                            <span className="font-bebas text-lg sm:text-xl text-primary flex-shrink-0">
-                              ₹{burger.price}
-                            </span>
-                          )}
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <p className="font-montserrat text-sm text-muted-foreground leading-relaxed mb-4">
-                    {burger.description}
-                  </p>
+                    <p className="font-montserrat text-sm text-muted-foreground leading-relaxed mb-4">
+                      {burger.description}
+                    </p>
                    
-                   {(burger as any).variants ? (
-                     <div className="space-y-2">
-                       {(burger as any).variants.map((variant: any, variantIndex: number) => (
-                         <div key={variantIndex} className="flex justify-between items-center p-2 border rounded-lg">
-                           <span className="font-montserrat text-sm text-foreground">{variant.size}</span>
-                           <div className="flex items-center space-x-2">
-                             <span className="font-bebas text-base text-primary">₹{variant.price}</span>
-                             {user ? (
-                               <Button 
-                                 onClick={() => handleAddToCart(`${burger.name} (${variant.size})`, variant.price)}
-                                 size="sm"
-                                 className="text-xs px-2 py-1"
-                               >
-                                 Add
-                               </Button>
-                             ) : (
-                               <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
-                                 <DialogTrigger asChild>
-                                    <Button size="sm" className="text-xs px-2 py-1">
+                    {(burger as any).variants ? (
+                      <div className="space-y-2" role="group" aria-label={`${burger.name} size options`}>
+                        {(burger as any).variants.map((variant: any, variantIndex: number) => (
+                          <div key={variantIndex} className="flex justify-between items-center p-2 border rounded-lg">
+                            <span className="font-montserrat text-sm text-foreground">{variant.size}</span>
+                            <div className="flex items-center space-x-2">
+                              <span className="font-bebas text-base text-primary" aria-label={`${variant.size} price ${variant.price} rupees`}>₹{variant.price}</span>
+                              {user ? (
+                                <Button 
+                                  onClick={() => handleAddToCart(`${burger.name} (${variant.size})`, variant.price)}
+                                  size="sm"
+                                  className="text-xs px-2 py-1"
+                                  aria-label={`Add ${burger.name} ${variant.size} to cart`}
+                                >
+                                  Add
+                                </Button>
+                              ) : (
+                                <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
+                                  <DialogTrigger asChild>
+                                    <Button size="sm" className="text-xs px-2 py-1" aria-label={`Add ${burger.name} ${variant.size} to cart - login required`}>
                                       Add to Cart
                                     </Button>
-                                 </DialogTrigger>
-                                 <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-                                   <DialogTitle className="sr-only">Authentication</DialogTitle>
-                                   <DialogDescription className="sr-only">Login or create an account to add items to cart</DialogDescription>
-                                   <AuthForm onClose={() => setAuthDialogOpen(false)} />
-                                 </DialogContent>
-                               </Dialog>
-                             )}
-                           </div>
-                         </div>
-                       ))}
-                     </div>
-                   ) : (
-                     user ? (
-                       <Button 
-                         onClick={() => handleAddToCart(burger.name, burger.price)}
-                         className="w-full"
-                         size="sm"
-                       >
-                         Add to Cart
-                       </Button>
-                     ) : (
-                       <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
-                         <DialogTrigger asChild>
-                            <Button className="w-full" size="sm">
+                                  </DialogTrigger>
+                                  <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+                                    <DialogTitle className="sr-only">Authentication</DialogTitle>
+                                    <DialogDescription className="sr-only">Login or create an account to add items to cart</DialogDescription>
+                                    <AuthForm onClose={() => setAuthDialogOpen(false)} />
+                                  </DialogContent>
+                                </Dialog>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      user ? (
+                        <Button 
+                          onClick={() => handleAddToCart(burger.name, burger.price)}
+                          className="w-full"
+                          size="sm"
+                          aria-label={`Add ${burger.name} to cart for ${burger.price} rupees`}
+                        >
+                          Add to Cart
+                        </Button>
+                      ) : (
+                        <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
+                          <DialogTrigger asChild>
+                            <Button className="w-full" size="sm" aria-label={`Add ${burger.name} to cart - login required`}>
                               Add to Cart
                             </Button>
-                         </DialogTrigger>
-                         <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-                           <DialogTitle className="sr-only">Authentication</DialogTitle>
-                           <DialogDescription className="sr-only">Login or create an account to add items to cart</DialogDescription>
-                           <AuthForm onClose={() => setAuthDialogOpen(false)} />
-                         </DialogContent>
-                       </Dialog>
-                     )
-                   )}
-                </CardContent>
-              </Card>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto" role="dialog" aria-labelledby="auth-title">
+                            <DialogTitle id="auth-title" className="sr-only">Authentication</DialogTitle>
+                            <DialogDescription className="sr-only">Login or create an account to add items to cart</DialogDescription>
+                            <AuthForm onClose={() => setAuthDialogOpen(false)} />
+                          </DialogContent>
+                        </Dialog>
+                      )
+                    )}
+                  </CardContent>
+                </Card>
+              </article>
             ))}
-            
-            <div className="pt-6 space-y-4">
-              {!showAll && (
-                <Link to="/menu">
-                  <Button 
-                    variant="outline" 
-                    size="lg" 
-                    className="w-full sm:w-auto mr-4"
-                  >
-                    View Full Menu
-                  </Button>
-                </Link>
-              )}
-              <Button 
-                variant="brand" 
-                size="lg" 
-                className="w-full sm:w-auto"
-                onClick={() => window.open('https://wa.me/919970078688', '_blank')}
-              >
-                Order on WhatsApp
-              </Button>
-            </div>
           </div>
-
+            
+          <nav className="pt-6 sm:pt-8 space-y-4 flex flex-col sm:flex-row sm:space-y-0 sm:space-x-4 justify-center items-center" aria-label="Menu actions">
+            {!showAll && (
+              <Link to="/menu">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="w-full sm:w-auto"
+                  aria-label="View complete menu"
+                >
+                  View Full Menu
+                </Button>
+              </Link>
+            )}
+            <Button 
+              variant="brand" 
+              size="lg" 
+              className="w-full sm:w-auto"
+              onClick={() => window.open('https://wa.me/919970078688', '_blank')}
+              aria-label="Order via WhatsApp"
+            >
+              Order on WhatsApp
+            </Button>
+          </nav>
         </div>
       </div>
     </section>

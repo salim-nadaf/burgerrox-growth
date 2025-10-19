@@ -3,30 +3,28 @@ import heroImage from "@/assets/hero-burger.jpg";
 
 const Hero = () => {
   return (
-    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden" aria-label="Hero section">
       {/* Background Image */}
-       <div className="absolute inset-0 z-0">
-         <img 
+      <div className="absolute inset-0 z-0" role="presentation">
+        <img 
           src={heroImage} 
-          alt="Delicious Burger Rox burger" 
+          alt="Delicious juicy Burger Rox burger with fresh toppings" 
           className="w-full h-full object-cover opacity-50"
-          fetchPriority="high"
-          decoding="async"
+          width="1920"
+          height="1080"
+          loading="eager"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/60 to-background/40"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-background/60 to-background/40" aria-hidden="true"></div>
       </div>
 
       <div className="container mx-auto px-4 z-10">
         <div className="max-w-4xl mx-auto text-center">
           <div className="space-y-6">
-            <h2 className="font-bebas text-7xl md:text-9xl text-foreground leading-none tracking-wider">
-              CRAVE-WORTHY
-            </h2>
-            <h3 className="font-bebas text-5xl md:text-7xl text-primary leading-none tracking-wider">
-              BURGERS
-            </h3>
+            <h1 className="font-bebas text-7xl md:text-9xl text-foreground leading-none tracking-wider">
+              CRAVE-WORTHY BURGERS
+            </h1>
             
-            <p className="font-allura text-3xl md:text-4xl text-foreground mt-4">
+            <p className="font-allura text-3xl md:text-4xl text-foreground mt-4" role="doc-subtitle">
               Rockin' homemade flavor
             </p>
             
@@ -36,34 +34,35 @@ const Hero = () => {
               that gets it.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
+            <nav className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8" aria-label="Primary actions">
               <Button 
                 variant="hero" 
                 size="xl" 
                 className="w-full sm:w-auto"
                 onClick={() => window.open('https://wa.me/919970078688', '_blank')}
+                aria-label="Order on WhatsApp"
               >
                 Order Your Fix
               </Button>
               <Button variant="outline" size="xl" className="w-full sm:w-auto" asChild>
-                <a href="/menu">View Menu</a>
+                <a href="/menu" aria-label="View full menu">View Menu</a>
               </Button>
-            </div>
+            </nav>
 
-            <div className="flex items-center justify-center space-x-8 mt-12 text-center">
-              <div className="font-montserrat">
-                <div className="font-bebas text-3xl text-primary">₹79</div>
-                <div className="text-sm text-muted-foreground">Affordable</div>
+            <div className="flex items-center justify-center space-x-4 sm:space-x-8 mt-12 text-center" role="list" aria-label="Key features">
+              <div className="font-montserrat" role="listitem">
+                <div className="font-bebas text-2xl sm:text-3xl text-primary" aria-label="Starting from 79 rupees">₹79</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Affordable</div>
               </div>
-              <div className="w-px h-12 bg-border"></div>
-              <div className="font-montserrat">
-                <div className="font-bebas text-3xl text-primary">30MIN</div>
-                <div className="text-sm text-muted-foreground">Quick Delivery</div>
+              <div className="w-px h-12 bg-border" aria-hidden="true"></div>
+              <div className="font-montserrat" role="listitem">
+                <div className="font-bebas text-2xl sm:text-3xl text-primary" aria-label="30 minute delivery">30MIN</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Quick Delivery</div>
               </div>
-              <div className="w-px h-12 bg-border"></div>
-              <div className="font-montserrat">
-                <div className="font-bebas text-3xl text-primary">4.6★</div>
-                <div className="text-sm text-muted-foreground">Customer Rated</div>
+              <div className="w-px h-12 bg-border" aria-hidden="true"></div>
+              <div className="font-montserrat" role="listitem">
+                <div className="font-bebas text-2xl sm:text-3xl text-primary" aria-label="4.6 star rating">4.6★</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Customer Rated</div>
               </div>
             </div>
           </div>

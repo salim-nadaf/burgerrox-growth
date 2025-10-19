@@ -139,11 +139,13 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
             {filteredItems.map((burger, index) => (
               <Card key={index} className="border-2 border-border hover:border-primary transition-all duration-300 hover:shadow-brand">
                 <CardContent className="p-4">
-                  <div className="flex gap-3 mb-4">
+                   <div className="flex gap-3 mb-4">
                     <img 
                       src={getItemImage(burger.name, burger.category)} 
                       alt={burger.name}
                       className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+                      loading="lazy"
+                      decoding="async"
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-col gap-1 mb-2">

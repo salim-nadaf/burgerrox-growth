@@ -5,11 +5,13 @@ const Hero = () => {
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
       {/* Background Image */}
-      <div className="absolute inset-0 z-0">
+       <div className="absolute inset-0 z-0">
          <img 
           src={heroImage} 
           alt="Delicious Burger Rox burger" 
           className="w-full h-full object-cover opacity-50"
+          fetchPriority="high"
+          decoding="async"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background/60 to-background/40"></div>
       </div>

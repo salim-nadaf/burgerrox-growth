@@ -29,10 +29,10 @@ const Header = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-8">
-            <Link to="/" className="font-bebas text-4xl text-foreground tracking-wider hover:text-primary transition-colors">
+            <Link to="/" className="font-bebas text-4xl text-foreground tracking-wider hover:text-primary transition-colors" aria-label="Burger Rox home">
               BURGER ROX
             </Link>
-            <nav className="hidden md:flex space-x-6">
+            <nav className="hidden md:flex space-x-6" aria-label="Main navigation">
               {location.pathname === '/menu' ? (
                 <Link to="/" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
                   Home
@@ -84,14 +84,14 @@ const Header = () => {
                   <span className="hidden lg:inline text-sm">
                     {profile?.name || 'User'}
                   </span>
-                  <Button variant="ghost" size="icon" onClick={signOut}>
+                  <Button variant="ghost" size="icon" onClick={signOut} aria-label="Sign out">
                     <LogOut className="h-4 w-4" />
                   </Button>
                 </div>
               ) : (
                 <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" aria-label="Login">
                       <User className="h-4 w-4" />
                     </Button>
                   </DialogTrigger>
@@ -108,6 +108,7 @@ const Header = () => {
                 size="lg" 
                 className="hidden lg:flex"
                 onClick={() => window.open('https://wa.me/919970078688', '_blank')}
+                aria-label="Order now on WhatsApp"
               >
                 Order Now
               </Button>
@@ -116,7 +117,7 @@ const Header = () => {
             {/* Mobile Menu */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
+                <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
                   <Menu size={20} />
                 </Button>
               </SheetTrigger>
@@ -160,7 +161,7 @@ const Header = () => {
                   </div>
 
                   {/* Navigation */}
-                  <nav className="flex flex-col space-y-4">
+                  <nav className="flex flex-col space-y-4" aria-label="Mobile navigation">
                     {location.pathname === '/menu' ? (
                       <Link 
                         to="/" 
@@ -245,6 +246,7 @@ const Header = () => {
                       window.open('https://wa.me/919970078688', '_blank');
                       setMobileMenuOpen(false);
                     }}
+                    aria-label="Order now on WhatsApp"
                   >
                     Order Now
                   </Button>

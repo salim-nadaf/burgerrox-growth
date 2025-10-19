@@ -4,23 +4,23 @@ import { MapPin, Phone, Clock, Instagram, Facebook } from "lucide-react";
 
 const Contact = () => {
   return (
-    <section id="contact" className="py-20 bg-secondary/30">
+    <section id="contact" className="py-20 bg-secondary/30" aria-labelledby="contact-heading">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="font-bebas text-6xl md:text-7xl text-foreground tracking-wider mb-4">
+        <header className="text-center mb-16">
+          <h2 id="contact-heading" className="font-bebas text-6xl md:text-7xl text-foreground tracking-wider mb-4">
             FIND US
           </h2>
-          <p className="font-allura text-2xl md:text-3xl text-primary mb-6">
+          <p className="font-allura text-2xl md:text-3xl text-primary mb-6" role="doc-subtitle">
             We're right where you need us to be
           </p>
-        </div>
+        </header>
 
         <div className="grid lg:grid-cols-2 gap-12">
           <div className="space-y-8">
             <Card className="border-2 border-border hover:border-primary transition-all duration-300">
               <CardContent className="p-6">
                 <div className="flex items-start space-x-4">
-                  <div className="bg-primary/10 rounded-full p-3">
+                  <div className="bg-primary/10 rounded-full p-3" aria-hidden="true">
                     <MapPin className="text-primary" size={24} />
                   </div>
                   <div>
@@ -39,7 +39,7 @@ const Contact = () => {
             <Card className="border-2 border-border hover:border-primary transition-all duration-300">
               <CardContent className="p-6">
                 <div className="flex items-start space-x-4">
-                  <div className="bg-primary/10 rounded-full p-3">
+                  <div className="bg-primary/10 rounded-full p-3" aria-hidden="true">
                     <Clock className="text-primary" size={24} />
                   </div>
                   <div>
@@ -58,7 +58,7 @@ const Contact = () => {
             <Card className="border-2 border-border hover:border-primary transition-all duration-300">
               <CardContent className="p-6">
                 <div className="flex items-start space-x-4">
-                  <div className="bg-primary/10 rounded-full p-3">
+                  <div className="bg-primary/10 rounded-full p-3" aria-hidden="true">
                     <Phone className="text-primary" size={24} />
                   </div>
                   <div>
@@ -90,6 +90,7 @@ const Contact = () => {
                   size="lg" 
                   className="w-full"
                   onClick={() => window.open('https://wa.me/919970078688', '_blank')}
+                  aria-label="Order on WhatsApp"
                 >
                   Order on WhatsApp
                 </Button>
@@ -98,6 +99,7 @@ const Contact = () => {
                   size="lg" 
                   className="w-full"
                   onClick={() => window.open('tel:9970078688', '_blank')}
+                  aria-label="Call us to place an order"
                 >
                   Call to Order
                 </Button>
@@ -116,18 +118,22 @@ const Contact = () => {
                   href="https://www.instagram.com/burgerroxx" 
                   target="_blank" 
                   rel="noopener noreferrer"
+                  aria-label="Follow us on Instagram"
                 >
                   <Button variant="ghost" size="icon" className="bg-primary/10 hover:bg-primary hover:text-primary-foreground">
-                    <Instagram size={20} />
+                    <Instagram size={20} aria-hidden="true" />
+                    <span className="sr-only">Instagram</span>
                   </Button>
                 </a>
                 <a 
                   href="https://www.facebook.com/burgerroxx/" 
                   target="_blank" 
                   rel="noopener noreferrer"
+                  aria-label="Follow us on Facebook"
                 >
                   <Button variant="ghost" size="icon" className="bg-primary/10 hover:bg-primary hover:text-primary-foreground">
-                    <Facebook size={20} />
+                    <Facebook size={20} aria-hidden="true" />
+                    <span className="sr-only">Facebook</span>
                   </Button>
                 </a>
               </div>

@@ -24,6 +24,22 @@ const Hero = () => {
               CRAVE-WORTHY BURGERS
             </h1>
             
+            {/* Restaurant Guru Recommended Badge */}
+            <div className="flex justify-center my-4">
+              <a 
+                id="b-circledLeaves27" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                href="https://restaurant-guru.in/Burger-Rox-Pimpri-Chinchwad" 
+                className="b-circledLeaves27--light b-circledLeaves27--2025"
+                aria-label="Burger Rox recommended by Restaurant Guru 2025"
+              >
+                <span className="b-circledLeaves27__title">Recommended</span>
+                <span className="b-circledLeaves27__separator"></span>
+                <span className="b-circledLeaves27__name">Burger Rox</span>
+              </a>
+            </div>
+            
             <p className="font-allura text-3xl md:text-4xl text-foreground mt-4" role="doc-subtitle">
               Rockin' homemade flavor
             </p>

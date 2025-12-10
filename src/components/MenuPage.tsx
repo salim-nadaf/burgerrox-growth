@@ -13,6 +13,7 @@ import veggieBurgerImage from "@/assets/veggie-burger.jpg";
 import comboMealImage from "@/assets/combo-meal.jpg";
 import cokeImage from "@/assets/coca-cola.jpg";
 import lavaCakeImage from "@/assets/lava-cake.jpg";
+import restaurantGuruCertificate from "@/assets/RestaurantGuru_Certificate1 (1).png";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
 import AuthForm from "./AuthForm";
@@ -136,12 +137,15 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
           </nav>
         )}
 
-        <div className="max-w-6xl mx-auto">
-          <div className={showAll ? "grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"} role="list" aria-label="Menu items">
-            {filteredItems.map((burger, index) => (
-              <article key={`${burger.name}-${index}`} role="listitem">
-                <Card className="border-2 border-border hover:border-primary transition-all duration-300 hover:shadow-brand h-full">
-                  <CardContent className="p-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Main Menu Grid */}
+            <div className="flex-1">
+              <div className={showAll ? "grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"} role="list" aria-label="Menu items">
+                {filteredItems.map((burger, index) => (
+                  <article key={`${burger.name}-${index}`} role="listitem">
+                    <Card className="border-2 border-border hover:border-primary transition-all duration-300 hover:shadow-brand h-full">
+                      <CardContent className="p-4">
                     <div className="flex gap-3 mb-4">
                       <img 
                         src={getItemImage(burger.name, burger.category)} 
@@ -240,7 +244,40 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                   </CardContent>
                 </Card>
               </article>
-            ))}
+                ))}
+              </div>
+            </div>
+            
+            {/* Side Certificate Section - Only on full menu page */}
+            {showAll && (
+              <aside className="lg:w-64 xl:w-72 flex-shrink-0">
+                <div className="lg:sticky lg:top-24 space-y-4">
+                  <Card className="border-2 border-primary/20 bg-card/50 backdrop-blur-sm">
+                    <CardContent className="p-4 text-center">
+                      <p className="font-bebas text-lg text-foreground mb-3 tracking-wide">CERTIFIED QUALITY</p>
+                      <a 
+                        href="https://restaurant-guru.in/Burger-Rox-Pimpri-Chinchwad" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="block hover:opacity-90 transition-opacity"
+                        aria-label="View our Restaurant Guru certification"
+                      >
+                        <img 
+                          src={restaurantGuruCertificate} 
+                          alt="Restaurant Guru Certificate - Burger Rox Recommended 2025"
+                          className="w-full max-w-[200px] mx-auto rounded-lg shadow-md"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </a>
+                      <p className="font-montserrat text-xs text-muted-foreground mt-3">
+                        Recommended by Restaurant Guru
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </aside>
+            )}
           </div>
             
           <nav className="pt-6 sm:pt-8 space-y-4 flex flex-col sm:flex-row sm:space-y-0 sm:space-x-4 justify-center items-center" aria-label="Menu actions">

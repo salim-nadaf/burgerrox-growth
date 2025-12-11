@@ -20,13 +20,13 @@ const Hero = () => {
       </div>
 
       {/* Restaurant Guru Recommended Badge - Floating Position */}
-      <aside className="absolute top-4 right-4 md:top-8 md:right-8 z-20" aria-label="Awards">
+      <aside className="absolute bottom-4 right-4 md:top-8 md:bottom-auto md:right-8 z-20" aria-label="Awards">
         <a 
           id="b-circledLeaves27" 
           target="_blank" 
           rel="noopener noreferrer"
           href="https://restaurant-guru.in/Burger-Rox-Pimpri-Chinchwad" 
-          className="b-circledLeaves27--light b-circledLeaves27--2025 transform scale-75 md:scale-100"
+          className="b-circledLeaves27--light b-circledLeaves27--2025 transform scale-50 sm:scale-75 md:scale-100"
           aria-label="Burger Rox recommended by Restaurant Guru 2025"
         >
           <span className="b-circledLeaves27__title">Recommended</span>

@@ -188,41 +188,36 @@ const Header = () => {
                         </a>
                       </>
                     )}
-                    {location.pathname === '/menu' ? (
-                      <>
-                        <Link 
-                          to="/#about" 
-                          className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          About
-                        </Link>
-                        <Link 
-                          to="/#contact" 
-                          className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          Contact
-                        </Link>
-                      </>
-                    ) : (
-                      <>
-                        <a 
-                          href="#about" 
-                          className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          About
-                        </a>
-                        <a 
-                          href="#contact" 
-                          className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          Contact
-                        </a>
-                      </>
-                    )}
+                    <button 
+                      className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2 text-left"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setTimeout(() => {
+                          if (location.pathname !== '/') {
+                            window.location.href = '/#about';
+                          } else {
+                            document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }, 300);
+                      }}
+                    >
+                      About
+                    </button>
+                    <button 
+                      className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2 text-left"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setTimeout(() => {
+                          if (location.pathname !== '/') {
+                            window.location.href = '/#contact';
+                          } else {
+                            document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }, 300);
+                      }}
+                    >
+                      Contact
+                    </button>
                   </nav>
 
                   {/* Contact Info */}

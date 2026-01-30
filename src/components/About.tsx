@@ -5,7 +5,7 @@ const About = () => {
     {
       icon: Users,
       title: "Family-First",
-      description: "Started by a loving mother known for her incredible homemade cooking, creating delicious meals with extra care for her special needs child."
+      description: "A brother-sister duo bringing mom's legendary recipes to life. We argue about toppings, but agree on one thing – every burger must be perfect."
     },
     {
       icon: DollarSign,
@@ -35,9 +35,9 @@ const About = () => {
             More than just burgers, we're your campus crew
           </p>
           <p className="font-montserrat text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Born from a mother's kitchen, known throughout the neighborhood for her exceptional homemade cooking. 
-            What started as preparing special meals for her beloved down syndrome child grew into a passion for 
-            creating wholesome, delicious food that brings families together – authentic flavors made with love.
+            Born from a brother-sister dream and their mom's legendary kitchen recipes. We grew up watching her 
+            create magic with simple ingredients – meals that brought the whole neighborhood together. Now we're 
+            on a mission to bring that same homemade love to your plate, one rockin' burger at a time.
           </p>
         </header>
 

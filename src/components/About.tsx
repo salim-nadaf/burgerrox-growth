@@ -32,12 +32,13 @@ const About = () => {
             WHY WE ROX
           </h2>
           <p className="font-allura text-2xl md:text-3xl text-primary mb-6" role="doc-subtitle">
-            More than just burgers, we're your campus crew
+            Fresh burgers, honest flavours, zero shortcuts
           </p>
           <p className="font-montserrat text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            What happens when a passionate home cook teams up with her brand-obsessed brother? Burger Rox. 
-            Her burgers had the whole neighborhood asking for more – so we decided to turn that love into something real. 
-            She brings the flavor, he brings the vision, and together we're serving up burgers that just hit different.
+            Burger Rox started with a simple idea – what if we could turn homemade magic into something everyone could enjoy? 
+            She'd been perfecting her craft for years, winning over relatives, neighbors, and anyone lucky enough to grab a bite. 
+            He saw something bigger – a brand built on trust and real flavor. Together, we're proving that quality doesn't need 
+            fancy gimmicks. Just fresh ingredients, honest recipes, and burgers made with care – one order at a time.
           </p>
         </header>
 

@@ -35,10 +35,10 @@ const About = () => {
             Fresh burgers, honest flavours, zero shortcuts
           </p>
           <p className="font-montserrat text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Burger Rox started with a simple idea – what if we could turn homemade magic into something everyone could enjoy? 
+            A brother-sister duo on a mission to serve fresh, crispy, and flavourful burgers – no shortcuts, no gimmicks. 
             She'd been perfecting her craft for years, winning over relatives, neighbors, and anyone lucky enough to grab a bite. 
-            He saw something bigger – a brand built on trust and real flavor. Together, we're proving that quality doesn't need 
-            fancy gimmicks. Just fresh ingredients, honest recipes, and burgers made with care – one order at a time.
+            He saw something bigger – a brand built on trust and real flavor. Quality ingredients, honest recipes, and burgers 
+            made with care – one order at a time.
           </p>
         </header>
 

@@ -51,18 +51,19 @@ export default function Cart() {
     customerArea: string
   ) => {
     const orderDetails = items.map(item => 
-      `${item.item_name} x${item.quantity} - ₹${(item.item_price * item.quantity).toFixed(2)}`
+      `${item.item_name} x${item.quantity} - Rs.${(item.item_price * item.quantity).toFixed(2)}`
     ).join('\n');
 
-    const message = `🍔 *BURGER ROX Order* 🍔\n\n` +
-      `🔢 *Order #:* ${orderNumber}\n` +
-      `👤 *Customer:* ${customerName}\n` +
-      `📱 *WhatsApp:* ${customerWhatsapp}\n` +
-      `📍 *Area:* ${customerArea}\n\n` +
-      `📋 *Order Details:*\n${orderDetails}\n\n` +
-      `💰 *Total Amount:* ₹${total.toFixed(2)}\n` +
-      `💳 *Payment:* ${paymentStatus}\n\n` +
-      `🚚 *Delivery Required* - Please confirm delivery time!`;
+    // Use simple ASCII characters for better WhatsApp encoding compatibility
+    const message = `--- BURGER ROX Order ---\n\n` +
+      `Order #: ${orderNumber}\n` +
+      `Customer: ${customerName}\n` +
+      `WhatsApp: ${customerWhatsapp}\n` +
+      `Area: ${customerArea}\n\n` +
+      `-- Order Details --\n${orderDetails}\n\n` +
+      `Total Amount: Rs.${total.toFixed(2)}\n` +
+      `Payment: ${paymentStatus}\n\n` +
+      `DELIVERY REQUIRED - Please confirm delivery time!`;
 
     const encodedMessage = encodeURIComponent(message);
     return `https://wa.me/919321389985?text=${encodedMessage}`;
@@ -102,7 +103,7 @@ export default function Cart() {
       });
 
       if (order) {
-        const paymentStatus = '💵 Cash on Delivery';
+        const paymentStatus = 'Cash on Delivery (COD)';
         const whatsappUrl = generateWhatsAppUrl(
           order.order_number, 
           paymentStatus, 
@@ -213,7 +214,7 @@ export default function Cart() {
           });
 
           if (order) {
-            const paymentStatus = `✅ Prepaid (${response.razorpay_payment_id})`;
+            const paymentStatus = `PAID ONLINE (ID: ${response.razorpay_payment_id})`;
             const whatsappUrl = generateWhatsAppUrl(
               order.order_number, 
               paymentStatus, 

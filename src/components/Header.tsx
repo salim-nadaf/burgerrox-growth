@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import AuthForm from "./AuthForm";
 import Cart from "./Cart";
 import OrdersSheet from "./OrdersSheet";
+import ProfileSheet from "./ProfileSheet";
 
 const Header = () => {
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
@@ -87,6 +88,7 @@ const Header = () => {
                   <span className="hidden lg:inline text-sm">
                     {profile?.name || 'User'}
                   </span>
+                  <ProfileSheet />
                   <Button variant="ghost" size="icon" onClick={signOut} aria-label="Sign out">
                     <LogOut className="h-4 w-4" />
                   </Button>
@@ -142,6 +144,7 @@ const Header = () => {
                           <span className="text-sm font-medium">
                             {profile?.name || 'User'}
                           </span>
+                          <ProfileSheet />
                           <Button variant="ghost" size="icon" onClick={handleSignOut}>
                             <LogOut className="h-4 w-4" />
                           </Button>

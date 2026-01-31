@@ -6,17 +6,31 @@ const corsHeaders = {
 };
 
 // Restaurant location - Urban Forest, Mamurdi, Pune 412101
-const RESTAURANT_ADDRESS = "Urban Forest, Mamurdi, Pune 412101, India";
+// Coordinates: 18.6298, 73.7997 (approximate)
+const RESTAURANT_LAT = 18.6298;
+const RESTAURANT_LNG = 73.7997;
 
 // Delivery charge tiers based on distance (in km)
-// Using mid-range values from the provided ranges
 const DELIVERY_TIERS = [
   { maxDistance: 3, charge: 0, label: "Free Delivery" },
-  { maxDistance: 5, charge: 50, label: "₹50 (3-5 km)" },      // Mid of ₹40-₹60
-  { maxDistance: 7, charge: 75, label: "₹75 (5-7 km)" },      // Mid of ₹60-₹90
-  { maxDistance: 10, charge: 105, label: "₹105 (7-10 km)" },  // Mid of ₹90-₹120
-  { maxDistance: Infinity, charge: 175, label: "₹175 (10+ km)" } // Mid of ₹150-₹200
+  { maxDistance: 5, charge: 50, label: "₹50 (3-5 km)" },
+  { maxDistance: 7, charge: 75, label: "₹75 (5-7 km)" },
+  { maxDistance: 10, charge: 105, label: "₹105 (7-10 km)" },
+  { maxDistance: Infinity, charge: 175, label: "₹175 (10+ km)" }
 ];
+
+// Haversine formula to calculate distance between two coordinates
+function calculateHaversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
 
 function getDeliveryCharge(distanceKm: number): { charge: number; label: string; distanceKm: number } {
   for (const tier of DELIVERY_TIERS) {
@@ -28,7 +42,6 @@ function getDeliveryCharge(distanceKm: number): { charge: number; label: string;
       };
     }
   }
-  // Fallback for very far distances
   return { 
     charge: DELIVERY_TIERS[DELIVERY_TIERS.length - 1].charge, 
     label: DELIVERY_TIERS[DELIVERY_TIERS.length - 1].label,
@@ -36,18 +49,56 @@ function getDeliveryCharge(distanceKm: number): { charge: number; label: string;
   };
 }
 
+// Geocode address using OpenStreetMap Nominatim (FREE, no API key needed)
+async function geocodeAddress(address: string): Promise<{ lat: number; lon: number; displayName: string } | null> {
+  const fullAddress = address.toLowerCase().includes('pune') 
+    ? address 
+    : `${address}, Pune, India`;
+  
+  const url = new URL('https://nominatim.openstreetmap.org/search');
+  url.searchParams.set('q', fullAddress);
+  url.searchParams.set('format', 'json');
+  url.searchParams.set('limit', '1');
+  url.searchParams.set('countrycodes', 'in');
+  
+  const response = await fetch(url.toString(), {
+    headers: {
+      'User-Agent': 'BurgerRox-Delivery-App/1.0'
+    }
+  });
+  
+  const data = await response.json();
+  console.log('Nominatim response:', JSON.stringify(data));
+  
+  if (data && data.length > 0) {
+    return {
+      lat: parseFloat(data[0].lat),
+      lon: parseFloat(data[0].lon),
+      displayName: data[0].display_name
+    };
+  }
+  
+  return null;
+}
+
+// Estimate travel time based on distance (rough estimate: 25 km/h average in city)
+function estimateDuration(distanceKm: number): string {
+  const avgSpeedKmh = 25;
+  const minutes = Math.round((distanceKm / avgSpeedKmh) * 60);
+  if (minutes < 60) {
+    return `${minutes} mins`;
+  }
+  const hours = Math.floor(minutes / 60);
+  const remainingMins = minutes % 60;
+  return `${hours} hr ${remainingMins} mins`;
+}
+
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const GOOGLE_MAPS_API_KEY = Deno.env.get('GOOGLE_MAPS_API_KEY');
-    if (!GOOGLE_MAPS_API_KEY) {
-      throw new Error('GOOGLE_MAPS_API_KEY is not configured');
-    }
-
     const { customerAddress } = await req.json();
     
     if (!customerAddress || customerAddress.trim().length < 5) {
@@ -57,59 +108,45 @@ serve(async (req) => {
       );
     }
 
-    // Add "Pune, India" to help with geocoding accuracy
-    const fullAddress = customerAddress.toLowerCase().includes('pune') 
-      ? customerAddress 
-      : `${customerAddress}, Pune, India`;
-
-    // Use Google Maps Distance Matrix API
-    const url = new URL('https://maps.googleapis.com/maps/api/distancematrix/json');
-    url.searchParams.set('origins', RESTAURANT_ADDRESS);
-    url.searchParams.set('destinations', fullAddress);
-    url.searchParams.set('units', 'metric');
-    url.searchParams.set('key', GOOGLE_MAPS_API_KEY);
-
-    const response = await fetch(url.toString());
-    const data = await response.json();
-
-    console.log('Google Maps API response:', JSON.stringify(data));
-
-    if (data.status !== 'OK') {
-      throw new Error(`Google Maps API error: ${data.status}`);
-    }
-
-    const element = data.rows?.[0]?.elements?.[0];
+    // Geocode the customer address using free Nominatim service
+    const location = await geocodeAddress(customerAddress);
     
-    if (!element || element.status !== 'OK') {
+    if (!location) {
       return new Response(
         JSON.stringify({ 
-          error: 'Could not calculate distance. Please check your address and try again.',
-          details: element?.status || 'No route found'
+          error: 'Could not find your address. Please try with more details (e.g., area name, landmark).',
+          details: 'Address not found'
         }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Distance is in meters, convert to km
-    const distanceMeters = element.distance.value;
-    const distanceKm = distanceMeters / 1000;
-    const durationText = element.duration.text;
+    // Calculate straight-line distance using Haversine formula
+    // Adding 30% buffer for actual road distance
+    const straightLineDistance = calculateHaversineDistance(
+      RESTAURANT_LAT, RESTAURANT_LNG,
+      location.lat, location.lon
+    );
+    const estimatedRoadDistance = straightLineDistance * 1.3;
+    
+    const deliveryInfo = getDeliveryCharge(estimatedRoadDistance);
+    const durationText = estimateDuration(estimatedRoadDistance);
 
-    const deliveryInfo = getDeliveryCharge(distanceKm);
+    console.log(`Distance calculated: ${straightLineDistance.toFixed(2)}km straight, ~${estimatedRoadDistance.toFixed(2)}km road`);
 
     return new Response(
       JSON.stringify({
         success: true,
         distance: {
-          value: distanceKm,
-          text: element.distance.text
+          value: estimatedRoadDistance,
+          text: `${estimatedRoadDistance.toFixed(1)} km`
         },
         duration: {
           text: durationText
         },
         deliveryCharge: deliveryInfo.charge,
         deliveryLabel: deliveryInfo.label,
-        destinationAddress: data.destination_addresses?.[0] || fullAddress
+        destinationAddress: location.displayName
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

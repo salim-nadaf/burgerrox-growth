@@ -31,9 +31,9 @@ export default function Cart() {
     ).join('\n');
 
     const message = `🍔 *BURGER ROX Order* 🍔\n\n` +
-      `👤 *Customer:* ${profile?.name || 'Customer'}\n` +
-      `📱 *WhatsApp:* ${profile?.whatsapp_number || 'Not provided'}\n` +
-      `📍 *Area:* ${profile?.area || 'Not provided'}\n\n` +
+      `👤 *Customer:* ${profile?.name || 'Guest Customer'}\n` +
+      `📱 *WhatsApp:* ${profile?.whatsapp_number || 'Will provide'}\n` +
+      `📍 *Area:* ${profile?.area || 'Will provide'}\n\n` +
       `📋 *Order Details:*\n${orderDetails}\n\n` +
       `💰 *Total Amount:* ₹${totalAmount.toFixed(2)}\n` +
       `💳 *Payment:* ${paymentStatus}\n\n` +
@@ -72,7 +72,7 @@ export default function Cart() {
       const { data, error } = await supabase.functions.invoke('create-razorpay-order', {
         body: { 
           amount: totalAmount,
-          receipt: `order_${user?.id?.slice(0, 8)}_${Date.now()}`
+          receipt: `order_guest_${Date.now()}`
         }
       });
 
@@ -138,25 +138,26 @@ export default function Cart() {
     }
   };
 
-  if (!user) {
-    return (
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetTrigger asChild>
-          <Button variant="outline" size="icon" className="relative">
-            <ShoppingCart className="h-4 w-4" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>Your Cart</SheetTitle>
-            <SheetDescription>
-              Please login to view your cart
-            </SheetDescription>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
-    );
-  }
+  // Login requirement temporarily disabled for testing
+  // if (!user) {
+  //   return (
+  //     <Sheet open={isOpen} onOpenChange={setIsOpen}>
+  //       <SheetTrigger asChild>
+  //         <Button variant="outline" size="icon" className="relative">
+  //           <ShoppingCart className="h-4 w-4" />
+  //         </Button>
+  //       </SheetTrigger>
+  //       <SheetContent>
+  //         <SheetHeader>
+  //           <SheetTitle>Your Cart</SheetTitle>
+  //           <SheetDescription>
+  //             Please login to view your cart
+  //           </SheetDescription>
+  //         </SheetHeader>
+  //       </SheetContent>
+  //     </Sheet>
+  //   );
+  // }
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -172,7 +173,7 @@ export default function Cart() {
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Your Cart {profile?.name && `- ${profile.name}`}</SheetTitle>
+          <SheetTitle>Your Cart {profile?.name ? `- ${profile.name}` : ''}</SheetTitle>
           <SheetDescription>
             {cartItems.length === 0 ? 'Your cart is empty' : `${itemCount} item(s) in your cart`}
           </SheetDescription>

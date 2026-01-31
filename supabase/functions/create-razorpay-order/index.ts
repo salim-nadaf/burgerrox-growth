@@ -21,16 +21,18 @@ serve(async (req) => {
       )
     }
 
-    const keyId = Deno.env.get('RAZORPAY_KEY_ID') || 'rzp_live_SAbEd4UGvVMZUF'
+    const keyId = Deno.env.get('RAZORPAY_KEY_ID')
     const keySecret = Deno.env.get('RAZORPAY_KEY_SECRET')
 
-    if (!keySecret) {
-      console.error('RAZORPAY_KEY_SECRET not configured')
+    if (!keyId || !keySecret) {
+      console.error('Razorpay credentials not configured. KEY_ID:', !!keyId, 'KEY_SECRET:', !!keySecret)
       return new Response(
-        JSON.stringify({ error: 'Payment configuration error' }),
+        JSON.stringify({ error: 'Payment configuration error. Please contact support.' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+
+    console.log('Using Razorpay Key ID:', keyId.substring(0, 10) + '...')
 
     // Create Razorpay order
     const auth = btoa(`${keyId}:${keySecret}`)

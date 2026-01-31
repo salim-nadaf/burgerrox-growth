@@ -1,21 +1,31 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { ShoppingCart, Minus, Plus, Trash2 } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { ShoppingCart, Minus, Plus, Trash2, CreditCard, Banknote } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
+import { toast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 export default function Cart() {
   const { cartItems, removeFromCart, updateQuantity, clearCart, totalAmount, itemCount } = useCart();
   const { user, profile } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'prepaid'>('cod');
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleWhatsAppOrder = () => {
-    if (cartItems.length === 0) return;
-
+  const sendWhatsAppOrder = (paymentStatus: string) => {
     const orderDetails = cartItems.map(item => 
       `${item.item_name} x${item.quantity} - ₹${(item.item_price * item.quantity).toFixed(2)}`
     ).join('\n');
@@ -25,14 +35,107 @@ export default function Cart() {
       `📱 *WhatsApp:* ${profile?.whatsapp_number || 'Not provided'}\n` +
       `📍 *Area:* ${profile?.area || 'Not provided'}\n\n` +
       `📋 *Order Details:*\n${orderDetails}\n\n` +
-      `💰 *Total Amount:* ₹${totalAmount.toFixed(2)}\n\n` +
+      `💰 *Total Amount:* ₹${totalAmount.toFixed(2)}\n` +
+      `💳 *Payment:* ${paymentStatus}\n\n` +
       `🚚 *Delivery Required* - Please confirm delivery time!`;
 
     const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/919970078688?text=${encodedMessage}`;
+    const whatsappUrl = `https://wa.me/919321389985?text=${encodedMessage}`;
     
     window.open(whatsappUrl, '_blank');
+    clearCart();
     setIsOpen(false);
+  };
+
+  const handleCODOrder = () => {
+    sendWhatsAppOrder('💵 Cash on Delivery');
+    toast({
+      title: "Order Placed!",
+      description: "Your COD order has been sent to WhatsApp",
+    });
+  };
+
+  const handlePrepaidOrder = async () => {
+    if (!window.Razorpay) {
+      toast({
+        title: "Error",
+        description: "Payment system not loaded. Please refresh and try again.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      // Create Razorpay order via edge function
+      const { data, error } = await supabase.functions.invoke('create-razorpay-order', {
+        body: { 
+          amount: totalAmount,
+          receipt: `order_${user?.id?.slice(0, 8)}_${Date.now()}`
+        }
+      });
+
+      if (error || !data?.orderId) {
+        throw new Error(error?.message || 'Failed to create payment order');
+      }
+
+      const options = {
+        key: data.keyId,
+        amount: data.amount,
+        currency: data.currency,
+        name: 'Burger Rox',
+        description: 'Order Payment',
+        order_id: data.orderId,
+        prefill: {
+          name: profile?.name || '',
+          contact: profile?.whatsapp_number || '',
+        },
+        theme: {
+          color: '#FFD939'
+        },
+        handler: function(response: any) {
+          // Payment successful
+          sendWhatsAppOrder(`✅ Prepaid (Razorpay: ${response.razorpay_payment_id})`);
+          toast({
+            title: "Payment Successful!",
+            description: "Your order has been sent to WhatsApp",
+          });
+        },
+        modal: {
+          ondismiss: function() {
+            setIsProcessing(false);
+            toast({
+              title: "Payment Cancelled",
+              description: "You can try again or choose Cash on Delivery",
+            });
+          }
+        }
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+
+    } catch (error: any) {
+      console.error('Payment error:', error);
+      toast({
+        title: "Payment Error",
+        description: error.message || "Failed to initiate payment. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handlePlaceOrder = () => {
+    if (cartItems.length === 0) return;
+
+    if (paymentMethod === 'cod') {
+      handleCODOrder();
+    } else {
+      handlePrepaidOrder();
+    }
   };
 
   if (!user) {
@@ -67,7 +170,7 @@ export default function Cart() {
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-lg">
+      <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Your Cart {profile?.name && `- ${profile.name}`}</SheetTitle>
           <SheetDescription>
@@ -131,31 +234,58 @@ export default function Cart() {
 
               <Separator />
 
-              <div className="space-y-4">
-                <div className="flex justify-between items-center text-lg font-semibold">
-                  <span>Total Amount:</span>
-                  <span>₹{totalAmount.toFixed(2)}</span>
-                </div>
+              <div className="flex justify-between items-center text-lg font-semibold">
+                <span>Total Amount:</span>
+                <span>₹{totalAmount.toFixed(2)}</span>
+              </div>
 
-                <div className="space-y-2">
-                  <Button 
-                    onClick={handleWhatsAppOrder} 
-                    className="w-full" 
-                    size="lg"
-                    disabled={cartItems.length === 0}
-                  >
-                    Order on WhatsApp
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    onClick={clearCart} 
-                    className="w-full"
-                    disabled={cartItems.length === 0}
-                  >
-                    Clear Cart
-                  </Button>
-                </div>
+              <Separator />
+
+              {/* Payment Method Selection */}
+              <div className="space-y-3">
+                <h4 className="font-semibold">Choose Payment Method</h4>
+                <RadioGroup value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as 'cod' | 'prepaid')}>
+                  <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="cod" id="cod" />
+                    <Label htmlFor="cod" className="flex items-center space-x-2 cursor-pointer flex-1">
+                      <Banknote className="h-5 w-5 text-primary" />
+                      <div>
+                        <p className="font-medium">Cash on Delivery</p>
+                        <p className="text-sm text-muted-foreground">Pay when you receive</p>
+                      </div>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="prepaid" id="prepaid" />
+                    <Label htmlFor="prepaid" className="flex items-center space-x-2 cursor-pointer flex-1">
+                      <CreditCard className="h-5 w-5 text-primary" />
+                      <div>
+                        <p className="font-medium">Pay Online</p>
+                        <p className="text-sm text-muted-foreground">UPI, Card, Net Banking</p>
+                      </div>
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              <div className="space-y-2 pt-2">
+                <Button 
+                  onClick={handlePlaceOrder} 
+                  className="w-full" 
+                  size="lg"
+                  disabled={cartItems.length === 0 || isProcessing}
+                >
+                  {isProcessing ? 'Processing...' : paymentMethod === 'cod' ? 'Place Order (COD)' : 'Pay & Order'}
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  onClick={clearCart} 
+                  className="w-full"
+                  disabled={cartItems.length === 0 || isProcessing}
+                >
+                  Clear Cart
+                </Button>
               </div>
             </div>
           )}

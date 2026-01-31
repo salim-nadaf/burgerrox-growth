@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { ShoppingCart, Minus, Plus, Trash2, CreditCard, Banknote } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
+import { useOrders } from '@/hooks/useOrders';
 import { toast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -21,16 +22,18 @@ declare global {
 export default function Cart() {
   const { cartItems, removeFromCart, updateQuantity, clearCart, totalAmount, itemCount } = useCart();
   const { user, profile } = useAuth();
+  const { createOrder } = useOrders();
   const [isOpen, setIsOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'prepaid'>('cod');
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const sendWhatsAppOrder = (paymentStatus: string) => {
+  const sendWhatsAppOrder = (orderNumber: string, paymentStatus: string) => {
     const orderDetails = cartItems.map(item => 
       `${item.item_name} x${item.quantity} - ₹${(item.item_price * item.quantity).toFixed(2)}`
     ).join('\n');
 
     const message = `🍔 *BURGER ROX Order* 🍔\n\n` +
+      `🔢 *Order #:* ${orderNumber}\n` +
       `👤 *Customer:* ${profile?.name || 'Guest Customer'}\n` +
       `📱 *WhatsApp:* ${profile?.whatsapp_number || 'Will provide'}\n` +
       `📍 *Area:* ${profile?.area || 'Will provide'}\n\n` +
@@ -43,16 +46,47 @@ export default function Cart() {
     const whatsappUrl = `https://wa.me/919321389985?text=${encodedMessage}`;
     
     window.open(whatsappUrl, '_blank');
-    clearCart();
-    setIsOpen(false);
   };
 
-  const handleCODOrder = () => {
-    sendWhatsAppOrder('💵 Cash on Delivery');
-    toast({
-      title: "Order Placed!",
-      description: "Your COD order has been sent to WhatsApp",
-    });
+  const handleCODOrder = async () => {
+    setIsProcessing(true);
+    
+    try {
+      // Create order in database
+      const order = await createOrder({
+        items: cartItems.map(item => ({
+          item_name: item.item_name,
+          item_price: item.item_price,
+          quantity: item.quantity
+        })),
+        totalAmount,
+        paymentMethod: 'cod',
+        paymentStatus: 'pending'
+      });
+
+      if (order) {
+        // Send WhatsApp message
+        sendWhatsAppOrder(order.order_number, '💵 Cash on Delivery');
+        clearCart();
+        setIsOpen(false);
+        
+        toast({
+          title: "Order Placed!",
+          description: `Order ${order.order_number} has been sent to WhatsApp`,
+        });
+      } else {
+        throw new Error('Failed to create order');
+      }
+    } catch (error) {
+      console.error('Error placing COD order:', error);
+      toast({
+        title: "Error",
+        description: "Failed to place order. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handlePrepaidOrder = async () => {
@@ -72,13 +106,19 @@ export default function Cart() {
       const { data, error } = await supabase.functions.invoke('create-razorpay-order', {
         body: { 
           amount: totalAmount,
-          receipt: `order_guest_${Date.now()}`
+          receipt: `order_${Date.now()}`
         }
       });
 
       if (error || !data?.orderId) {
         throw new Error(error?.message || 'Failed to create payment order');
       }
+
+      const orderItems = cartItems.map(item => ({
+        item_name: item.item_name,
+        item_price: item.item_price,
+        quantity: item.quantity
+      }));
 
       const options = {
         key: data.keyId,
@@ -94,13 +134,33 @@ export default function Cart() {
         theme: {
           color: '#FFD939'
         },
-        handler: function(response: any) {
-          // Payment successful
-          sendWhatsAppOrder(`✅ Prepaid (Razorpay: ${response.razorpay_payment_id})`);
-          toast({
-            title: "Payment Successful!",
-            description: "Your order has been sent to WhatsApp",
+        handler: async function(response: any) {
+          // Payment successful - create order in database
+          const order = await createOrder({
+            items: orderItems,
+            totalAmount,
+            paymentMethod: 'prepaid',
+            paymentStatus: 'completed',
+            paymentId: response.razorpay_payment_id
           });
+
+          if (order) {
+            // Send WhatsApp message AFTER successful payment
+            sendWhatsAppOrder(order.order_number, `✅ Prepaid (Razorpay: ${response.razorpay_payment_id})`);
+            clearCart();
+            setIsOpen(false);
+            
+            toast({
+              title: "Payment Successful!",
+              description: `Order ${order.order_number} has been placed`,
+            });
+          } else {
+            toast({
+              title: "Payment Received",
+              description: "Payment was successful but order creation failed. Please contact support.",
+              variant: "destructive"
+            });
+          }
         },
         modal: {
           ondismiss: function() {

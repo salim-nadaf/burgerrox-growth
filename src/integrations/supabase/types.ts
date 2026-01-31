@@ -44,6 +44,57 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          created_at: string
+          customer_area: string | null
+          customer_name: string | null
+          customer_whatsapp: string | null
+          id: string
+          items: Json
+          order_number: string
+          payment_id: string | null
+          payment_method: string
+          payment_status: string
+          status: Database["public"]["Enums"]["order_status"]
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_area?: string | null
+          customer_name?: string | null
+          customer_whatsapp?: string | null
+          id?: string
+          items: Json
+          order_number: string
+          payment_id?: string | null
+          payment_method: string
+          payment_status?: string
+          status?: Database["public"]["Enums"]["order_status"]
+          total_amount: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          customer_area?: string | null
+          customer_name?: string | null
+          customer_whatsapp?: string | null
+          id?: string
+          items?: Json
+          order_number?: string
+          payment_id?: string | null
+          payment_method?: string
+          payment_status?: string
+          status?: Database["public"]["Enums"]["order_status"]
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           area: string | null
@@ -82,7 +133,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      order_status:
+        | "pending"
+        | "confirmed"
+        | "preparing"
+        | "out_for_delivery"
+        | "delivered"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -209,6 +266,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      order_status: [
+        "pending",
+        "confirmed",
+        "preparing",
+        "out_for_delivery",
+        "delivered",
+        "cancelled",
+      ],
+    },
   },
 } as const

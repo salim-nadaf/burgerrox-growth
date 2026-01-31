@@ -49,14 +49,10 @@ function getDeliveryCharge(distanceKm: number): { charge: number; label: string;
   };
 }
 
-// Geocode address using OpenStreetMap Nominatim (FREE, no API key needed)
-async function geocodeAddress(address: string): Promise<{ lat: number; lon: number; displayName: string } | null> {
-  const fullAddress = address.toLowerCase().includes('pune') 
-    ? address 
-    : `${address}, Pune, India`;
-  
+// Try to geocode with Nominatim
+async function tryGeocode(query: string): Promise<{ lat: number; lon: number; displayName: string } | null> {
   const url = new URL('https://nominatim.openstreetmap.org/search');
-  url.searchParams.set('q', fullAddress);
+  url.searchParams.set('q', query);
   url.searchParams.set('format', 'json');
   url.searchParams.set('limit', '1');
   url.searchParams.set('countrycodes', 'in');
@@ -68,7 +64,7 @@ async function geocodeAddress(address: string): Promise<{ lat: number; lon: numb
   });
   
   const data = await response.json();
-  console.log('Nominatim response:', JSON.stringify(data));
+  console.log(`Nominatim query "${query}":`, JSON.stringify(data));
   
   if (data && data.length > 0) {
     return {
@@ -76,6 +72,60 @@ async function geocodeAddress(address: string): Promise<{ lat: number; lon: numb
       lon: parseFloat(data[0].lon),
       displayName: data[0].display_name
     };
+  }
+  return null;
+}
+
+// Geocode address using OpenStreetMap Nominatim with fallback strategies
+async function geocodeAddress(address: string): Promise<{ lat: number; lon: number; displayName: string } | null> {
+  // Clean and normalize the address
+  const cleanAddress = address.trim();
+  
+  // Extract road/area name (remove business names, landmarks)
+  // Common patterns: "Shop name, Road name" or "Landmark, Area"
+  const parts = cleanAddress.split(',').map(p => p.trim());
+  
+  // Build search queries from most specific to least
+  const searchQueries: string[] = [];
+  
+  // 1. Full address with Pune
+  const fullAddress = cleanAddress.toLowerCase().includes('pune') 
+    ? cleanAddress 
+    : `${cleanAddress}, Pune, Maharashtra, India`;
+  searchQueries.push(fullAddress);
+  
+  // 2. If there are multiple parts, try without the first part (often business name)
+  if (parts.length >= 2) {
+    const withoutFirst = parts.slice(1).join(', ');
+    const areaSearch = withoutFirst.toLowerCase().includes('pune')
+      ? withoutFirst
+      : `${withoutFirst}, Pune, Maharashtra, India`;
+    searchQueries.push(areaSearch);
+  }
+  
+  // 3. Try just the last part (likely area name) + Pune
+  if (parts.length >= 1) {
+    const lastPart = parts[parts.length - 1];
+    if (!lastPart.toLowerCase().includes('pune')) {
+      searchQueries.push(`${lastPart}, Pune, Maharashtra, India`);
+    }
+  }
+  
+  // 4. Look for common road keywords
+  const roadKeywords = ['road', 'marg', 'nagar', 'chowk', 'colony', 'society', 'vihar', 'path'];
+  for (const part of parts) {
+    const lowerPart = part.toLowerCase();
+    if (roadKeywords.some(kw => lowerPart.includes(kw))) {
+      searchQueries.push(`${part}, Pune, Maharashtra, India`);
+    }
+  }
+
+  // Try each query until one works
+  for (const query of searchQueries) {
+    const result = await tryGeocode(query);
+    if (result) {
+      return result;
+    }
   }
   
   return null;

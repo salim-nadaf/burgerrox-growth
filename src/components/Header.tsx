@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Menu, Phone, MapPin, User, LogOut, X } from "lucide-react";
+import { Menu, Phone, MapPin, User, LogOut } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import AuthForm from "./AuthForm";
 import Cart from "./Cart";
+import OrdersSheet from "./OrdersSheet";
 
 const Header = () => {
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
@@ -77,7 +78,8 @@ const Header = () => {
           </div>
 
           <div className="flex items-center space-x-4">
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-2">
+              <OrdersSheet />
               <Cart />
               
               {user ? (
@@ -133,6 +135,7 @@ const Header = () => {
                   {/* User Section */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
+                      <OrdersSheet />
                       <Cart />
                       {user ? (
                         <div className="flex items-center space-x-2">

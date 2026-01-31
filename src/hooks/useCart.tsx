@@ -41,7 +41,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('cart_items')
         .select('*')
         .eq('user_id', user.id);
@@ -76,7 +76,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (existingItem) {
         await updateQuantity(existingItem.id, existingItem.quantity + 1);
       } else {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from('cart_items')
           .insert({
             user_id: user.id,
@@ -117,7 +117,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (!user) return;
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('cart_items')
         .delete()
         .eq('id', itemId);
@@ -141,7 +141,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (!user || quantity < 1) return;
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('cart_items')
         .update({ quantity })
         .eq('id', itemId)
@@ -165,7 +165,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (!user) return;
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('cart_items')
         .delete()
         .eq('user_id', user.id);

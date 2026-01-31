@@ -9,10 +9,7 @@ const LoginIncentive = () => {
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const { user } = useAuth();
 
-  // Temporarily disabled for payment testing
-  return null;
-
-  // if (user) return null; // Don't show if user is already logged in
+  if (user) return null; // Don't show if user is already logged in
 
   return (
     <section className="py-16 bg-primary/5">

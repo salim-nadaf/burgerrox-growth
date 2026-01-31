@@ -131,8 +131,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       console.log('Signin result:', { data, error });
       return { error };
-    } catch (networkError) {
+    } catch (networkError: any) {
       console.error('Network error during signin:', networkError);
+      // Check for specific network error types
+      if (networkError?.message?.includes('fetch') || networkError?.name === 'TypeError') {
+        return { 
+          error: { message: "Unable to connect to the server. Please check your internet connection and try again." }
+        };
+      }
       return { 
         error: { message: "Network error. Please check your internet connection and try again." }
       };

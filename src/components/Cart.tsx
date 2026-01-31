@@ -138,26 +138,25 @@ export default function Cart() {
     }
   };
 
-  // Login requirement temporarily disabled for testing
-  // if (!user) {
-  //   return (
-  //     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-  //       <SheetTrigger asChild>
-  //         <Button variant="outline" size="icon" className="relative">
-  //           <ShoppingCart className="h-4 w-4" />
-  //         </Button>
-  //       </SheetTrigger>
-  //       <SheetContent>
-  //         <SheetHeader>
-  //           <SheetTitle>Your Cart</SheetTitle>
-  //           <SheetDescription>
-  //             Please login to view your cart
-  //           </SheetDescription>
-  //         </SheetHeader>
-  //       </SheetContent>
-  //     </Sheet>
-  //   );
-  // }
+  if (!user) {
+    return (
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <SheetTrigger asChild>
+          <Button variant="outline" size="icon" className="relative">
+            <ShoppingCart className="h-4 w-4" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Your Cart</SheetTitle>
+            <SheetDescription>
+              Please login to view your cart
+            </SheetDescription>
+          </SheetHeader>
+        </SheetContent>
+      </Sheet>
+    );
+  }
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>

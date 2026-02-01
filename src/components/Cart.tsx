@@ -224,6 +224,34 @@ export default function Cart() {
           name: customerName,
           contact: customerWhatsapp,
         },
+        // Enable UPI intent for mobile - auto-opens UPI apps
+        config: {
+          display: {
+            blocks: {
+              utib: {
+                name: "Pay using UPI",
+                instruments: [
+                  {
+                    method: "upi",
+                    flows: ["intent", "collect", "qr"]
+                  }
+                ]
+              },
+              other: {
+                name: "Other Payment Methods",
+                instruments: [
+                  { method: "card" },
+                  { method: "netbanking" },
+                  { method: "wallet" }
+                ]
+              }
+            },
+            sequence: ["block.utib", "block.other"],
+            preferences: {
+              show_default_blocks: false
+            }
+          }
+        },
         theme: {
           color: '#FFD939'
         },

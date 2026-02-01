@@ -294,8 +294,29 @@ export default function Cart() {
         }
       };
 
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
+      // IMPORTANT (mobile fix): the cart is a Radix "Sheet" (Dialog). When it's open,
+      // Radix may disable pointer-events on <body> to prevent outside interaction.
+      // Razorpay injects its checkout iframe into <body>, so it can become visible
+      // but completely unclickable. Close the Sheet first, then open Razorpay on the
+      // next frame after pointer-events are restored.
+      setIsOpen(false);
+
+      window.requestAnimationFrame(() => {
+        try {
+          // Best-effort unlock (Radix will normally restore this on close)
+          document.body.style.pointerEvents = "auto";
+          document.body.removeAttribute("data-radix-disable-outside-pointer-events");
+          console.debug(
+            "[Razorpay] opening checkout; body pointer-events:",
+            window.getComputedStyle(document.body).pointerEvents
+          );
+        } catch {
+          // ignore
+        }
+
+        const razorpay = new window.Razorpay(options);
+        razorpay.open();
+      });
 
     } catch (error: any) {
       console.error('Payment error:', error);

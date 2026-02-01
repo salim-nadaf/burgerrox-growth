@@ -55,24 +55,35 @@ export default function GooglePlacesSearch({
 
   // Load Google Maps script
   useEffect(() => {
+    console.log('[GooglePlaces] Checking for Google Maps API...');
+    
     if (window.google?.maps?.places) {
+      console.log('[GooglePlaces] Google Maps already loaded');
       setIsLoaded(true);
       return;
     }
 
     const existingScript = document.getElementById(GOOGLE_MAPS_SCRIPT_ID);
     if (existingScript) {
-      existingScript.addEventListener('load', () => setIsLoaded(true));
+      console.log('[GooglePlaces] Script exists, waiting for load...');
+      existingScript.addEventListener('load', () => {
+        console.log('[GooglePlaces] Existing script loaded');
+        setIsLoaded(true);
+      });
       return;
     }
 
+    console.log('[GooglePlaces] Loading Google Maps script with key:', apiKey?.substring(0, 10) + '...');
     const script = document.createElement('script');
     script.id = GOOGLE_MAPS_SCRIPT_ID;
     script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
     script.async = true;
     script.defer = true;
-    script.onload = () => setIsLoaded(true);
-    script.onerror = () => console.error('Failed to load Google Maps script');
+    script.onload = () => {
+      console.log('[GooglePlaces] Script loaded successfully');
+      setIsLoaded(true);
+    };
+    script.onerror = (e) => console.error('[GooglePlaces] Failed to load Google Maps script:', e);
     document.head.appendChild(script);
 
     return () => {
@@ -103,13 +114,18 @@ export default function GooglePlacesSearch({
 
   // Debounced search
   const searchPlaces = useCallback((input: string) => {
+    console.log('[GooglePlaces] searchPlaces called with:', input);
+    console.log('[GooglePlaces] autocompleteService exists:', !!autocompleteServiceRef.current);
+    
     if (!autocompleteServiceRef.current || input.length < 3) {
+      console.log('[GooglePlaces] Skipping search - service not ready or input too short');
       setPredictions([]);
       setShowResults(false);
       return;
     }
 
     setIsSearching(true);
+    console.log('[GooglePlaces] Calling getPlacePredictions...');
     
     autocompleteServiceRef.current.getPlacePredictions(
       {
@@ -123,6 +139,7 @@ export default function GooglePlacesSearch({
         types: ['establishment', 'geocode']
       },
       (results, status) => {
+        console.log('[GooglePlaces] Autocomplete response - status:', status, 'results:', results?.length || 0);
         setIsSearching(false);
         if (status === google.maps.places.PlacesServiceStatus.OK && results) {
           setPredictions(results as PlacePrediction[]);
@@ -130,7 +147,7 @@ export default function GooglePlacesSearch({
         } else {
           setPredictions([]);
           if (status !== google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
-            console.error('Places autocomplete error:', status);
+            console.error('[GooglePlaces] Autocomplete error:', status);
           }
         }
       }

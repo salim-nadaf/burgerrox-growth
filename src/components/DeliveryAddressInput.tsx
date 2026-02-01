@@ -9,7 +9,7 @@ import { toast } from '@/components/ui/use-toast';
 import GooglePlacesSearch from './GooglePlacesSearch';
 
 // Google Maps API Key (publishable - restricted by HTTP referrer in Google Console)
-const GOOGLE_MAPS_API_KEY = 'AIzaSyA_M0xkGYWN7xtQTqE3qvW9djVGw7yBGWU';
+const GOOGLE_MAPS_API_KEY = 'AIzaSyCsYwmjFxC5JrZtZKB8EhzBF2hF61K1xVs';
 
 // Common Pune delivery areas with their coordinates
 const PUNE_AREAS = [

@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { MapPin, Loader2, Truck, CheckCircle, Navigation } from 'lucide-react';
 import { useDelivery } from '@/hooks/useDelivery';
 import { toast } from '@/components/ui/use-toast';
+import LocationSearch from './LocationSearch';
 
 // Common Pune delivery areas with their coordinates
 const PUNE_AREAS = [
@@ -46,6 +47,17 @@ export default function DeliveryAddressInput() {
     }
   };
 
+  const handleLocationSearchSelect = async (location: {
+    lat: number;
+    lon: number;
+    displayName: string;
+    shortName: string;
+  }) => {
+    setSelectedArea('search');
+    // Pass full display name for WhatsApp message
+    await calculateDeliveryFromCoords(location.lat, location.lon, location.displayName);
+  };
+
   const handleGetGPSLocation = async () => {
     if (!navigator.geolocation) {
       toast({
@@ -61,7 +73,26 @@ export default function DeliveryAddressInput() {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
-        await calculateDeliveryFromCoords(latitude, longitude, "Your Current Location (GPS)");
+        // Reverse geocode to get address
+        try {
+          const url = new URL('https://nominatim.openstreetmap.org/reverse');
+          url.searchParams.set('lat', latitude.toString());
+          url.searchParams.set('lon', longitude.toString());
+          url.searchParams.set('format', 'json');
+          url.searchParams.set('addressdetails', '1');
+          
+          const response = await fetch(url.toString(), {
+            headers: { 'User-Agent': 'BurgerRox-Delivery-App/1.0' }
+          });
+          const data = await response.json();
+          
+          const fullAddress = data.display_name || `GPS Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+          await calculateDeliveryFromCoords(latitude, longitude, fullAddress);
+        } catch {
+          // Fallback if reverse geocoding fails
+          await calculateDeliveryFromCoords(latitude, longitude, `GPS Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`);
+        }
+        
         setSelectedArea('gps');
         setIsGettingLocation(false);
       },
@@ -108,7 +139,7 @@ export default function DeliveryAddressInput() {
             </Button>
           </div>
           
-          <p className="text-sm text-muted-foreground line-clamp-2">
+          <p className="text-sm text-muted-foreground line-clamp-3">
             {deliveryInfo.destinationAddress}
           </p>
           
@@ -126,13 +157,13 @@ export default function DeliveryAddressInput() {
               <Truck className="h-5 w-5 text-primary" />
               <span className="font-medium">Delivery Charge</span>
             </div>
-            <span className={`font-bold text-lg ${deliveryInfo.charge === 0 ? 'text-green-600' : 'text-foreground'}`}>
+            <span className={`font-bold text-lg ${deliveryInfo.charge === 0 ? 'text-primary' : ''}`}>
               {deliveryInfo.charge === 0 ? 'FREE' : `₹${deliveryInfo.charge}`}
             </span>
           </div>
           
           {deliveryInfo.charge === 0 && (
-            <p className="text-xs text-green-600 text-center">
+            <p className="text-xs text-primary text-center">
               You're within 3km - Free delivery zone!
             </p>
           )}
@@ -150,12 +181,28 @@ export default function DeliveryAddressInput() {
         </Label>
         
         <div className="space-y-3">
+          {/* Location Search - Rapido/Uber style */}
+          <LocationSearch 
+            onLocationSelect={handleLocationSearchSelect}
+            placeholder="Search: D Y Patil, Hinjewadi IT Park..."
+            disabled={isCalculating || isGettingLocation}
+          />
+          
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">or</span>
+            </div>
+          </div>
+          
           {/* GPS Location Button */}
           <Button 
             onClick={handleGetGPSLocation}
             disabled={isGettingLocation || isCalculating}
             className="w-full"
-            variant="default"
+            variant="outline"
           >
             {isGettingLocation ? (
               <>

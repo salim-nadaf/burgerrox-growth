@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.calculate-delivery]
 verify_jwt = false
+
+[functions.google-distance]
+verify_jwt = false

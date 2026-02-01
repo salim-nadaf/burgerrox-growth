@@ -6,7 +6,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { MapPin, Loader2, Truck, CheckCircle, Navigation } from 'lucide-react';
 import { useDelivery } from '@/hooks/useDelivery';
 import { toast } from '@/components/ui/use-toast';
-import LocationSearch from './LocationSearch';
+import GooglePlacesSearch from './GooglePlacesSearch';
+
+// Google Maps API Key (publishable - restricted by HTTP referrer in Google Console)
+const GOOGLE_MAPS_API_KEY = 'AIzaSyA_M0xkGYWN7xtQTqE3qvW9djVGw7yBGWU';
 
 // Common Pune delivery areas with their coordinates
 const PUNE_AREAS = [
@@ -30,7 +33,7 @@ const PUNE_AREAS = [
 ];
 
 export default function DeliveryAddressInput() {
-  const { deliveryInfo, isCalculating, calculateDeliveryFromCoords, clearDelivery } = useDelivery();
+  const { deliveryInfo, isCalculating, calculateDeliveryFromPlace, calculateDeliveryFromCoords, clearDelivery } = useDelivery();
   const [selectedArea, setSelectedArea] = useState<string>('');
   const [isGettingLocation, setIsGettingLocation] = useState(false);
 
@@ -47,15 +50,15 @@ export default function DeliveryAddressInput() {
     }
   };
 
-  const handleLocationSearchSelect = async (location: {
+  const handlePlaceSelect = async (place: {
+    placeId: string;
+    formattedAddress: string;
+    shortAddress: string;
     lat: number;
-    lon: number;
-    displayName: string;
-    shortName: string;
+    lng: number;
   }) => {
     setSelectedArea('search');
-    // Pass full display name for WhatsApp message
-    await calculateDeliveryFromCoords(location.lat, location.lon, location.displayName);
+    await calculateDeliveryFromPlace(place.placeId, place.formattedAddress);
   };
 
   const handleGetGPSLocation = async () => {
@@ -73,24 +76,24 @@ export default function DeliveryAddressInput() {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
-        // Reverse geocode to get address
+        
+        // Use Google Geocoding to get address from coords
         try {
-          const url = new URL('https://nominatim.openstreetmap.org/reverse');
-          url.searchParams.set('lat', latitude.toString());
-          url.searchParams.set('lon', longitude.toString());
-          url.searchParams.set('format', 'json');
-          url.searchParams.set('addressdetails', '1');
-          
-          const response = await fetch(url.toString(), {
-            headers: { 'User-Agent': 'BurgerRox-Delivery-App/1.0' }
-          });
+          const response = await fetch(
+            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_MAPS_API_KEY}`
+          );
           const data = await response.json();
           
-          const fullAddress = data.display_name || `GPS Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+          const fullAddress = data.results?.[0]?.formatted_address || 
+            `GPS Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+          
           await calculateDeliveryFromCoords(latitude, longitude, fullAddress);
         } catch {
-          // Fallback if reverse geocoding fails
-          await calculateDeliveryFromCoords(latitude, longitude, `GPS Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`);
+          await calculateDeliveryFromCoords(
+            latitude, 
+            longitude, 
+            `GPS Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`
+          );
         }
         
         setSelectedArea('gps');
@@ -181,11 +184,12 @@ export default function DeliveryAddressInput() {
         </Label>
         
         <div className="space-y-3">
-          {/* Location Search - Rapido/Uber style */}
-          <LocationSearch 
-            onLocationSelect={handleLocationSearchSelect}
+          {/* Google Places Autocomplete Search */}
+          <GooglePlacesSearch 
+            onPlaceSelect={handlePlaceSelect}
             placeholder="Search: D Y Patil, Hinjewadi IT Park..."
             disabled={isCalculating || isGettingLocation}
+            apiKey={GOOGLE_MAPS_API_KEY}
           />
           
           <div className="relative">

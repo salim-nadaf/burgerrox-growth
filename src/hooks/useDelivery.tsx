@@ -29,13 +29,16 @@ const DeliveryContext = createContext<DeliveryContextType | undefined>(undefined
 const RESTAURANT_LAT = 18.6550;
 const RESTAURANT_LNG = 73.7260;
 
+// Max delivery distance
+const MAX_DELIVERY_DISTANCE_KM = 12;
+
 // Delivery charge tiers based on distance (in km) - fallback for local calculation
 const DELIVERY_TIERS = [
   { maxDistance: 3, charge: 0, label: "Free Delivery" },
   { maxDistance: 5, charge: 50, label: "₹50 (3-5 km)" },
   { maxDistance: 7, charge: 75, label: "₹75 (5-7 km)" },
   { maxDistance: 10, charge: 105, label: "₹105 (7-10 km)" },
-  { maxDistance: Infinity, charge: 175, label: "₹175 (10+ km)" }
+  { maxDistance: 12, charge: 175, label: "₹175 (10-12 km)" }
 ];
 
 // Haversine formula fallback

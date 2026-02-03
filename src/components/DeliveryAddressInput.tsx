@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, Loader2, Truck, CheckCircle, Navigation } from 'lucide-react';
+import { MapPin, Loader2, Truck, CheckCircle, Navigation, AlertTriangle, Leaf } from 'lucide-react';
 import { useDelivery } from '@/hooks/useDelivery';
 import { toast } from '@/components/ui/use-toast';
 import GooglePlacesSearch from './GooglePlacesSearch';
@@ -11,44 +10,14 @@ import GooglePlacesSearch from './GooglePlacesSearch';
 // Google Maps API Key (publishable - restricted by HTTP referrer in Google Console)
 const GOOGLE_MAPS_API_KEY = 'AIzaSyCsYwmjFxC5JrZtZKB8EhzBF2hF61K1xVs';
 
-// Common Pune delivery areas with their coordinates
-const PUNE_AREAS = [
-  { name: "Mamurdi", lat: 18.6285, lon: 73.7937, label: "Mamurdi (Free Delivery Zone)" },
-  { name: "Dehu Road", lat: 18.6747, lon: 73.7597, label: "Dehu Road" },
-  { name: "Wakad", lat: 18.5986, lon: 73.7593, label: "Wakad" },
-  { name: "Pimpri", lat: 18.6279, lon: 73.8009, label: "Pimpri" },
-  { name: "Chinchwad", lat: 18.6298, lon: 73.7997, label: "Chinchwad" },
-  { name: "Hinjewadi", lat: 18.5912, lon: 73.7380, label: "Hinjewadi" },
-  { name: "Aundh", lat: 18.5580, lon: 73.8073, label: "Aundh" },
-  { name: "Baner", lat: 18.5590, lon: 73.7868, label: "Baner" },
-  { name: "Balewadi", lat: 18.5748, lon: 73.7700, label: "Balewadi" },
-  { name: "Ravet", lat: 18.6494, lon: 73.7462, label: "Ravet" },
-  { name: "Punawale", lat: 18.6200, lon: 73.7467, label: "Punawale" },
-  { name: "Tathawade", lat: 18.6163, lon: 73.7503, label: "Tathawade" },
-  { name: "Nigdi", lat: 18.6519, lon: 73.7659, label: "Nigdi" },
-  { name: "Akurdi", lat: 18.6480, lon: 73.7692, label: "Akurdi" },
-  { name: "Bhosari", lat: 18.6363, lon: 73.8502, label: "Bhosari" },
-  { name: "Moshi", lat: 18.6723, lon: 73.8508, label: "Moshi" },
-  { name: "Talegaon", lat: 18.7297, lon: 73.6756, label: "Talegaon Dabhade" },
-];
+// Max delivery distance
+const MAX_DELIVERY_DISTANCE_KM = 12;
+const FRESHNESS_MESSAGE_THRESHOLD_KM = 6;
 
 export default function DeliveryAddressInput() {
   const { deliveryInfo, isCalculating, calculateDeliveryFromPlace, calculateDeliveryFromCoords, clearDelivery } = useDelivery();
-  const [selectedArea, setSelectedArea] = useState<string>('');
   const [isGettingLocation, setIsGettingLocation] = useState(false);
-
-  const handleAreaSelect = async (areaName: string) => {
-    if (areaName === 'gps') {
-      handleGetGPSLocation();
-      return;
-    }
-    
-    const area = PUNE_AREAS.find(a => a.name === areaName);
-    if (area) {
-      setSelectedArea(areaName);
-      await calculateDeliveryFromCoords(area.lat, area.lon, area.label);
-    }
-  };
+  const [tooFarError, setTooFarError] = useState<string | null>(null);
 
   const handlePlaceSelect = async (place: {
     placeId: string;
@@ -57,8 +26,14 @@ export default function DeliveryAddressInput() {
     lat: number;
     lng: number;
   }) => {
-    setSelectedArea('search');
-    await calculateDeliveryFromPlace(place.placeId, place.formattedAddress);
+    setTooFarError(null);
+    const result = await calculateDeliveryFromPlace(place.placeId, place.formattedAddress);
+    
+    // Check if distance exceeds limit
+    if (result && result.distanceKm > MAX_DELIVERY_DISTANCE_KM) {
+      setTooFarError(`Sorry, we don't deliver beyond ${MAX_DELIVERY_DISTANCE_KM} km. Your location is ${result.distanceText} away.`);
+      clearDelivery();
+    }
   };
 
   const handleGetGPSLocation = async () => {
@@ -72,6 +47,7 @@ export default function DeliveryAddressInput() {
     }
 
     setIsGettingLocation(true);
+    setTooFarError(null);
     
     navigator.geolocation.getCurrentPosition(
       async (position) => {
@@ -87,16 +63,26 @@ export default function DeliveryAddressInput() {
           const fullAddress = data.results?.[0]?.formatted_address || 
             `GPS Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
           
-          await calculateDeliveryFromCoords(latitude, longitude, fullAddress);
+          const result = await calculateDeliveryFromCoords(latitude, longitude, fullAddress);
+          
+          // Check if distance exceeds limit
+          if (result && result.distanceKm > MAX_DELIVERY_DISTANCE_KM) {
+            setTooFarError(`Sorry, we don't deliver beyond ${MAX_DELIVERY_DISTANCE_KM} km. Your location is ${result.distanceText} away.`);
+            clearDelivery();
+          }
         } catch {
-          await calculateDeliveryFromCoords(
+          const result = await calculateDeliveryFromCoords(
             latitude, 
             longitude, 
             `GPS Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`
           );
+          
+          if (result && result.distanceKm > MAX_DELIVERY_DISTANCE_KM) {
+            setTooFarError(`Sorry, we don't deliver beyond ${MAX_DELIVERY_DISTANCE_KM} km. Your location is ${result.distanceText} away.`);
+            clearDelivery();
+          }
         }
         
-        setSelectedArea('gps');
         setIsGettingLocation(false);
       },
       (error) => {
@@ -125,10 +111,39 @@ export default function DeliveryAddressInput() {
 
   const handleClear = () => {
     clearDelivery();
-    setSelectedArea('');
+    setTooFarError(null);
   };
 
+  // Show "too far" error state
+  if (tooFarError) {
+    return (
+      <Card className="border-destructive/50 bg-destructive/5">
+        <CardContent className="p-4 space-y-3">
+          <div className="flex items-center gap-2 text-destructive">
+            <AlertTriangle className="h-5 w-5" />
+            <span className="font-semibold">Delivery Not Available</span>
+          </div>
+          
+          <p className="text-sm text-destructive">
+            {tooFarError}
+          </p>
+          
+          <p className="text-sm text-muted-foreground">
+            We currently deliver within {MAX_DELIVERY_DISTANCE_KM} km of Urban Forest, Kiwale to ensure fresh food quality.
+          </p>
+          
+          <Button onClick={handleClear} variant="outline" className="w-full">
+            Try Different Location
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Show delivery info if already set
   if (deliveryInfo) {
+    const isLongDistance = deliveryInfo.distanceKm >= FRESHNESS_MESSAGE_THRESHOLD_KM;
+    
     return (
       <Card className="border-primary/30 bg-primary/5">
         <CardContent className="p-4 space-y-2">
@@ -170,11 +185,22 @@ export default function DeliveryAddressInput() {
               You're within 3km - Free delivery zone!
             </p>
           )}
+          
+          {/* Freshness guaranteed message for long distances */}
+          {isLongDistance && (
+            <div className="flex items-center gap-2 p-2 bg-accent rounded-lg border border-border">
+              <Leaf className="h-4 w-4 text-primary" />
+              <p className="text-xs text-foreground">
+                🍔 Freshness Guaranteed! Your order will be packed with care for optimal quality.
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     );
   }
 
+  // Default input state - always show search field as primary input
   return (
     <Card>
       <CardContent className="p-4 space-y-3">
@@ -184,10 +210,10 @@ export default function DeliveryAddressInput() {
         </Label>
         
         <div className="space-y-3">
-          {/* Google Places Autocomplete Search */}
+          {/* Google Places Autocomplete Search - Primary Input */}
           <GooglePlacesSearch 
             onPlaceSelect={handlePlaceSelect}
-            placeholder="Search: D Y Patil, Hinjewadi IT Park..."
+            placeholder="Search your address, landmark, college..."
             disabled={isCalculating || isGettingLocation}
             apiKey={GOOGLE_MAPS_API_KEY}
           />
@@ -221,37 +247,6 @@ export default function DeliveryAddressInput() {
             )}
           </Button>
           
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">or select area</span>
-            </div>
-          </div>
-          
-          {/* Area Dropdown */}
-          <Select 
-            value={selectedArea} 
-            onValueChange={handleAreaSelect}
-            disabled={isCalculating || isGettingLocation}
-          >
-            <SelectTrigger className="w-full bg-background">
-              <SelectValue placeholder="Select your area" />
-            </SelectTrigger>
-            <SelectContent className="bg-background border shadow-lg z-50">
-              {PUNE_AREAS.map((area) => (
-                <SelectItem 
-                  key={area.name} 
-                  value={area.name}
-                  className="cursor-pointer"
-                >
-                  {area.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
           {isCalculating && (
             <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -261,7 +256,7 @@ export default function DeliveryAddressInput() {
         </div>
         
         <p className="text-xs text-muted-foreground text-center">
-          Free delivery within 3km of Urban Forest, Mamurdi
+          Free delivery within 3km • Max delivery: {MAX_DELIVERY_DISTANCE_KM}km
         </p>
       </CardContent>
     </Card>

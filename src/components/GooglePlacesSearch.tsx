@@ -50,6 +50,7 @@ export default function GooglePlacesSearch({
   const [isLoaded, setIsLoaded] = useState(false);
   const [placesLibrary, setPlacesLibrary] = useState<google.maps.PlacesLibrary | null>(null);
   const [useNewAutocompleteApi, setUseNewAutocompleteApi] = useState(false);
+  const [lastError, setLastError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const sessionTokenRef = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
   const debounceRef = useRef<NodeJS.Timeout>();
@@ -161,6 +162,7 @@ export default function GooglePlacesSearch({
     console.log('[GooglePlaces] useNewAutocompleteApi:', useNewAutocompleteApi);
     
     if (input.length < 3) {
+      setLastError(null);
       setPredictions([]);
       setShowResults(false);
       return;
@@ -168,12 +170,16 @@ export default function GooglePlacesSearch({
 
     if (!isLoaded) {
       console.log('[GooglePlaces] Skipping search - maps not loaded yet');
+      // Important UX: user might type before Maps finishes loading. We'll re-run
+      // automatically once isLoaded flips to true (see effect below).
+      setLastError('Loading Google Maps…');
       setPredictions([]);
       setShowResults(false);
       return;
     }
 
     setIsSearching(true);
+    setLastError(null);
     
     try {
       // 1) New API path
@@ -229,9 +235,11 @@ export default function GooglePlacesSearch({
       console.log('[GooglePlaces] Falling back to legacy AutocompleteService...');
       const svc = legacyAutocompleteRef.current;
       if (!svc) {
+        const msg = 'Google Places is not ready yet. Please try again in 2 seconds.';
         console.warn('[GooglePlaces] Legacy autocomplete service not ready');
+        setLastError(msg);
         setPredictions([]);
-        setShowResults(false);
+        setShowResults(true);
         return;
       }
 
@@ -247,8 +255,13 @@ export default function GooglePlacesSearch({
         legacyRequest.sessionToken = sessionTokenRef.current;
       }
 
-      const legacyPredictions = await new Promise<google.maps.places.AutocompletePrediction[]>((resolve) => {
-        svc.getPlacePredictions(legacyRequest, (preds) => resolve(preds || []));
+      const legacyPredictions = await new Promise<google.maps.places.AutocompletePrediction[]>((resolve, reject) => {
+        svc.getPlacePredictions(legacyRequest, (preds, status) => {
+          if (status && status !== window.google!.maps.places.PlacesServiceStatus.OK) {
+            return reject(new Error(`Legacy autocomplete failed: ${status}`));
+          }
+          resolve(preds || []);
+        });
       });
 
       const formatted: PlacePrediction[] = legacyPredictions.map((p) => ({
@@ -262,9 +275,11 @@ export default function GooglePlacesSearch({
       setPredictions(formatted);
       setShowResults(true);
     } catch (error: any) {
+      const msg = error?.message || 'Failed to fetch location suggestions.';
       console.error('[GooglePlaces] Autocomplete error:', error);
+      setLastError(msg);
       setPredictions([]);
-      setShowResults(false);
+      setShowResults(true);
     } finally {
       setIsSearching(false);
     }
@@ -276,6 +291,7 @@ export default function GooglePlacesSearch({
     }
 
     if (query.length < 3) {
+      setLastError(null);
       setPredictions([]);
       setShowResults(false);
       return;
@@ -291,6 +307,17 @@ export default function GooglePlacesSearch({
       }
     };
   }, [query, searchPlaces]);
+
+  // If the user typed while Maps was still loading, auto-run a search as soon
+  // as we become ready.
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (query.length < 3) return;
+    // Avoid double-fire while actively searching
+    if (isSearching) return;
+    searchPlaces(query);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded]);
 
   const handleSelect = useCallback(async (prediction: PlacePrediction) => {
     try {
@@ -448,8 +475,17 @@ export default function GooglePlacesSearch({
       {showResults && query.length >= 3 && !isSearching && predictions.length === 0 && (
         <Card className="absolute top-full left-0 right-0 mt-1 z-50 bg-background border shadow-lg">
           <div className="px-3 py-4 text-center text-sm text-muted-foreground">
-            <p>No locations found for "{query}"</p>
-            <p className="text-xs mt-1">Try searching for a landmark, area, or road name</p>
+            {lastError ? (
+              <>
+                <p className="font-medium">{lastError}</p>
+                <p className="text-xs mt-1">Try again, or use “Use My Current Location (GPS)”.</p>
+              </>
+            ) : (
+              <>
+                <p>No locations found for "{query}"</p>
+                <p className="text-xs mt-1">Try searching for a landmark, area, or road name</p>
+              </>
+            )}
           </div>
         </Card>
       )}

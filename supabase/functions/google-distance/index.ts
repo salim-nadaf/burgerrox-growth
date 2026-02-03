@@ -83,7 +83,8 @@ serve(async (req) => {
 
     // Calculate distance using Distance Matrix API
     const distanceUrl = new URL('https://maps.googleapis.com/maps/api/distancematrix/json');
-    distanceUrl.searchParams.set('origins', `${RESTAURANT_LAT},${RESTAURANT_LNG}`);
+    // Use address as origin for more "Google Maps-like" routing (entrance/road snapping)
+    distanceUrl.searchParams.set('origins', RESTAURANT_ADDRESS);
     distanceUrl.searchParams.set('destinations', `${destLat},${destLng}`);
     distanceUrl.searchParams.set('mode', 'driving');
     distanceUrl.searchParams.set('units', 'metric');

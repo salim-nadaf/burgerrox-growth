@@ -5,10 +5,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Restaurant location - Urban Forest, Mamurdi, Pune 412101
-const RESTAURANT_ADDRESS = "Urban Forest, Mamurdi, Pune 412101, India";
-const RESTAURANT_LAT = 18.6298;
-const RESTAURANT_LNG = 73.7997;
+// Restaurant location - Urban Forest, Mamurdi, Saint Tukaram Nagar Road, Kiwale
+const RESTAURANT_ADDRESS = "Urban Forest, Saint Tukaram Nagar Road, Kiwale, Mamurdi, Taluka Haveli 412101, India";
+const RESTAURANT_LAT = 18.6550;
+const RESTAURANT_LNG = 73.7260;
 
 // Delivery charge tiers based on distance (in km)
 const DELIVERY_TIERS = [

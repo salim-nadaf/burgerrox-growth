@@ -29,12 +29,11 @@ interface GooglePlacesSearchProps {
 }
 
 interface PlacePrediction {
-  place_id: string;
-  description: string;
-  structured_formatting: {
-    main_text: string;
-    secondary_text: string;
-  };
+  placeId: string;
+  mainText: string;
+  secondaryText: string;
+  fullText: string;
+  toPlace: () => google.maps.places.Place;
 }
 
 export default function GooglePlacesSearch({ 
@@ -48,41 +47,50 @@ export default function GooglePlacesSearch({
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [placesLibrary, setPlacesLibrary] = useState<google.maps.PlacesLibrary | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const autocompleteServiceRef = useRef<google.maps.places.AutocompleteService | null>(null);
-  const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
+  const sessionTokenRef = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
   const debounceRef = useRef<NodeJS.Timeout>();
 
   // Load Google Maps script
   useEffect(() => {
     console.log('[GooglePlaces] Checking for Google Maps API...');
     
-    if (window.google?.maps?.places) {
-      console.log('[GooglePlaces] Google Maps already loaded');
-      setIsLoaded(true);
+    const loadLibrary = async () => {
+      try {
+        if (window.google?.maps?.importLibrary) {
+          console.log('[GooglePlaces] Loading places library via importLibrary...');
+          const lib = await window.google.maps.importLibrary('places') as google.maps.PlacesLibrary;
+          setPlacesLibrary(lib);
+          setIsLoaded(true);
+          console.log('[GooglePlaces] Places library loaded successfully');
+          return;
+        }
+      } catch (e) {
+        console.error('[GooglePlaces] Error loading places library:', e);
+      }
+    };
+
+    if (window.google?.maps) {
+      loadLibrary();
       return;
     }
 
     const existingScript = document.getElementById(GOOGLE_MAPS_SCRIPT_ID);
     if (existingScript) {
       console.log('[GooglePlaces] Script exists, waiting for load...');
-      existingScript.addEventListener('load', () => {
-        console.log('[GooglePlaces] Existing script loaded');
-        setIsLoaded(true);
-      });
+      existingScript.addEventListener('load', loadLibrary);
       return;
     }
 
     console.log('[GooglePlaces] Loading Google Maps script with key:', apiKey?.substring(0, 10) + '...');
     const script = document.createElement('script');
     script.id = GOOGLE_MAPS_SCRIPT_ID;
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+    // Use the new loading pattern with loading=async for better performance
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`;
     script.async = true;
     script.defer = true;
-    script.onload = () => {
-      console.log('[GooglePlaces] Script loaded successfully');
-      setIsLoaded(true);
-    };
+    script.onload = loadLibrary;
     script.onerror = (e) => console.error('[GooglePlaces] Failed to load Google Maps script:', e);
     document.head.appendChild(script);
 
@@ -91,15 +99,13 @@ export default function GooglePlacesSearch({
     };
   }, [apiKey]);
 
-  // Initialize services when loaded
+  // Create session token when library is loaded
   useEffect(() => {
-    if (isLoaded && window.google?.maps?.places) {
-      autocompleteServiceRef.current = new google.maps.places.AutocompleteService();
-      // Create a dummy div for PlacesService (required by API)
-      const dummyDiv = document.createElement('div');
-      placesServiceRef.current = new google.maps.places.PlacesService(dummyDiv);
+    if (placesLibrary) {
+      sessionTokenRef.current = new placesLibrary.AutocompleteSessionToken();
+      console.log('[GooglePlaces] Session token created');
     }
-  }, [isLoaded]);
+  }, [placesLibrary]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -112,47 +118,73 @@ export default function GooglePlacesSearch({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Debounced search
-  const searchPlaces = useCallback((input: string) => {
+  // Debounced search using new Places API (AutocompleteSuggestion)
+  const searchPlaces = useCallback(async (input: string) => {
     console.log('[GooglePlaces] searchPlaces called with:', input);
-    console.log('[GooglePlaces] autocompleteService exists:', !!autocompleteServiceRef.current);
+    console.log('[GooglePlaces] placesLibrary exists:', !!placesLibrary);
     
-    if (!autocompleteServiceRef.current || input.length < 3) {
-      console.log('[GooglePlaces] Skipping search - service not ready or input too short');
+    if (!placesLibrary || input.length < 3) {
+      console.log('[GooglePlaces] Skipping search - library not ready or input too short');
       setPredictions([]);
       setShowResults(false);
       return;
     }
 
     setIsSearching(true);
-    console.log('[GooglePlaces] Calling getPlacePredictions...');
+    console.log('[GooglePlaces] Calling fetchAutocompleteSuggestions (new API)...');
     
-    autocompleteServiceRef.current.getPlacePredictions(
-      {
+    try {
+      const request: google.maps.places.AutocompleteRequest = {
         input,
-        componentRestrictions: { country: 'in' },
-        // Bias towards Pune
-        locationBias: new google.maps.Circle({
+        includedRegionCodes: ['in'], // India only
+        locationBias: {
           center: { lat: 18.5204, lng: 73.8567 }, // Pune center
           radius: 50000 // 50km radius
-        }),
-        types: ['establishment', 'geocode']
-      },
-      (results, status) => {
-        console.log('[GooglePlaces] Autocomplete response - status:', status, 'results:', results?.length || 0);
-        setIsSearching(false);
-        if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-          setPredictions(results as PlacePrediction[]);
-          setShowResults(true);
-        } else {
-          setPredictions([]);
-          if (status !== google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
-            console.error('[GooglePlaces] Autocomplete error:', status);
-          }
-        }
+        },
+        language: 'en-IN',
+      };
+
+      // Add session token if available
+      if (sessionTokenRef.current) {
+        (request as any).sessionToken = sessionTokenRef.current;
       }
-    );
-  }, []);
+
+      const { suggestions } = await placesLibrary.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+      
+      console.log('[GooglePlaces] Autocomplete response - suggestions:', suggestions?.length || 0);
+      
+      if (suggestions && suggestions.length > 0) {
+        const formattedPredictions: PlacePrediction[] = suggestions
+          .filter(s => s.placePrediction)
+          .map(s => {
+            const prediction = s.placePrediction!;
+            const text = prediction.text;
+            const mainText = prediction.mainText;
+            const secondaryText = prediction.secondaryText;
+            
+            return {
+              placeId: prediction.placeId,
+              mainText: mainText?.text || text?.text?.split(',')[0] || '',
+              secondaryText: secondaryText?.text || text?.text || '',
+              fullText: text?.text || '',
+              toPlace: () => prediction.toPlace()
+            };
+          });
+        
+        setPredictions(formattedPredictions);
+        setShowResults(true);
+      } else {
+        setPredictions([]);
+        setShowResults(true); // Show "no results" message
+      }
+    } catch (error: any) {
+      console.error('[GooglePlaces] Autocomplete error:', error);
+      setPredictions([]);
+      setShowResults(false);
+    } finally {
+      setIsSearching(false);
+    }
+  }, [placesLibrary]);
 
   useEffect(() => {
     if (debounceRef.current) {
@@ -176,34 +208,42 @@ export default function GooglePlacesSearch({
     };
   }, [query, searchPlaces]);
 
-  const handleSelect = useCallback((prediction: PlacePrediction) => {
-    if (!placesServiceRef.current) return;
+  const handleSelect = useCallback(async (prediction: PlacePrediction) => {
+    if (!placesLibrary) return;
 
-    placesServiceRef.current.getDetails(
-      {
-        placeId: prediction.place_id,
-        fields: ['geometry', 'formatted_address', 'name']
-      },
-      (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && place?.geometry?.location) {
-          const lat = place.geometry.location.lat();
-          const lng = place.geometry.location.lng();
-          
-          onPlaceSelect({
-            placeId: prediction.place_id,
-            formattedAddress: place.formatted_address || prediction.description,
-            shortAddress: prediction.structured_formatting?.main_text || prediction.description.split(',')[0],
-            lat,
-            lng
-          });
-          
-          setQuery(prediction.structured_formatting?.main_text || prediction.description.split(',')[0]);
-          setShowResults(false);
-          setPredictions([]);
-        }
+    try {
+      console.log('[GooglePlaces] Fetching place details for:', prediction.placeId);
+      
+      const place = prediction.toPlace();
+      await place.fetchFields({
+        fields: ['displayName', 'formattedAddress', 'location', 'id']
+      });
+
+      const location = place.location;
+      if (location) {
+        const lat = location.lat();
+        const lng = location.lng();
+        
+        onPlaceSelect({
+          placeId: place.id || prediction.placeId,
+          formattedAddress: place.formattedAddress || prediction.fullText,
+          shortAddress: place.displayName || prediction.mainText,
+          lat,
+          lng
+        });
+        
+        setQuery(place.displayName || prediction.mainText);
+        setShowResults(false);
+        setPredictions([]);
+        
+        // Create a new session token for the next search
+        sessionTokenRef.current = new placesLibrary.AutocompleteSessionToken();
+        console.log('[GooglePlaces] Place selected, new session token created');
       }
-    );
-  }, [onPlaceSelect]);
+    } catch (error) {
+      console.error('[GooglePlaces] Error fetching place details:', error);
+    }
+  }, [placesLibrary, onPlaceSelect]);
 
   const clearSearch = () => {
     setQuery('');
@@ -260,7 +300,7 @@ export default function GooglePlacesSearch({
           <div className="py-1">
             {predictions.map((prediction) => (
               <button
-                key={prediction.place_id}
+                key={prediction.placeId}
                 onClick={() => handleSelect(prediction)}
                 className={cn(
                   "w-full px-3 py-2 text-left hover:bg-accent transition-colors",
@@ -270,10 +310,10 @@ export default function GooglePlacesSearch({
                 <MapPin className="h-4 w-4 mt-0.5 text-primary shrink-0" />
                 <div className="min-w-0">
                   <p className="font-medium text-sm truncate">
-                    {prediction.structured_formatting?.main_text || prediction.description.split(',')[0]}
+                    {prediction.mainText}
                   </p>
                   <p className="text-xs text-muted-foreground truncate">
-                    {prediction.structured_formatting?.secondary_text || prediction.description}
+                    {prediction.secondaryText}
                   </p>
                 </div>
               </button>

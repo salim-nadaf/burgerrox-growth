@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { MapPin, Loader2, Search, X } from 'lucide-react';
+ import { MapPin, Loader2, Search, X, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+ import { supabase } from '@/integrations/supabase/client';
 
 interface GooglePlacesSearchProps {
   onPlaceSelect: (place: {
@@ -15,7 +16,7 @@ interface GooglePlacesSearchProps {
   }) => void;
   placeholder?: string;
   disabled?: boolean;
-  apiKey: string;
+   apiKey?: string; // No longer needed, using server-side API
 }
 
 interface PlacePrediction {
@@ -23,117 +24,31 @@ interface PlacePrediction {
   mainText: string;
   secondaryText: string;
   fullText: string;
+   lat?: number;
+   lng?: number;
 }
 
-// Script loading state
-let scriptLoadPromise: Promise<void> | null = null;
-let isScriptLoaded = false;
-
-function loadGoogleMapsScript(apiKey: string): Promise<void> {
-  if (isScriptLoaded && window.google?.maps?.places) {
-    return Promise.resolve();
-  }
-
-  if (scriptLoadPromise) {
-    return scriptLoadPromise;
-  }
-
-  scriptLoadPromise = new Promise((resolve, reject) => {
-    // Check if already loaded
-    if (window.google?.maps?.places) {
-      isScriptLoaded = true;
-      resolve();
-      return;
-    }
-
-    // Check for existing script
-    const existingScript = document.getElementById('google-maps-script');
-    if (existingScript) {
-      existingScript.addEventListener('load', () => {
-        isScriptLoaded = true;
-        resolve();
-      });
-      existingScript.addEventListener('error', reject);
-      return;
-    }
-
-    // Create new script
-    const script = document.createElement('script');
-    script.id = 'google-maps-script';
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&v=weekly&region=IN&language=en`;
-    script.async = true;
-    script.defer = true;
-    
-    script.onload = () => {
-      isScriptLoaded = true;
-      resolve();
-    };
-    script.onerror = () => reject(new Error('Failed to load Google Maps'));
-    
-    document.head.appendChild(script);
-  });
-
-  return scriptLoadPromise;
+ // Generate a simple session token
+ function generateSessionToken(): string {
+   return `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
 }
 
 export default function GooglePlacesSearch({ 
   onPlaceSelect, 
   placeholder = "Search for your delivery location...",
-  disabled = false,
-  apiKey
+   disabled = false
 }: GooglePlacesSearchProps) {
   const [query, setQuery] = useState('');
   const [predictions, setPredictions] = useState<PlacePrediction[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
   const containerRef = useRef<HTMLDivElement>(null);
-  const autocompleteServiceRef = useRef<google.maps.places.AutocompleteService | null>(null);
-  const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
-  const placesContainerRef = useRef<HTMLDivElement | null>(null);
   const debounceRef = useRef<NodeJS.Timeout>();
-  const sessionTokenRef = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
-
-  // Initialize Google Maps
-  useEffect(() => {
-    let mounted = true;
-
-    const init = async () => {
-      try {
-        await loadGoogleMapsScript(apiKey);
-        
-        if (!mounted) return;
-
-        // Create services
-        autocompleteServiceRef.current = new google.maps.places.AutocompleteService();
-        
-        // Create hidden div for PlacesService
-        if (!placesContainerRef.current) {
-          placesContainerRef.current = document.createElement('div');
-        }
-        placesServiceRef.current = new google.maps.places.PlacesService(placesContainerRef.current);
-        
-        // Create session token
-        sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
-        
-        setIsReady(true);
-        setError(null);
-      } catch (err) {
-        console.error('[GooglePlaces] Init error:', err);
-        if (mounted) {
-          setError('Failed to load Google Maps. Please refresh.');
-        }
-      }
-    };
-
-    init();
-
-    return () => {
-      mounted = false;
-    };
-  }, [apiKey]);
+   
+   // Memoize session token - changes only when a place is selected
+   const sessionTokenRef = useRef<string>(generateSessionToken());
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -147,15 +62,10 @@ export default function GooglePlacesSearch({
   }, []);
 
   // Search function
-  const searchPlaces = useCallback(async (input: string) => {
-    if (input.length < 3) {
+   const searchPlaces = useCallback(async (searchInput: string) => {
+     if (searchInput.length < 3) {
       setPredictions([]);
       setShowResults(false);
-      return;
-    }
-
-    if (!isReady || !autocompleteServiceRef.current) {
-      setError('Google Maps is loading...');
       return;
     }
 
@@ -163,49 +73,46 @@ export default function GooglePlacesSearch({
     setError(null);
 
     try {
-      const request: google.maps.places.AutocompletionRequest = {
-        input,
-        componentRestrictions: { country: 'in' },
-        location: new google.maps.LatLng(18.5204, 73.8567), // Pune center
-        radius: 50000,
-      };
+       const { data, error: apiError } = await supabase.functions.invoke('places-autocomplete', {
+         body: {
+           input: searchInput,
+           sessionToken: sessionTokenRef.current,
+         },
+       });
 
-      if (sessionTokenRef.current) {
-        request.sessionToken = sessionTokenRef.current;
-      }
+       setIsSearching(false);
 
-      autocompleteServiceRef.current.getPlacePredictions(
-        request,
-        (results, status) => {
-          setIsSearching(false);
-
-          if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-            const formatted: PlacePrediction[] = results.map((p) => ({
-              placeId: p.place_id,
-              mainText: p.structured_formatting?.main_text || p.description.split(',')[0],
-              secondaryText: p.structured_formatting?.secondary_text || p.description,
-              fullText: p.description,
-            }));
-            setPredictions(formatted);
-            setShowResults(true);
-          } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
-            setPredictions([]);
-            setShowResults(true);
-          } else {
-            console.error('[GooglePlaces] Search error:', status);
-            setError(`Search failed: ${status}`);
-            setPredictions([]);
-            setShowResults(true);
-          }
-        }
-      );
-    } catch (err: any) {
+       if (apiError) {
+         console.error('[GooglePlaces] API error:', apiError);
+         setError('Search failed. Try again or use GPS.');
+         setPredictions([]);
+         setShowResults(true);
+         return;
+       }
+ 
+       if (data?.predictions && data.predictions.length > 0) {
+         setPredictions(data.predictions);
+         setShowResults(true);
+       } else if (data?.status === 'ZERO_RESULTS') {
+         setPredictions([]);
+         setShowResults(true);
+       } else if (data?.error) {
+         console.error('[GooglePlaces] Search error:', data.error);
+         setError(data.error);
+         setPredictions([]);
+         setShowResults(true);
+       } else {
+         setPredictions([]);
+         setShowResults(true);
+       }
+     } catch (err: unknown) {
       setIsSearching(false);
-      setError(err.message || 'Search failed');
+       const message = err instanceof Error ? err.message : 'Search failed';
+       setError(message);
       setPredictions([]);
       setShowResults(true);
     }
-  }, [isReady]);
+   }, []);
 
   // Debounced search on query change
   useEffect(() => {
@@ -231,39 +138,65 @@ export default function GooglePlacesSearch({
   }, [query, searchPlaces]);
 
   // Handle place selection
-  const handleSelect = useCallback((prediction: PlacePrediction) => {
-    if (!placesServiceRef.current) {
-      setError('Places service not ready');
-      return;
+   const handleSelect = useCallback(async (prediction: PlacePrediction) => {
+     setIsSearching(true);
+     setShowResults(false);
+     
+     try {
+       // If prediction already has coordinates (from Geocoding API), use them directly
+       if (prediction.lat && prediction.lng) {
+         setIsSearching(false);
+         onPlaceSelect({
+           placeId: prediction.placeId,
+           formattedAddress: prediction.fullText,
+           shortAddress: prediction.mainText,
+           lat: prediction.lat,
+           lng: prediction.lng,
+         });
+ 
+         setQuery(prediction.mainText);
+         setPredictions([]);
+         
+         // Generate new session token for next search
+         sessionTokenRef.current = generateSessionToken();
+         return;
+       }
+ 
+       // Fallback: fetch details if no coordinates in prediction
+       const { data, error: apiError } = await supabase.functions.invoke('places-details', {
+         body: {
+           placeId: prediction.placeId,
+         },
+       });
+ 
+       setIsSearching(false);
+ 
+       if (apiError || data?.error) {
+         console.error('[GooglePlaces] Details error:', apiError || data?.error);
+         setError('Failed to get location details');
+         return;
+       }
+ 
+       if (data?.lat && data?.lng) {
+         onPlaceSelect({
+           placeId: data.placeId || prediction.placeId,
+           formattedAddress: data.formattedAddress || prediction.fullText,
+           shortAddress: data.name || prediction.mainText,
+           lat: data.lat,
+           lng: data.lng,
+         });
+ 
+         setQuery(data.name || prediction.mainText);
+         setPredictions([]);
+         sessionTokenRef.current = generateSessionToken();
+       } else {
+         setError('Could not get location coordinates');
+       }
+     } catch (err: unknown) {
+       setIsSearching(false);
+       const message = err instanceof Error ? err.message : 'Failed to get details';
+       setError(message);
     }
-
-    placesServiceRef.current.getDetails(
-      {
-        placeId: prediction.placeId,
-        fields: ['place_id', 'name', 'formatted_address', 'geometry'],
-        sessionToken: sessionTokenRef.current || undefined,
-      },
-      (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && place?.geometry?.location) {
-          onPlaceSelect({
-            placeId: place.place_id || prediction.placeId,
-            formattedAddress: place.formatted_address || prediction.fullText,
-            shortAddress: place.name || prediction.mainText,
-            lat: place.geometry.location.lat(),
-            lng: place.geometry.location.lng(),
-          });
-
-          setQuery(place.name || prediction.mainText);
-          setShowResults(false);
-          setPredictions([]);
-
-          // New session token for next search
-          sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
-        } else {
-          setError(`Failed to get place details: ${status}`);
-        }
-      }
-    );
   }, [onPlaceSelect]);
 
   const clearSearch = () => {
@@ -272,6 +205,13 @@ export default function GooglePlacesSearch({
     setShowResults(false);
     setError(null);
   };
+ 
+   const retrySearch = () => {
+     setError(null);
+     if (query.length >= 3) {
+       searchPlaces(query);
+     }
+   };
 
   return (
     <div ref={containerRef} className="relative w-full">
@@ -282,7 +222,7 @@ export default function GooglePlacesSearch({
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => predictions.length > 0 && setShowResults(true)}
           placeholder={placeholder}
-          disabled={disabled}
+         disabled={disabled || isSearching}
           className="pl-9 pr-9 bg-background"
         />
         {query && (
@@ -304,14 +244,6 @@ export default function GooglePlacesSearch({
           />
         )}
       </div>
-
-      {/* Loading indicator */}
-      {!isReady && !error && (
-        <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-          <Loader2 className="h-3 w-3 animate-spin" />
-          Loading Google Maps...
-        </p>
-      )}
 
       {/* Results dropdown */}
       {showResults && predictions.length > 0 && (
@@ -357,7 +289,15 @@ export default function GooglePlacesSearch({
             {error ? (
               <>
                 <p className="font-medium text-destructive">{error}</p>
-                <p className="text-xs mt-1">Try again or use GPS location</p>
+                 <Button 
+                   variant="ghost" 
+                   size="sm" 
+                   onClick={retrySearch}
+                   className="mt-2"
+                 >
+                   <RefreshCw className="h-3 w-3 mr-1" />
+                   Retry
+                 </Button>
               </>
             ) : (
               <>

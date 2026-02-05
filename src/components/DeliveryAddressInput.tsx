@@ -8,8 +8,8 @@ import { toast } from '@/components/ui/use-toast';
 import GooglePlacesSearch from './GooglePlacesSearch';
 import DetailedAddressForm, { DetailedAddress, isAddressComplete, formatFullAddress } from './DetailedAddressForm';
 
-// Google Maps API Key (publishable - restricted by HTTP referrer in Google Console)
-const GOOGLE_MAPS_API_KEY = 'AIzaSyCsYwmjFxC5JrZtZKB8EhzBF2hF61K1xVs';
+ // Google Maps API Key for GPS reverse geocoding only
+ const GOOGLE_MAPS_API_KEY = 'AIzaSyCsYwmjFxC5JrZtZKB8EhzBF2hF61K1xVs';
 
 // Max delivery distance
 const MAX_DELIVERY_DISTANCE_KM = 12;
@@ -254,7 +254,6 @@ export default function DeliveryAddressInput({
             onPlaceSelect={handlePlaceSelect}
             placeholder="Search your address, landmark, college..."
             disabled={isCalculating || isGettingLocation}
-            apiKey={GOOGLE_MAPS_API_KEY}
           />
           
           <div className="relative">

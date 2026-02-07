@@ -7,9 +7,7 @@ import { useDelivery } from '@/hooks/useDelivery';
 import { toast } from '@/components/ui/use-toast';
 import GooglePlacesSearch from './GooglePlacesSearch';
 import DetailedAddressForm, { DetailedAddress, isAddressComplete, formatFullAddress } from './DetailedAddressForm';
-
- // Google Maps API Key for GPS reverse geocoding only
- const GOOGLE_MAPS_API_KEY = 'AIzaSyCsYwmjFxC5JrZtZKB8EhzBF2hF61K1xVs';
+import { supabase } from '@/integrations/supabase/client';
 
 // Max delivery distance
 const MAX_DELIVERY_DISTANCE_KM = 12;
@@ -61,37 +59,27 @@ export default function DeliveryAddressInput({
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
-        
-        // Use Google Geocoding to get address from coords
+        const fallbackAddress = `GPS Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+
         try {
-          const response = await fetch(
-            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_MAPS_API_KEY}`
-          );
-          const data = await response.json();
-          
-          const fullAddress = data.results?.[0]?.formatted_address || 
-            `GPS Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
-          
+          const { data: geoData } = await supabase.functions.invoke('geocode-reverse', {
+            body: { lat: latitude, lng: longitude },
+          });
+          const fullAddress = geoData?.formattedAddress || fallbackAddress;
           const result = await calculateDeliveryFromCoords(latitude, longitude, fullAddress);
-          
-          // Check if distance exceeds limit
+
           if (result && result.distanceKm > MAX_DELIVERY_DISTANCE_KM) {
             setTooFarError(`Sorry, we don't deliver beyond ${MAX_DELIVERY_DISTANCE_KM} km. Your location is ${result.distanceText} away.`);
             clearDelivery();
           }
         } catch {
-          const result = await calculateDeliveryFromCoords(
-            latitude, 
-            longitude, 
-            `GPS Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`
-          );
-          
+          const result = await calculateDeliveryFromCoords(latitude, longitude, fallbackAddress);
           if (result && result.distanceKm > MAX_DELIVERY_DISTANCE_KM) {
             setTooFarError(`Sorry, we don't deliver beyond ${MAX_DELIVERY_DISTANCE_KM} km. Your location is ${result.distanceText} away.`);
             clearDelivery();
           }
         }
-        
+
         setIsGettingLocation(false);
       },
       (error) => {

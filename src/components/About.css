@@ -2,14 +2,4 @@
   aspect-ratio: 1 / 1;
   border-radius: 50%;
   object-position: center 40%;
-  /* Add responsive design for all screen sizes */
-  width: 100%;
-  height: auto;
-  max-width: 500px; /* Example max width */
-}
-
-@media (max-width: 600px) {
-  .about-circle {
-    max-width: 300px; /* Smaller size for mobile */
-  }
 }

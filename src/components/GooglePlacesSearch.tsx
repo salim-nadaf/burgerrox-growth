@@ -28,7 +28,10 @@ interface PlacePrediction {
    lng?: number;
 }
 
- // Generate a simple session token
+ // Wait for user to finish typing before searching (reduces interruption & cart abandonment)
+ const MIN_SEARCH_LENGTH = 5;
+ const SEARCH_DEBOUNCE_MS = 600;
+
  function generateSessionToken(): string {
    return `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
 }
@@ -61,9 +64,10 @@ export default function GooglePlacesSearch({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Search function
+  // Search function – only when input is long enough
    const searchPlaces = useCallback(async (searchInput: string) => {
-     if (searchInput.length < 3) {
+     const trimmed = searchInput.trim();
+     if (trimmed.length < MIN_SEARCH_LENGTH) {
       setPredictions([]);
       setShowResults(false);
       return;
@@ -75,7 +79,7 @@ export default function GooglePlacesSearch({
     try {
        const { data, error: apiError } = await supabase.functions.invoke('places-autocomplete', {
          body: {
-           input: searchInput,
+           input: trimmed,
            sessionToken: sessionTokenRef.current,
          },
        });
@@ -114,13 +118,13 @@ export default function GooglePlacesSearch({
     }
    }, []);
 
-  // Debounced search on query change
+  // Debounced search – wait for user to pause typing (no search on every keystroke)
   useEffect(() => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
 
-    if (query.length < 3) {
+    if (query.trim().length < MIN_SEARCH_LENGTH) {
       setPredictions([]);
       setShowResults(false);
       return;
@@ -128,7 +132,7 @@ export default function GooglePlacesSearch({
 
     debounceRef.current = setTimeout(() => {
       searchPlaces(query);
-    }, 300);
+    }, SEARCH_DEBOUNCE_MS);
 
     return () => {
       if (debounceRef.current) {
@@ -208,7 +212,7 @@ export default function GooglePlacesSearch({
  
    const retrySearch = () => {
      setError(null);
-     if (query.length >= 3) {
+     if (query.trim().length >= MIN_SEARCH_LENGTH) {
        searchPlaces(query);
      }
    };
@@ -283,7 +287,7 @@ export default function GooglePlacesSearch({
       )}
 
       {/* No results / Error message */}
-      {showResults && query.length >= 3 && !isSearching && predictions.length === 0 && (
+      {showResults && query.trim().length >= MIN_SEARCH_LENGTH && !isSearching && predictions.length === 0 && (
         <Card className="absolute top-full left-0 right-0 mt-1 z-50 bg-background border shadow-lg">
           <div className="px-3 py-4 text-center text-sm text-muted-foreground">
             {error ? (

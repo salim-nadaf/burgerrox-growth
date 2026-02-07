@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import burgerTrio from "@/assets/burger-trio.jpg";
 import friesImage from "@/assets/fries.jpg";
 import nuggetsImage from "@/assets/nuggets.jpg";
@@ -93,6 +93,17 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [pendingAddItem, setPendingAddItem] = useState<{ itemName: string; itemPrice: number } | null>(null);
+  const prevUserRef = useRef(user);
+
+  // Watch for user state change: when user goes from null → logged in with a pending item, add it
+  useEffect(() => {
+    if (!prevUserRef.current && user && pendingAddItem) {
+      // User just logged in and there's a pending item — add it now
+      addToCart(pendingAddItem.itemName, pendingAddItem.itemPrice);
+      setPendingAddItem(null);
+    }
+    prevUserRef.current = user;
+  }, [user, pendingAddItem, addToCart]);
 
   const displayItems = showAll ? allMenuItems : allMenuItems.slice(0, 6);
   const categories = ["All", "Fries", "Sides", "Chicken", "Egg", "Vegetarian", "Combos", "Beverages", "Desserts"];
@@ -102,17 +113,19 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
     : displayItems.filter(item => item.category === selectedCategory);
 
   const handleAddToCart = async (itemName: string, itemPrice: number) => {
+    if (!user) {
+      // User not logged in — store item and open auth dialog
+      setPendingAddItem({ itemName, itemPrice });
+      setAuthDialogOpen(true);
+      return;
+    }
     await addToCart(itemName, itemPrice);
   };
 
-  const handleAuthSuccess = () => {
-    if (pendingAddItem) {
-      addToCart(pendingAddItem.itemName, pendingAddItem.itemPrice);
-      setPendingAddItem(null);
-    }
+  const handleAuthClose = () => {
     setAuthDialogOpen(false);
+    // Don't clear pending item — it'll be added via useEffect when user state updates
   };
-  const handleAuthClose = () => setAuthDialogOpen(false);
 
   return (
     <section id="menu" className="py-12 sm:py-20 bg-secondary/30" aria-labelledby="menu-heading">
@@ -201,67 +214,27 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                             <span className="font-montserrat text-sm text-foreground">{variant.size}</span>
                             <div className="flex items-center space-x-2">
                               <span className="font-bebas text-base text-primary" aria-label={`${variant.size} price ${variant.price} rupees`}>₹{variant.price}</span>
-                              {user ? (
-                                <Button 
-                                  onClick={() => handleAddToCart(`${burger.name} (${variant.size})`, variant.price)}
-                                  size="sm"
-                                  className="text-xs px-2 py-1"
-                                  aria-label={`Add ${burger.name} ${variant.size} to cart`}
-                                >
-                                  Add
-                                </Button>
-                              ) : (
-                                <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
-                                  <DialogTrigger asChild>
-                                    <Button
-                                      size="sm"
-                                      className="text-xs px-2 py-1"
-                                      aria-label={`Add ${burger.name} ${variant.size} to cart - login required`}
-                                      onClick={() => setPendingAddItem({ itemName: `${burger.name} (${variant.size})`, itemPrice: variant.price })}
-                                    >
-                                      Add to Cart
-                                    </Button>
-                                  </DialogTrigger>
-                                  <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-                                    <DialogTitle className="sr-only">Authentication</DialogTitle>
-                                    <DialogDescription className="sr-only">Login or create an account to add items to cart</DialogDescription>
-                                    <AuthForm onClose={handleAuthClose} onSuccess={handleAuthSuccess} />
-                                  </DialogContent>
-                                </Dialog>
-                              )}
+                              <Button 
+                                onClick={() => handleAddToCart(`${burger.name} (${variant.size})`, variant.price)}
+                                size="sm"
+                                className="text-xs px-2 py-1"
+                                aria-label={`Add ${burger.name} ${variant.size} to cart`}
+                              >
+                                Add
+                              </Button>
                             </div>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      user ? (
-                        <Button 
-                          onClick={() => handleAddToCart(burger.name, burger.price)}
-                          className="w-full"
-                          size="sm"
-                          aria-label={`Add ${burger.name} to cart for ${burger.price} rupees`}
-                        >
-                          Add to Cart
-                        </Button>
-                      ) : (
-                        <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
-                          <DialogTrigger asChild>
-                            <Button
-                              className="w-full"
-                              size="sm"
-                              aria-label={`Add ${burger.name} to cart - login required`}
-                              onClick={() => setPendingAddItem({ itemName: burger.name, itemPrice: burger.price })}
-                            >
-                              Add to Cart
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto" role="dialog" aria-labelledby="auth-title">
-                            <DialogTitle id="auth-title" className="sr-only">Authentication</DialogTitle>
-                            <DialogDescription className="sr-only">Login or create an account to add items to cart</DialogDescription>
-                            <AuthForm onClose={handleAuthClose} onSuccess={handleAuthSuccess} />
-                          </DialogContent>
-                        </Dialog>
-                      )
+                      <Button 
+                        onClick={() => handleAddToCart(burger.name, burger.price)}
+                        className="w-full"
+                        size="sm"
+                        aria-label={`Add ${burger.name} to cart for ${burger.price} rupees`}
+                      >
+                        Add to Cart
+                      </Button>
                     )}
                   </CardContent>
                 </Card>
@@ -327,6 +300,15 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
           </nav>
         </div>
       </div>
+
+      {/* Single Auth Dialog — rendered once, controlled by authDialogOpen */}
+      <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
+        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogTitle className="sr-only">Authentication</DialogTitle>
+          <DialogDescription className="sr-only">Login or create an account to add items to cart</DialogDescription>
+          <AuthForm onClose={handleAuthClose} />
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };

@@ -1,0 +1,24 @@
+.about-frame {
+    border-radius: 50%;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .about-frame {
+        width: 90%;
+    }
+}
+
+.logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.logo img {
+    max-width: 100%;
+    height: auto;
+}

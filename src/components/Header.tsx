@@ -32,9 +32,9 @@ const Header = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-8">
-            <Link to="/" className="font-bebas text-4xl text-foreground tracking-wider hover:text-primary transition-colors" aria-label="Burger Rox home">
+            <a href="/" className="font-bebas text-4xl text-foreground tracking-wider hover:text-primary transition-colors" aria-label="Burger Rox home">
               BURGER ROX
-            </Link>
+            </a>
             <nav className="hidden md:flex space-x-6" aria-label="Main navigation">
               {location.pathname === '/menu' ? (
                 <Link to="/" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">

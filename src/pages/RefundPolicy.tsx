@@ -25,10 +25,19 @@ const RefundPolicy = () => {
             </p>
 
             <section>
-              <h2 className="font-bebas text-xl tracking-wide text-foreground mb-2">Eligibility</h2>
+              <h2 className="font-bebas text-xl tracking-wide text-foreground mb-2">Cancellation Policy</h2>
+              <ul className="list-disc pl-6 mt-2 space-y-1">
+                <li>Orders can be cancelled within <strong>1 minute</strong> of placing the order.</li>
+                <li>After 1 minute, once preparation has begun, cancellations are <strong>not possible</strong>.</li>
+                <li>For cancellation requests before delivery, please contact us immediately via WhatsApp or phone (details below). We will do our best to accommodate, subject to order preparation status.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="font-bebas text-xl tracking-wide text-foreground mb-2">Refund Eligibility</h2>
               <p>Refunds may be considered for:</p>
               <ul className="list-disc pl-6 mt-2 space-y-1">
-                <li>Order cancelled before preparation or dispatch</li>
+                <li>Order cancelled within the 1-minute cancellation window</li>
                 <li>Wrong or missing items (reported promptly)</li>
                 <li>Payment charged in error or duplicate</li>
               </ul>

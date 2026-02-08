@@ -74,7 +74,7 @@ const allMenuItems = [
     { size: "Large", price: 149 }
   ]},
   { name: "Chicken Nuggets [4 Pcs]", description: "Crispy fried chicken nuggets, perfect for a quick bite.", price: 89, popular: true, category: "Sides", foodType: "nonveg" as const },
-  { name: "Potato Wedges", description: "Crispy golden potato wedges seasoned to perfection.", price: 1, popular: false, category: "Sides", foodType: "veg" as const },
+  { name: "Potato Wedges", description: "Crispy golden potato wedges seasoned to perfection.", price: 99, popular: false, category: "Sides", foodType: "veg" as const },
   { name: "Molten Lava Cake [80g]", description: "Rich, decadent cake oozing with warm, velvety chocolate center.", price: 79, popular: true, category: "Sides", foodType: "veg" as const },
 
   // Beverages

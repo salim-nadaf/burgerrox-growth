@@ -30,11 +30,12 @@ export default function AuthForm({ onClose, onSuccess }: AuthFormProps) {
   const { signIn, signUp, resetPassword } = useAuth();
 
   const validateForm = () => {
-    // Email validation - must end with .com
-    if (!formData.email.endsWith('.com')) {
+    // Email validation - allow .com, .in, .edu
+    const allowedExtensions = ['.com', '.in', '.edu'];
+    if (!allowedExtensions.some(ext => formData.email.endsWith(ext))) {
       toast({
         title: "Invalid Email",
-        description: "Email must end with .com",
+        description: "Email must end with .com, .in, or .edu",
         variant: "destructive"
       });
       return false;
@@ -242,7 +243,7 @@ export default function AuthForm({ onClose, onSuccess }: AuthFormProps) {
               onChange={handleInputChange}
               placeholder="your.email@example.com"
               required
-              pattern=".*\.com$"
+              pattern=".*(\.com|\.in|\.edu)$"
             />
           </div>
           

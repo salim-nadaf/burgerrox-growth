@@ -30,19 +30,18 @@ serve(async (req) => {
       global: { headers: { Authorization: authHeader } }
     })
 
-    // Verify the user's JWT and get claims
-    const token = authHeader.replace('Bearer ', '')
-    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token)
+    // Verify the user's JWT
+    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
     
-    if (claimsError || !claimsData?.claims) {
-      console.error('JWT verification failed:', claimsError)
+    if (authError || !authUser) {
+      console.error('JWT verification failed:', authError)
       return new Response(
         JSON.stringify({ error: 'Unauthorized - invalid token' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    const userId = claimsData.claims.sub
+    const userId = authUser.id
     console.log('Authenticated user:', userId)
 
     const body = await req.json()

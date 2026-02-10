@@ -157,7 +157,7 @@ const AuthForm = ({ onClose }: AuthFormProps) => {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="your@email.com"
+            placeholder="example@gmail.com, user@college.edu.in"
             required
           />
         </div>

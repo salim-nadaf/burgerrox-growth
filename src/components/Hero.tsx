@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Clock } from "lucide-react";
 import heroImage from "@/assets/hero-burger.jpg";
 
 const Hero = () => {
@@ -80,8 +81,15 @@ const Hero = () => {
               <div className="w-px h-12 bg-border" aria-hidden="true"></div>
               <div className="font-montserrat" role="listitem">
                 <div className="font-bebas text-2xl sm:text-3xl text-primary" aria-label="4.6 star rating">4.6★</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">Customer Rated</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Customer Rated</div>
               </div>
+            </div>
+
+            <div className="flex items-center justify-center gap-2 mt-6 px-4 py-2 bg-foreground/10 backdrop-blur-sm rounded-full border border-border/50 w-fit mx-auto">
+              <Clock className="h-4 w-4 text-primary" />
+              <span className="font-montserrat text-sm text-foreground font-medium">
+                Orders open daily from 7 PM to 10 PM
+              </span>
             </div>
           </div>
         </div>

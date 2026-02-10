@@ -4,12 +4,13 @@ import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } 
 import { useState } from "react";
 import AuthForm from "./AuthForm";
 import { useAuth } from "@/hooks/useAuth";
+import { ShieldCheck, Truck, Banknote } from "lucide-react";
 
 const LoginIncentive = () => {
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const { user } = useAuth();
 
-  if (user) return null; // Don't show if user is already logged in
+  if (user) return null;
 
   return (
     <section className="py-16 bg-primary/5">
@@ -20,31 +21,35 @@ const LoginIncentive = () => {
               <div className="space-y-6">
                 <div>
                   <h2 className="font-bebas text-4xl md:text-5xl text-foreground tracking-wider mb-2">
-                    SPECIAL OFFERS AWAIT!
+                    WHY ORDER DIRECT?
                   </h2>
                   <p className="font-allura text-2xl md:text-3xl text-primary">
-                    Just for you
+                    Better prices, faster service
                   </p>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="p-6 bg-background rounded-lg border-2 border-primary/30">
-                    <div className="text-center">
-                      <div className="font-bebas text-3xl text-primary mb-2">10% OFF</div>
-                      <div className="font-montserrat text-lg text-foreground mb-2">First Order Discount</div>
-                      <div className="font-montserrat text-sm text-muted-foreground">
-                        Sign up now and get 10% off your first order!
-                      </div>
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="p-6 bg-background rounded-lg border-2 border-primary/30 flex flex-col items-center">
+                    <Banknote className="h-8 w-8 text-primary mb-3" />
+                    <div className="font-bebas text-2xl text-primary mb-1">LOWER PRICES</div>
+                    <div className="font-montserrat text-sm text-muted-foreground">
+                      Direct ordering = no middleman fees. You save more.
                     </div>
                   </div>
 
-                  <div className="p-6 bg-background rounded-lg border-2 border-primary/30">
-                    <div className="text-center">
-                      <div className="font-bebas text-3xl text-primary mb-2">EXTRA 5% OFF</div>
-                      <div className="font-montserrat text-lg text-foreground mb-2">Student Special</div>
-                      <div className="font-montserrat text-sm text-muted-foreground">
-                        Show your Symbiosis University ID for additional 5% off!
-                      </div>
+                  <div className="p-6 bg-background rounded-lg border-2 border-primary/30 flex flex-col items-center">
+                    <Truck className="h-8 w-8 text-primary mb-3" />
+                    <div className="font-bebas text-2xl text-primary mb-1">FREE DELIVERY</div>
+                    <div className="font-montserrat text-sm text-muted-foreground">
+                      Within 3 km of our restaurant — no hidden charges.
+                    </div>
+                  </div>
+
+                  <div className="p-6 bg-background rounded-lg border-2 border-primary/30 flex flex-col items-center">
+                    <ShieldCheck className="h-8 w-8 text-primary mb-3" />
+                    <div className="font-bebas text-2xl text-primary mb-1">TRACK ORDERS</div>
+                    <div className="font-montserrat text-sm text-muted-foreground">
+                      Sign up to save your address and view order history.
                     </div>
                   </div>
                 </div>
@@ -53,21 +58,15 @@ const LoginIncentive = () => {
                   <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
                     <DialogTrigger asChild>
                       <Button size="xl" className="px-8 py-4 text-lg">
-                        Claim Your Discount Now!
+                        Create Free Account
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
                       <DialogTitle className="sr-only">Authentication</DialogTitle>
-                      <DialogDescription className="sr-only">Login or create an account to claim your discount</DialogDescription>
+                      <DialogDescription className="sr-only">Login or create an account</DialogDescription>
                       <AuthForm onClose={() => setAuthDialogOpen(false)} />
                     </DialogContent>
                   </Dialog>
-                </div>
-
-                <div className="text-center">
-                  <p className="font-montserrat text-sm text-muted-foreground">
-                    * Student discount applicable with valid Symbiosis University ID card
-                  </p>
                 </div>
               </div>
             </CardContent>

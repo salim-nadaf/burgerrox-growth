@@ -5,12 +5,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Restaurant location - Urban Forest, Mamurdi, Pune 412101
-// Coordinates: 18.6298, 73.7997 (approximate)
 const RESTAURANT_LAT = 18.6298;
 const RESTAURANT_LNG = 73.7997;
 
-// Delivery charge tiers based on distance (in km)
 const DELIVERY_TIERS = [
   { maxDistance: 3, charge: 0, label: "Free Delivery" },
   { maxDistance: 5, charge: 50, label: "₹50 (3-5 km)" },
@@ -19,9 +16,8 @@ const DELIVERY_TIERS = [
   { maxDistance: Infinity, charge: 175, label: "₹175 (10+ km)" }
 ];
 
-// Haversine formula to calculate distance between two coordinates
 function calculateHaversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371; // Earth's radius in km
+  const R = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
   const a = 
@@ -35,11 +31,7 @@ function calculateHaversineDistance(lat1: number, lon1: number, lat2: number, lo
 function getDeliveryCharge(distanceKm: number): { charge: number; label: string; distanceKm: number } {
   for (const tier of DELIVERY_TIERS) {
     if (distanceKm <= tier.maxDistance) {
-      return { 
-        charge: tier.charge, 
-        label: tier.label,
-        distanceKm: Math.round(distanceKm * 10) / 10
-      };
+      return { charge: tier.charge, label: tier.label, distanceKm: Math.round(distanceKm * 10) / 10 };
     }
   }
   return { 
@@ -49,22 +41,26 @@ function getDeliveryCharge(distanceKm: number): { charge: number; label: string;
   };
 }
 
-// Try to geocode with Nominatim
+function isValidCoordinate(lat: number, lng: number): boolean {
+  return typeof lat === 'number' && typeof lng === 'number' &&
+    lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 &&
+    isFinite(lat) && isFinite(lng);
+}
+
 async function tryGeocode(query: string): Promise<{ lat: number; lon: number; displayName: string } | null> {
+  // Limit query length
+  const safeQuery = query.substring(0, 500);
   const url = new URL('https://nominatim.openstreetmap.org/search');
-  url.searchParams.set('q', query);
+  url.searchParams.set('q', safeQuery);
   url.searchParams.set('format', 'json');
   url.searchParams.set('limit', '1');
   url.searchParams.set('countrycodes', 'in');
   
   const response = await fetch(url.toString(), {
-    headers: {
-      'User-Agent': 'BurgerRox-Delivery-App/1.0'
-    }
+    headers: { 'User-Agent': 'BurgerRox-Delivery-App/1.0' }
   });
   
   const data = await response.json();
-  console.log(`Nominatim query "${query}":`, JSON.stringify(data));
   
   if (data && data.length > 0) {
     return {
@@ -76,25 +72,17 @@ async function tryGeocode(query: string): Promise<{ lat: number; lon: number; di
   return null;
 }
 
-// Geocode address using OpenStreetMap Nominatim with fallback strategies
 async function geocodeAddress(address: string): Promise<{ lat: number; lon: number; displayName: string } | null> {
-  // Clean and normalize the address
-  const cleanAddress = address.trim();
-  
-  // Extract road/area name (remove business names, landmarks)
-  // Common patterns: "Shop name, Road name" or "Landmark, Area"
+  const cleanAddress = address.trim().substring(0, 500);
   const parts = cleanAddress.split(',').map(p => p.trim());
   
-  // Build search queries from most specific to least
   const searchQueries: string[] = [];
   
-  // 1. Full address with Pune
   const fullAddress = cleanAddress.toLowerCase().includes('pune') 
     ? cleanAddress 
     : `${cleanAddress}, Pune, Maharashtra, India`;
   searchQueries.push(fullAddress);
   
-  // 2. If there are multiple parts, try without the first part (often business name)
   if (parts.length >= 2) {
     const withoutFirst = parts.slice(1).join(', ');
     const areaSearch = withoutFirst.toLowerCase().includes('pune')
@@ -103,7 +91,6 @@ async function geocodeAddress(address: string): Promise<{ lat: number; lon: numb
     searchQueries.push(areaSearch);
   }
   
-  // 3. Try just the last part (likely area name) + Pune
   if (parts.length >= 1) {
     const lastPart = parts[parts.length - 1];
     if (!lastPart.toLowerCase().includes('pune')) {
@@ -111,7 +98,6 @@ async function geocodeAddress(address: string): Promise<{ lat: number; lon: numb
     }
   }
   
-  // 4. Look for common road keywords
   const roadKeywords = ['road', 'marg', 'nagar', 'chowk', 'colony', 'society', 'vihar', 'path'];
   for (const part of parts) {
     const lowerPart = part.toLowerCase();
@@ -120,24 +106,18 @@ async function geocodeAddress(address: string): Promise<{ lat: number; lon: numb
     }
   }
 
-  // Try each query until one works
   for (const query of searchQueries) {
     const result = await tryGeocode(query);
-    if (result) {
-      return result;
-    }
+    if (result) return result;
   }
   
   return null;
 }
 
-// Estimate travel time based on distance (rough estimate: 25 km/h average in city)
 function estimateDuration(distanceKm: number): string {
   const avgSpeedKmh = 25;
   const minutes = Math.round((distanceKm / avgSpeedKmh) * 60);
-  if (minutes < 60) {
-    return `${minutes} mins`;
-  }
+  if (minutes < 60) return `${minutes} mins`;
   const hours = Math.floor(minutes / 60);
   const remainingMins = minutes % 60;
   return `${hours} hr ${remainingMins} mins`;
@@ -149,30 +129,35 @@ serve(async (req) => {
   }
 
   try {
-    const { customerAddress } = await req.json();
+    const body = await req.json();
+    const customerAddress = typeof body.customerAddress === 'string' 
+      ? body.customerAddress.trim().substring(0, 500) 
+      : '';
     
-    if (!customerAddress || customerAddress.trim().length < 5) {
+    if (!customerAddress || customerAddress.length < 5) {
       return new Response(
         JSON.stringify({ error: 'Please enter a valid delivery address' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Geocode the customer address using free Nominatim service
     const location = await geocodeAddress(customerAddress);
     
     if (!location) {
       return new Response(
-        JSON.stringify({ 
-          error: 'Could not find your address. Please try with more details (e.g., area name, landmark).',
-          details: 'Address not found'
-        }),
+        JSON.stringify({ error: 'Could not find your address. Please try with more details.' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Calculate straight-line distance using Haversine formula
-    // Adding 30% buffer for actual road distance
+    // Validate geocoded coordinates
+    if (!isValidCoordinate(location.lat, location.lon)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid location returned from geocoding' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const straightLineDistance = calculateHaversineDistance(
       RESTAURANT_LAT, RESTAURANT_LNG,
       location.lat, location.lon
@@ -182,18 +167,11 @@ serve(async (req) => {
     const deliveryInfo = getDeliveryCharge(estimatedRoadDistance);
     const durationText = estimateDuration(estimatedRoadDistance);
 
-    console.log(`Distance calculated: ${straightLineDistance.toFixed(2)}km straight, ~${estimatedRoadDistance.toFixed(2)}km road`);
-
     return new Response(
       JSON.stringify({
         success: true,
-        distance: {
-          value: estimatedRoadDistance,
-          text: `${estimatedRoadDistance.toFixed(1)} km`
-        },
-        duration: {
-          text: durationText
-        },
+        distance: { value: estimatedRoadDistance, text: `${estimatedRoadDistance.toFixed(1)} km` },
+        duration: { text: durationText },
         deliveryCharge: deliveryInfo.charge,
         deliveryLabel: deliveryInfo.label,
         destinationAddress: location.displayName
@@ -204,7 +182,7 @@ serve(async (req) => {
   } catch (error: any) {
     console.error('Error calculating delivery:', error);
     return new Response(
-      JSON.stringify({ error: error.message || 'Failed to calculate delivery charge' }),
+      JSON.stringify({ error: 'Failed to calculate delivery charge' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

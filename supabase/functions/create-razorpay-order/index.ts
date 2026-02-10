@@ -45,7 +45,10 @@ serve(async (req) => {
     const userId = claimsData.claims.sub
     console.log('Authenticated user:', userId)
 
-    const { amount, currency = 'INR', receipt } = await req.json()
+    const body = await req.json()
+    const amount = body.amount
+    const currency = body.currency || 'INR'
+    const receipt = typeof body.receipt === 'string' ? body.receipt.trim().substring(0, 200).replace(/[^a-zA-Z0-9_\-]/g, '') : undefined
 
     // Enhanced amount validation
     if (!amount || typeof amount !== 'number' || amount <= 0) {

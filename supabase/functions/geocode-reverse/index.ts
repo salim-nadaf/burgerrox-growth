@@ -5,6 +5,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+function isValidCoordinate(lat: number, lng: number): boolean {
+  return typeof lat === 'number' && typeof lng === 'number' &&
+    lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 &&
+    isFinite(lat) && isFinite(lng);
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -18,15 +24,15 @@ serve(async (req) => {
 
     const { lat, lng } = await req.json();
 
-    if (typeof lat !== 'number' || typeof lng !== 'number') {
+    if (!isValidCoordinate(Number(lat), Number(lng))) {
       return new Response(
-        JSON.stringify({ error: 'lat and lng numbers are required' }),
+        JSON.stringify({ error: 'Invalid coordinates. Latitude must be -90 to 90, longitude -180 to 180.', formattedAddress: null }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     const url = new URL('https://maps.googleapis.com/maps/api/geocode/json');
-    url.searchParams.set('latlng', `${lat},${lng}`);
+    url.searchParams.set('latlng', `${Number(lat)},${Number(lng)}`);
     url.searchParams.set('key', GOOGLE_MAPS_API_KEY);
 
     const res = await fetch(url.toString());
@@ -36,23 +42,20 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({
           formattedAddress: null,
-          error: data.status === 'ZERO_RESULTS' ? 'No address found' : (data.error_message || data.status),
+          error: data.status === 'ZERO_RESULTS' ? 'No address found' : 'Geocoding failed',
         }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     return new Response(
-      JSON.stringify({
-        formattedAddress: data.results[0].formatted_address,
-      }),
+      JSON.stringify({ formattedAddress: data.results[0].formatted_address }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Reverse geocode failed';
     console.error('geocode-reverse error:', error);
     return new Response(
-      JSON.stringify({ error: message, formattedAddress: null }),
+      JSON.stringify({ error: 'Reverse geocode failed', formattedAddress: null }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

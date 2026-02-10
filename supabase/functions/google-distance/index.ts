@@ -5,16 +5,11 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Restaurant location - Urban Forest, Mamurdi, Saint Tukaram Nagar Road, Kiwale, Taluka Haveli 412101
-// Coordinates confirmed from Google Maps
 const RESTAURANT_ADDRESS = "Urban Forest, Mamurdi, Saint Tukaram Nagar Road, Kiwale, Taluka Haveli 412101, India";
 const RESTAURANT_LAT = 18.665812;
 const RESTAURANT_LNG = 73.716100;
-
-// Max delivery distance
 const MAX_DELIVERY_DISTANCE_KM = 12;
 
-// Delivery charge tiers based on distance (in km)
 const DELIVERY_TIERS = [
   { maxDistance: 3, charge: 0, label: "Free Delivery" },
   { maxDistance: 5, charge: 50, label: "₹50 (3-5 km)" },
@@ -35,6 +30,18 @@ function getDeliveryCharge(distanceKm: number): { charge: number; label: string 
   };
 }
 
+// Input validation helpers
+function isValidCoordinate(lat: number, lng: number): boolean {
+  return typeof lat === 'number' && typeof lng === 'number' &&
+    lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 &&
+    isFinite(lat) && isFinite(lng);
+}
+
+function sanitizeString(input: string, maxLength: number): string {
+  if (typeof input !== 'string') return '';
+  return input.trim().substring(0, maxLength);
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -46,20 +53,33 @@ serve(async (req) => {
       throw new Error('Google Maps API key not configured');
     }
 
-    const { placeId, destinationLat, destinationLng, formattedAddress } = await req.json();
+    const body = await req.json();
+    const placeId = body.placeId ? sanitizeString(String(body.placeId), 300) : undefined;
+    const destinationLat = body.destinationLat;
+    const destinationLng = body.destinationLng;
+    const formattedAddress = body.formattedAddress ? sanitizeString(String(body.formattedAddress), 500) : '';
 
-    if (!placeId && (!destinationLat || !destinationLng)) {
+    if (!placeId && (destinationLat === undefined || destinationLng === undefined)) {
       return new Response(
         JSON.stringify({ error: 'Either placeId or coordinates are required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    // Validate coordinates if provided
+    if (destinationLat !== undefined && destinationLng !== undefined) {
+      if (!isValidCoordinate(Number(destinationLat), Number(destinationLng))) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid coordinates. Latitude must be -90 to 90, longitude -180 to 180.' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
     let destLat = destinationLat;
     let destLng = destinationLng;
-    let destAddress = formattedAddress || '';
+    let destAddress = formattedAddress;
 
-    // If placeId provided, get coordinates from Geocoding API
     if (placeId && !destinationLat) {
       const geocodeUrl = new URL('https://maps.googleapis.com/maps/api/geocode/json');
       geocodeUrl.searchParams.set('place_id', placeId);
@@ -81,9 +101,7 @@ serve(async (req) => {
       destAddress = geocodeData.results[0].formatted_address;
     }
 
-    // Calculate distance using Distance Matrix API
     const distanceUrl = new URL('https://maps.googleapis.com/maps/api/distancematrix/json');
-    // Use address as origin for more "Google Maps-like" routing (entrance/road snapping)
     distanceUrl.searchParams.set('origins', RESTAURANT_ADDRESS);
     distanceUrl.searchParams.set('destinations', `${destLat},${destLng}`);
     distanceUrl.searchParams.set('mode', 'driving');
@@ -93,11 +111,9 @@ serve(async (req) => {
     const distanceResponse = await fetch(distanceUrl.toString());
     const distanceData = await distanceResponse.json();
 
-    console.log('Distance Matrix response:', JSON.stringify(distanceData));
-
     if (distanceData.status !== 'OK') {
       return new Response(
-        JSON.stringify({ error: 'Failed to calculate distance', details: distanceData.status }),
+        JSON.stringify({ error: 'Failed to calculate distance' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -105,32 +121,20 @@ serve(async (req) => {
     const element = distanceData.rows?.[0]?.elements?.[0];
     if (!element || element.status !== 'OK') {
       return new Response(
-        JSON.stringify({ 
-          error: 'Could not calculate route to this location',
-          details: element?.status || 'No route found'
-        }),
+        JSON.stringify({ error: 'Could not calculate route to this location' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Distance in km
     const distanceKm = element.distance.value / 1000;
     const roundedDistance = Math.round(distanceKm * 10) / 10;
     const deliveryCharge = getDeliveryCharge(distanceKm);
 
-    console.log(`Distance: ${roundedDistance}km, Charge: ₹${deliveryCharge.charge}`);
-
     return new Response(
       JSON.stringify({
         success: true,
-        distance: {
-          value: roundedDistance,
-          text: element.distance.text
-        },
-        duration: {
-          value: element.duration.value,
-          text: element.duration.text
-        },
+        distance: { value: roundedDistance, text: element.distance.text },
+        duration: { value: element.duration.value, text: element.duration.text },
         deliveryCharge: deliveryCharge.charge,
         deliveryLabel: deliveryCharge.label,
         destinationAddress: destAddress,
@@ -143,7 +147,7 @@ serve(async (req) => {
   } catch (error: any) {
     console.error('Error calculating distance:', error);
     return new Response(
-      JSON.stringify({ error: error.message || 'Failed to calculate delivery charge' }),
+      JSON.stringify({ error: 'Failed to calculate delivery charge' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

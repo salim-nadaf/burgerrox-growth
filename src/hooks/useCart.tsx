@@ -28,13 +28,49 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
 
+  // Merge guest cart from localStorage into DB after login
   useEffect(() => {
     if (user) {
-      fetchCartItems();
+      mergeGuestCart().then(() => fetchCartItems());
     } else {
       setCartItems([]);
     }
   }, [user]);
+
+  const mergeGuestCart = async () => {
+    try {
+      const raw = localStorage.getItem('guest_cart');
+      if (!raw) return;
+      const guestItems: { item_name: string; item_price: number; quantity: number }[] = JSON.parse(raw);
+      if (!guestItems.length) return;
+
+      // Fetch existing cart items to check for duplicates
+      const { data: existingItems } = await (supabase as any)
+        .from('cart_items')
+        .select('*')
+        .eq('user_id', user!.id);
+
+      for (const gi of guestItems) {
+        const existing = (existingItems || []).find((e: any) => e.item_name === gi.item_name);
+        if (existing) {
+          // Update quantity
+          await (supabase as any)
+            .from('cart_items')
+            .update({ quantity: existing.quantity + gi.quantity })
+            .eq('id', existing.id);
+        } else {
+          // Insert new item
+          await (supabase as any)
+            .from('cart_items')
+            .insert({ user_id: user!.id, item_name: gi.item_name, item_price: gi.item_price, quantity: gi.quantity });
+        }
+      }
+      localStorage.removeItem('guest_cart');
+    } catch (e) {
+      console.error('Error merging guest cart:', e);
+      localStorage.removeItem('guest_cart');
+    }
+  };
 
   const fetchCartItems = async () => {
     if (!user) return;
@@ -61,9 +97,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addToCart = async (itemName: string, itemPrice: number) => {
     if (!user) {
+      // Save to localStorage for guest users
+      try {
+        const raw = localStorage.getItem('guest_cart');
+        const guestItems: { item_name: string; item_price: number; quantity: number }[] = raw ? JSON.parse(raw) : [];
+        const existing = guestItems.find(i => i.item_name === itemName);
+        if (existing) {
+          existing.quantity += 1;
+        } else {
+          guestItems.push({ item_name: itemName, item_price: itemPrice, quantity: 1 });
+        }
+        localStorage.setItem('guest_cart', JSON.stringify(guestItems));
+      } catch (e) {
+        console.error('Error saving guest cart:', e);
+      }
       toast({
         title: "Login Required",
-        description: "Please login to add items to cart",
+        description: "Please login to add items to cart. Your item has been saved!",
         variant: "destructive"
       });
       return;

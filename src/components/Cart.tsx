@@ -373,6 +373,10 @@ Please confirm delivery time.`;
                 </Button>
               </div>
 
+              <p className="text-xs text-center text-muted-foreground font-montserrat italic">
+                Fresh batches made daily – limited evening slots.
+              </p>
+
               <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={clearCart}>
                 Clear Cart
               </Button>

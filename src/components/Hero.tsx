@@ -58,8 +58,8 @@ const Hero = () => {
                 variant="hero" 
                 size="xl" 
                 className="w-full sm:w-auto"
-                onClick={() => window.open('https://wa.me/919321389985', '_blank')}
-                aria-label="Order on WhatsApp"
+                onClick={() => window.location.href = '/menu'}
+                aria-label="Order from menu"
               >
                 Order Your Fix
               </Button>

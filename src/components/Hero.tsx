@@ -48,13 +48,7 @@ const Hero = () => {
             </p>
 
             <p className="font-montserrat text-sm md:text-base text-muted-foreground mt-2">
-              Rockin' burgers made with our homemade signature sauce.
-            </p>
-            
-            <p className="font-montserrat text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Maximum taste, minimum drama. We're all about serving up affordable, 
-              delicious burgers that hit different. No fancy fluff – just real food 
-              that gets it.
+              Burgers made with our homemade signature sauce.
             </p>
 
             <nav className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8" aria-label="Primary actions">

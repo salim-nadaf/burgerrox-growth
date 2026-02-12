@@ -173,12 +173,88 @@ Please confirm delivery time.`;
     }
   };
 
+  const COD_MINIMUM = 149;
+  const isCODAllowed = grandTotal >= COD_MINIMUM;
+
+  const generateCODWhatsAppMessage = () => {
+    const orderItems = cartItems
+      .map((item) => `• ${item.item_name} x${item.quantity} — ₹${(item.item_price * item.quantity).toFixed(2)}`)
+      .join("\n");
+
+    const customerName = profile?.name || "Guest";
+    const customerWhatsApp = profile?.whatsapp_number || "N/A";
+    const paymentLabel = orderType === "pickup" ? "Cash on Pickup" : "Cash on Delivery";
+
+    if (orderType === "pickup") {
+      return `--- BURGER ROX ORDER ---
+
+Order Type: PICKUP
+
+Customer: ${customerName}
+WhatsApp: ${customerWhatsApp}
+
+${orderItems}
+
+TOTAL: ₹${totalAmount.toFixed(2)}
+
+Payment: ${paymentLabel}
+
+Pickup Location: ${RESTAURANT_ADDRESS}
+
+Please confirm preparation time.
+Customer will arrive after confirmation.`;
+    } else {
+      const subtotalLine = `Subtotal: ₹${totalAmount.toFixed(2)}`;
+      const deliveryLine = `Delivery Charge: ${deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}`;
+      const totalLine = `TOTAL: ₹${grandTotal.toFixed(2)}`;
+
+      const fullAddr = formatFullAddress(detailedAddress, deliveryInfo?.destinationAddress);
+      const mapsLink = deliveryInfo?.lat && deliveryInfo?.lng
+        ? `https://www.google.com/maps?q=${deliveryInfo.lat},${deliveryInfo.lng}`
+        : "";
+      const landmark = detailedAddress.building || "N/A";
+
+      return `--- BURGER ROX ORDER ---
+
+Order Type: DELIVERY
+
+Customer: ${customerName}
+WhatsApp: ${customerWhatsApp}
+
+${orderItems}
+
+${subtotalLine}
+${deliveryLine}
+${totalLine}
+
+Payment: ${paymentLabel}
+${mapsLink ? `\nGoogle Maps: ${mapsLink}` : ""}
+
+Delivery Address:
+${fullAddr}
+
+Landmark: ${landmark}
+
+Please confirm delivery time.`;
+    }
+  };
+
   const handleCODOrder = () => {
     if (!user) {
       toast({ title: "Login Required", description: "Please login to place an order", variant: "destructive" });
       return;
     }
-    placeOrder("cod");
+    if (!canPlaceOrder() || !isCODAllowed) return;
+
+    const whatsappMessage = generateCODWhatsAppMessage();
+    window.open(`https://wa.me/919321389985?text=${encodeURIComponent(whatsappMessage)}`, "_blank");
+
+    // Clear cart after sending to WhatsApp
+    clearCart();
+    if (orderType === "delivery") clearDelivery();
+    setDetailedAddress({ flatNo: "", building: "", area: "", pincode: "" });
+    setIsOpen(false);
+    document.body.style.pointerEvents = "auto";
   };
 
   const handleOnlinePayment = async () => {
@@ -375,11 +451,23 @@ Please confirm delivery time.`;
                 <Button
                   className="w-full" variant="brand" size="lg"
                   onClick={handleCODOrder}
-                  disabled={!canPlaceOrder() || isProcessing}
+                  disabled={!canPlaceOrder() || isProcessing || !isCODAllowed}
                 >
                   <Banknote className="h-4 w-4 mr-2" />
-                  {orderType === "pickup" ? "Cash on Pickup" : "Cash on Delivery"}
+                  {isCODAllowed
+                    ? "Confirm on WhatsApp"
+                    : orderType === "pickup" ? "Cash on Pickup" : "Cash on Delivery"}
                 </Button>
+                {!isCODAllowed && (
+                  <p className="text-xs text-center text-destructive font-montserrat">
+                    Cash on Delivery available only for orders ₹{COD_MINIMUM} and above.
+                  </p>
+                )}
+                {isCODAllowed && (
+                  <p className="text-xs text-center text-muted-foreground font-montserrat">
+                    Our team will confirm your order on WhatsApp before delivery.
+                  </p>
+                )}
 
                 <Button
                   className="w-full" variant="default" size="lg"

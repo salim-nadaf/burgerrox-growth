@@ -86,15 +86,13 @@ const allMenuItems: MenuItem[] = [
   { name: "Zinger Combo", description: "Burger Rox Zinger with fries and your choice of drink or lava cake.", price: 349, popular: true, category: "Combos", foodType: "nonveg", section: ["Combos"], comboChoice: true },
 
   // Sides
-  { name: "Salted Fries", description: "Hot, crunchy and irresistibly delicious.", price: 59, popular: true, category: "Sides", foodType: "veg", section: ["Sides"], variants: [
-    { size: "Small", price: 59 },
-    { size: "Medium", price: 109 },
-    { size: "Large", price: 129 },
+  { name: "Salted Fries", description: "Hot, crunchy and irresistibly delicious.", price: 79, popular: true, category: "Sides", foodType: "veg", section: ["Sides"], variants: [
+    { size: "Small", price: 79 },
+    { size: "Regular", price: 109 },
   ]},
-  { name: "Peri Peri Fries", description: "Golden crisp fries tossed in a flavorful blend of herbs and spices.", price: 69, popular: true, category: "Sides", foodType: "veg", section: ["Sides"], variants: [
-    { size: "Small", price: 69 },
-    { size: "Medium", price: 119 },
-    { size: "Large", price: 149 },
+  { name: "Peri Peri Fries", description: "Golden crisp fries tossed in a flavorful blend of herbs and spices.", price: 89, popular: true, category: "Sides", foodType: "veg", section: ["Sides"], variants: [
+    { size: "Small", price: 89 },
+    { size: "Regular", price: 119 },
   ]},
   { name: "Potato Wedges", description: "Crispy golden potato wedges seasoned to perfection.", price: 99, popular: false, category: "Sides", foodType: "veg", section: ["Sides"] },
   { name: "Chicken Popcorn", description: "Bite-sized crispy chicken pieces, perfect for sharing.", price: 119, popular: false, category: "Sides", foodType: "nonveg", section: ["Sides"] },

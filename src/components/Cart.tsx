@@ -32,7 +32,7 @@ const Cart = () => {
     flatNo: "", building: "", area: "", pincode: ""
   });
 
-  const { cartItems, removeFromCart, updateQuantity, clearCart, totalAmount, itemCount } = useCart();
+  const { cartItems, addToCart, removeFromCart, updateQuantity, clearCart, totalAmount, itemCount } = useCart();
   const { user, profile } = useAuth();
   const { createOrder } = useOrders();
   const { deliveryInfo, clearDelivery } = useDelivery();
@@ -352,9 +352,22 @@ Please confirm delivery time.`;
 
               <Separator />
 
-              {/* Urgency message above checkout */}
+              {/* Wedges upsell */}
+              {!cartItems.some(i => i.item_name.toLowerCase().includes('wedges')) && (
+                <div className="flex items-center justify-between p-2 border border-primary/20 rounded-lg bg-primary/5">
+                  <p className="font-montserrat text-xs text-foreground">Make it a combo: add crispy potato wedges for just ₹69</p>
+                  <Button size="sm" variant="outline" className="text-xs ml-2 flex-shrink-0" onClick={() => addToCart("Potato Wedges (Upsell)", 69)}>
+                    + Add
+                  </Button>
+                </div>
+              )}
+
+              {/* Urgency + USP messages */}
               <p className="text-xs text-center text-muted-foreground font-montserrat italic">
                 Fresh batches made daily – limited evening slots.
+              </p>
+              <p className="text-xs text-center text-muted-foreground font-montserrat">
+                Every burger made with our homemade signature sauce.
               </p>
 
               {/* Payment Buttons */}

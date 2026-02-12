@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import burgerTrio from "@/assets/burger-trio.jpg";
 import friesImage from "@/assets/fries.jpg";
 import nuggetsImage from "@/assets/nuggets.jpg";
@@ -35,66 +38,70 @@ const FoodTypeIndicator = ({ type }: { type: 'veg' | 'nonveg' | 'egg' }) => {
 
 const getItemImage = (name: string, category: string) => {
   if (name.includes("Fries") || name.includes("Wedges")) return friesImage;
-  if (name.includes("Nuggets")) return nuggetsImage;
+  if (name.includes("Popcorn")) return nuggetsImage;
   if (name.includes("Lava Cake")) return lavaCakeImage;
-  if (name.includes("Coke")) return cokeImage;
+  if (name.includes("Coke") || name.includes("drink")) return cokeImage;
   if (name.includes("Egg")) return eggBurgerImage;
-  if (category === "Non-Veg") return chickenBurgerImage;
-  if (category === "Veg") return veggieBurgerImage;
-  if (category === "Combos & Meals") return comboMealImage;
-  return chickenBurgerImage; // default
+  if (name.includes("Veg") || name.includes("Aloo")) return veggieBurgerImage;
+  if (category === "Combos") return comboMealImage;
+  return chickenBurgerImage;
 };
 
-const allMenuItems = [
-  // Non-Veg Burgers
-  { name: "Burger Rox Zinger", description: "Premium chicken breast fried to perfection with signature sauce and liquid cheese.", price: 259, popular: true, category: "Non-Veg", foodType: "nonveg" as const },
-  { name: "Chicken Classic", description: "Classic chicken burger with fresh toppings and signature sauce.", price: 89, popular: true, category: "Non-Veg", foodType: "nonveg" as const },
-  { name: "Chicken Blaze Crisp", description: "Crispy chicken with signature sauce, fresh onion, tomato and lettuce.", price: 99, popular: false, category: "Non-Veg", foodType: "nonveg" as const, variants: [
-    { size: "Single Patty", price: 99 },
-    { size: "Double Patty", price: 139 }
-  ]},
-  { name: "Egg Cellent Fusion", description: "Aloo tikki with scrambled eggs, onion, tomato, lettuce and signature sauce.", price: 169, popular: false, category: "Non-Veg", foodType: "egg" as const },
+interface AddOn {
+  name: string;
+  price: number;
+}
 
-  // Veg Burgers
-  { name: "Aloo Tikki", description: "Crispy aloo tikki patty with onion, tomato, lettuce and signature sauce.", price: 79, popular: true, category: "Veg", foodType: "veg" as const },
-  { name: "Veggie Blaze Crisp", description: "Veg crispy burger with onion, tomato, lettuce and crispy patty.", price: 79, popular: false, category: "Veg", foodType: "veg" as const, variants: [
-    { size: "Single Patty", price: 79 },
-    { size: "Double Patty", price: 119 }
-  ]},
-  
+const BURGER_ADDONS: AddOn[] = [
+  { name: "Signature Sauce", price: 49 },
+  { name: "Cheese Slice", price: 29 },
+  { name: "Extra Lettuce & Onion", price: 19 },
+];
+
+interface MenuItem {
+  name: string;
+  description: string;
+  price: number;
+  popular: boolean;
+  category: string;
+  foodType: 'veg' | 'nonveg' | 'egg';
+  section: string[];
+  variants?: { size: string; price: number }[];
+  hasAddons?: boolean;
+  comboChoice?: boolean;
+}
+
+const allMenuItems: MenuItem[] = [
+  // Burgers
+  { name: "Blaze Chicken Burger", description: "Crispy chicken patty with fresh veggies and our rockin' homemade blaze sauce.", price: 129, popular: true, category: "Burgers", foodType: "nonveg", section: ["Most Popular", "All Burgers"], hasAddons: true },
+  { name: "Blaze Veg Burger", description: "Golden veg patty, crunchy lettuce, and signature blaze sauce in a soft bun.", price: 149, popular: true, category: "Burgers", foodType: "veg", section: ["Most Popular", "All Burgers"], hasAddons: true },
+  { name: "Aloo Rock Burger", description: "Classic aloo tikki with onions, lettuce, and our homemade signature sauce.", price: 99, popular: false, category: "Burgers", foodType: "veg", section: ["All Burgers"], hasAddons: true },
+  { name: "Egg Blaze Smash", description: "Crispy aloo tikki topped with scrambled egg and loaded with blaze sauce.", price: 169, popular: false, category: "Burgers", foodType: "egg", section: ["All Burgers"], hasAddons: true },
+  { name: "Double Blaze Chicken", description: "Two crispy chicken patties stacked with fresh veggies and double blaze flavor.", price: 199, popular: false, category: "Burgers", foodType: "nonveg", section: ["All Burgers"], hasAddons: true },
+  { name: "Double Blaze Veg", description: "Double veg patties with crunchy lettuce and extra signature sauce.", price: 169, popular: false, category: "Burgers", foodType: "veg", section: ["All Burgers"], hasAddons: true },
+  { name: "Burger Rox Zinger", description: "Our premium zinger-style chicken burger with bold spices and signature sauce.", price: 259, popular: true, category: "Burgers", foodType: "nonveg", section: ["All Burgers"], hasAddons: true },
+
+  // Combos
+  { name: "Blaze Combo", description: "Blaze Chicken Burger with fries and your choice of drink or lava cake.", price: 229, popular: true, category: "Combos", foodType: "nonveg", section: ["Combos"], comboChoice: true },
+  { name: "Zinger Combo", description: "Burger Rox Zinger with fries and your choice of drink or lava cake.", price: 349, popular: true, category: "Combos", foodType: "nonveg", section: ["Combos"], comboChoice: true },
+
   // Sides
-  { name: "Salted Fries", description: "Hot, crunchy and irresistibly delicious.", price: 59, popular: true, category: "Sides", foodType: "veg" as const, variants: [
+  { name: "Salted Fries", description: "Hot, crunchy and irresistibly delicious.", price: 59, popular: true, category: "Sides", foodType: "veg", section: ["Sides"], variants: [
     { size: "Small", price: 59 },
     { size: "Medium", price: 109 },
-    { size: "Large", price: 129 }
+    { size: "Large", price: 129 },
   ]},
-  { name: "Peri Peri Fries", description: "Golden crisp fries tossed in a flavorful blend of herbs and spices.", price: 69, popular: true, category: "Sides", foodType: "veg" as const, variants: [
+  { name: "Peri Peri Fries", description: "Golden crisp fries tossed in a flavorful blend of herbs and spices.", price: 69, popular: true, category: "Sides", foodType: "veg", section: ["Sides"], variants: [
     { size: "Small", price: 69 },
     { size: "Medium", price: 119 },
-    { size: "Large", price: 149 }
+    { size: "Large", price: 149 },
   ]},
-  { name: "Chicken Nuggets [4 Pcs]", description: "Crispy fried chicken nuggets, perfect for a quick bite.", price: 89, popular: true, category: "Sides", foodType: "nonveg" as const },
-  { name: "Potato Wedges", description: "Crispy golden potato wedges seasoned to perfection.", price: 99, popular: false, category: "Sides", foodType: "veg" as const },
-  { name: "Molten Lava Cake [80g]", description: "Rich, decadent cake oozing with warm, velvety chocolate center.", price: 79, popular: true, category: "Sides", foodType: "veg" as const },
-
-  // Beverages
-  { name: "Coke", description: "Refreshing coca cola.", price: 69, popular: true, category: "Beverages", foodType: "veg" as const, variants: [
-    { size: "Medium", price: 69 },
-    { size: "Large", price: 99 }
-  ]},
-  
-  // Combos & Meals
-  { name: "Classic Delight [Serves 2]", description: "2 Chicken Classic Burgers + Coke [250 ml].", price: 199, popular: true, category: "Combos & Meals", foodType: "nonveg" as const },
-  { name: "Veggie Crisp Duo [Serves 2]", description: "2 Veg Crispy Burgers + Golden Medium Fries.", price: 249, popular: false, category: "Combos & Meals", foodType: "veg" as const },
-  { name: "Rox Veggie Twist [Serves 2]", description: "2 Aloo Tikki burgers, medium fries and molten lava cake.", price: 274, popular: false, category: "Combos & Meals", foodType: "veg" as const },
-  { name: "Double Egg Stravagance [Serves 2]", description: "2 Aloo Tikki Egg Burgers + Chicken Nuggets [2 Pcs].", price: 299, popular: false, category: "Combos & Meals", foodType: "egg" as const },
-  { name: "Aloo Tikki Fiesta [Serves 4]", description: "4x the flavor with Indian spices and crispy texture, served with large Coke.", price: 349, popular: false, category: "Combos & Meals", foodType: "veg" as const },
-  { name: "Zinger Value Meal [Serves 2]", description: "2 Zinger Burgers + Medium Fries + Coke [250 ml] + Nuggets [2 Pcs].", price: 379, popular: false, category: "Combos & Meals", foodType: "nonveg" as const },
-  { name: "Crispy Chaos [Serves 4]", description: "2 Veg Crispy + 2 Chicken Crispy Patties + Large Fries.", price: 449, popular: true, category: "Combos & Meals", foodType: "nonveg" as const },
-  { name: "Rox Family Fiesta [Serves 4]", description: "4 Crispy Veg Burgers + Large Fries + Coke [350 ml].", price: 449, popular: true, category: "Combos & Meals", foodType: "veg" as const },
-  { name: "Classic Blaze Box [Serves 4]", description: "4 Chicken Classic + Nuggets [4 Pcs] + 2 Lava Cakes.", price: 499, popular: false, category: "Combos & Meals", foodType: "nonveg" as const },
-  { name: "Rox Zinger Blast [Serves 4]", description: "2 Zinger + 2 Classic Burgers + 2 Choco Lava Cakes.", price: 499, popular: true, category: "Combos & Meals", foodType: "nonveg" as const },
+  { name: "Potato Wedges", description: "Crispy golden potato wedges seasoned to perfection.", price: 99, popular: false, category: "Sides", foodType: "veg", section: ["Sides"] },
+  { name: "Chicken Popcorn", description: "Bite-sized crispy chicken pieces, perfect for sharing.", price: 119, popular: false, category: "Sides", foodType: "nonveg", section: ["Sides"] },
+  { name: "Choco Lava Cake", description: "Rich, decadent cake oozing with warm, velvety chocolate center.", price: 79, popular: true, category: "Sides", foodType: "veg", section: ["Sides"] },
 ];
+
+const MENU_SECTIONS = ["Most Popular", "Combos", "All Burgers", "Sides"];
 
 interface MenuPageProps {
   showAll?: boolean;
@@ -103,41 +110,214 @@ interface MenuPageProps {
 const MenuPage = ({ showAll = false }: MenuPageProps) => {
   const { addToCart } = useCart();
   const { user } = useAuth();
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [pendingAddItem, setPendingAddItem] = useState<{ itemName: string; itemPrice: number } | null>(null);
   const prevUserRef = useRef(user);
 
-  // Watch for user state change: when user goes from null → logged in with a pending item, add it
+  // Addon state per item
+  const [selectedAddons, setSelectedAddons] = useState<Record<string, string[]>>({});
+  // Combo choice state per item
+  const [comboChoices, setComboChoices] = useState<Record<string, string>>({});
+
   useEffect(() => {
     if (!prevUserRef.current && user && pendingAddItem) {
-      // User just logged in and there's a pending item — add it now
       addToCart(pendingAddItem.itemName, pendingAddItem.itemPrice);
       setPendingAddItem(null);
     }
     prevUserRef.current = user;
   }, [user, pendingAddItem, addToCart]);
 
-  const displayItems = showAll ? allMenuItems : allMenuItems.slice(0, 6);
-  const categories = ["All", "Veg", "Non-Veg", "Sides", "Beverages", "Combos & Meals"];
-  
-  const filteredItems = selectedCategory === 'All' 
-    ? displayItems 
-    : displayItems.filter(item => item.category === selectedCategory);
+  const toggleAddon = (itemName: string, addonName: string) => {
+    setSelectedAddons(prev => {
+      const current = prev[itemName] || [];
+      if (current.includes(addonName)) {
+        return { ...prev, [itemName]: current.filter(a => a !== addonName) };
+      }
+      return { ...prev, [itemName]: [...current, addonName] };
+    });
+  };
 
-  const handleAddToCart = async (itemName: string, itemPrice: number) => {
+  const setComboChoice = (itemName: string, choice: string) => {
+    setComboChoices(prev => ({ ...prev, [itemName]: choice }));
+  };
+
+  const getAddonTotal = (itemName: string) => {
+    const addons = selectedAddons[itemName] || [];
+    return addons.reduce((sum, name) => {
+      const addon = BURGER_ADDONS.find(a => a.name === name);
+      return sum + (addon?.price || 0);
+    }, 0);
+  };
+
+  const handleAddToCart = async (item: MenuItem, variantSize?: string, variantPrice?: number) => {
+    let finalName = item.name;
+    let finalPrice = variantPrice ?? item.price;
+
+    // Append combo choice
+    if (item.comboChoice) {
+      const choice = comboChoices[item.name] || "Soft Drink";
+      finalName = `${item.name} (with ${choice})`;
+    }
+
+    // Append variant
+    if (variantSize) {
+      finalName = `${item.name} (${variantSize})`;
+    }
+
+    // Handle add-ons for burgers
+    if (item.hasAddons) {
+      const addons = selectedAddons[item.name] || [];
+      if (addons.length > 0) {
+        finalName = `${finalName} + ${addons.join(', ')}`;
+        finalPrice += getAddonTotal(item.name);
+      }
+    }
+
     if (!user) {
-      // User not logged in — store item and open auth dialog
-      setPendingAddItem({ itemName, itemPrice });
+      setPendingAddItem({ itemName: finalName, itemPrice: finalPrice });
       setAuthDialogOpen(true);
       return;
     }
-    await addToCart(itemName, itemPrice);
+    await addToCart(finalName, finalPrice);
+    // Reset addons/combo choice for this item after adding
+    setSelectedAddons(prev => ({ ...prev, [item.name]: [] }));
   };
 
   const handleAuthClose = () => {
     setAuthDialogOpen(false);
-    // Don't clear pending item — it'll be added via useEffect when user state updates
+  };
+
+  // For homepage preview, show Most Popular + Combos only
+  const sectionsToShow = showAll ? MENU_SECTIONS : ["Most Popular", "Combos"];
+
+  const getItemsForSection = (section: string) => {
+    return allMenuItems.filter(item => item.section.includes(section));
+  };
+
+  const renderItemCard = (item: MenuItem) => {
+    const addons = selectedAddons[item.name] || [];
+    const addonTotal = getAddonTotal(item.name);
+    const comboChoice = comboChoices[item.name] || "Soft Drink";
+
+    return (
+      <article key={item.name} role="listitem">
+        <Card className="border-2 border-border hover:border-primary transition-all duration-300 hover:shadow-brand h-full">
+          <CardContent className="p-4">
+            <div className="flex gap-3 mb-4">
+              <img
+                src={getItemImage(item.name, item.category)}
+                alt={`${item.name} - ${item.description}`}
+                className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+                width="64"
+                height="64"
+                loading="lazy"
+                decoding="async"
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-col gap-1 mb-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <FoodTypeIndicator type={item.foodType} />
+                        <h3 className="font-bebas text-lg sm:text-xl text-foreground tracking-wide leading-tight">
+                          {item.name}
+                        </h3>
+                      </div>
+                      {item.popular && (
+                        <Badge variant="default" className="bg-primary text-primary-foreground text-xs mt-1" aria-label="Popular item">
+                          POPULAR
+                        </Badge>
+                      )}
+                    </div>
+                    {!item.variants && (
+                      <span className="font-bebas text-lg sm:text-xl text-primary flex-shrink-0" aria-label={`Price ${item.price} rupees`}>
+                        ₹{item.price}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p className="font-montserrat text-sm text-muted-foreground leading-relaxed mb-4">
+              {item.description}
+            </p>
+
+            {/* Combo choice */}
+            {item.comboChoice && (
+              <div className="mb-4 p-3 border rounded-lg bg-muted/30">
+                <p className="font-montserrat text-xs font-medium text-foreground mb-2">Choose one:</p>
+                <RadioGroup value={comboChoice} onValueChange={(v) => setComboChoice(item.name, v)} className="space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Soft Drink" id={`${item.name}-drink`} />
+                    <Label htmlFor={`${item.name}-drink`} className="text-sm font-montserrat">Soft Drink</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Choco Lava Cake" id={`${item.name}-cake`} />
+                    <Label htmlFor={`${item.name}-cake`} className="text-sm font-montserrat">Choco Lava Cake</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            )}
+
+            {/* Add-ons for burgers */}
+            {item.hasAddons && (
+              <div className="mb-4 p-3 border rounded-lg bg-muted/30">
+                <p className="font-montserrat text-xs font-medium text-foreground mb-2">Add-ons:</p>
+                <div className="space-y-1.5">
+                  {BURGER_ADDONS.map(addon => (
+                    <div key={addon.name} className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`${item.name}-${addon.name}`}
+                          checked={addons.includes(addon.name)}
+                          onCheckedChange={() => toggleAddon(item.name, addon.name)}
+                        />
+                        <Label htmlFor={`${item.name}-${addon.name}`} className="text-sm font-montserrat">{addon.name}</Label>
+                      </div>
+                      <span className="font-bebas text-sm text-primary">+₹{addon.price}</span>
+                    </div>
+                  ))}
+                </div>
+                {addonTotal > 0 && (
+                  <p className="font-montserrat text-xs text-primary mt-2">Add-ons total: +₹{addonTotal}</p>
+                )}
+              </div>
+            )}
+
+            {/* Variants */}
+            {item.variants ? (
+              <div className="space-y-2" role="group" aria-label={`${item.name} size options`}>
+                {item.variants.map((variant, i) => (
+                  <div key={i} className="flex justify-between items-center p-2 border rounded-lg">
+                    <span className="font-montserrat text-sm text-foreground">{variant.size}</span>
+                    <div className="flex items-center space-x-2">
+                      <span className="font-bebas text-base text-primary" aria-label={`${variant.size} price ${variant.price} rupees`}>₹{variant.price}</span>
+                      <Button
+                        onClick={() => handleAddToCart(item, variant.size, variant.price)}
+                        size="sm"
+                        className="text-xs px-2 py-1"
+                        aria-label={`Add ${item.name} ${variant.size} to cart`}
+                      >
+                        Add
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <Button
+                onClick={() => handleAddToCart(item)}
+                className="w-full"
+                size="sm"
+                aria-label={`Add ${item.name} to cart for ${item.price + addonTotal} rupees`}
+              >
+                Add to Cart{addonTotal > 0 ? ` — ₹${item.price + addonTotal}` : ''}
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      </article>
+    );
   };
 
   return (
@@ -156,109 +336,25 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
           </p>
         </header>
 
-        {showAll && (
-          <nav className="flex justify-center mb-8 px-4" aria-label="Menu category filter">
-            <div className="flex flex-wrap gap-2 justify-center max-w-4xl" role="group">
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  variant={selectedCategory === category ? "default" : "outline"}
-                  onClick={() => setSelectedCategory(category)}
-                  className="text-sm px-3 py-2"
-                  aria-pressed={selectedCategory === category}
-                  aria-label={`Filter by ${category}`}
-                >
-                  {category}
-                </Button>
-              ))}
-            </div>
-          </nav>
-        )}
-
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-6">
-            {/* Main Menu Grid */}
             <div className="flex-1">
-              <div className={showAll ? "grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"} role="list" aria-label="Menu items">
-                {filteredItems.map((burger, index) => (
-                  <article key={`${burger.name}-${index}`} role="listitem">
-                    <Card className="border-2 border-border hover:border-primary transition-all duration-300 hover:shadow-brand h-full">
-                      <CardContent className="p-4">
-                    <div className="flex gap-3 mb-4">
-                      <img 
-                        src={getItemImage(burger.name, burger.category)} 
-                        alt={`${burger.name} - ${burger.description}`}
-                        className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
-                        width="64"
-                        height="64"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-col gap-1 mb-2">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-1.5">
-                                <FoodTypeIndicator type={(burger as any).foodType || 'veg'} />
-                                <h3 className="font-bebas text-lg sm:text-xl text-foreground tracking-wide leading-tight">
-                                  {burger.name}
-                                </h3>
-                              </div>
-                              {burger.popular && (
-                                <Badge variant="default" className="bg-primary text-primary-foreground text-xs mt-1" aria-label="Popular item">
-                                  POPULAR
-                                </Badge>
-                              )}
-                            </div>
-                            {!(burger as any).variants && (
-                              <span className="font-bebas text-lg sm:text-xl text-primary flex-shrink-0" aria-label={`Price ${burger.price} rupees`}>
-                                ₹{burger.price}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
+              {sectionsToShow.map(section => {
+                const items = getItemsForSection(section);
+                if (items.length === 0) return null;
+                return (
+                  <div key={section} className="mb-10">
+                    <h3 className="font-bebas text-2xl sm:text-3xl text-foreground tracking-wider mb-4 border-b-2 border-primary/30 pb-2">
+                      {section}
+                    </h3>
+                    <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" role="list" aria-label={`${section} items`}>
+                      {items.map(item => renderItemCard(item))}
                     </div>
-                    <p className="font-montserrat text-sm text-muted-foreground leading-relaxed mb-4">
-                      {burger.description}
-                    </p>
-                   
-                    {(burger as any).variants ? (
-                      <div className="space-y-2" role="group" aria-label={`${burger.name} size options`}>
-                        {(burger as any).variants.map((variant: any, variantIndex: number) => (
-                          <div key={variantIndex} className="flex justify-between items-center p-2 border rounded-lg">
-                            <span className="font-montserrat text-sm text-foreground">{variant.size}</span>
-                            <div className="flex items-center space-x-2">
-                              <span className="font-bebas text-base text-primary" aria-label={`${variant.size} price ${variant.price} rupees`}>₹{variant.price}</span>
-                              <Button 
-                                onClick={() => handleAddToCart(`${burger.name} (${variant.size})`, variant.price)}
-                                size="sm"
-                                className="text-xs px-2 py-1"
-                                aria-label={`Add ${burger.name} ${variant.size} to cart`}
-                              >
-                                Add
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <Button 
-                        onClick={() => handleAddToCart(burger.name, burger.price)}
-                        className="w-full"
-                        size="sm"
-                        aria-label={`Add ${burger.name} to cart for ${burger.price} rupees`}
-                      >
-                        Add to Cart
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              </article>
-                ))}
-              </div>
+                  </div>
+                );
+              })}
             </div>
-            
+
             {/* Side Certificate Section - Only on full menu page */}
             {showAll && (
               <aside className="lg:w-64 xl:w-72 flex-shrink-0">
@@ -266,15 +362,15 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                   <Card className="border-2 border-primary/20 bg-card/50 backdrop-blur-sm">
                     <CardContent className="p-4 text-center">
                       <p className="font-bebas text-lg text-foreground mb-3 tracking-wide">CERTIFIED QUALITY</p>
-                      <a 
-                        href="https://restaurant-guru.in/Burger-Rox-Pimpri-Chinchwad" 
-                        target="_blank" 
+                      <a
+                        href="https://restaurant-guru.in/Burger-Rox-Pimpri-Chinchwad"
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="block hover:opacity-90 transition-opacity"
                         aria-label="View our Restaurant Guru certification"
                       >
-                        <img 
-                          src={restaurantGuruCertificate} 
+                        <img
+                          src={restaurantGuruCertificate}
                           alt="Restaurant Guru Certificate - Burger Rox Recommended 2025"
                           className="w-full max-w-[200px] mx-auto rounded-lg shadow-md"
                           loading="lazy"
@@ -290,13 +386,13 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
               </aside>
             )}
           </div>
-            
+
           <nav className="pt-6 sm:pt-8 space-y-4 flex flex-col sm:flex-row sm:space-y-0 sm:space-x-4 justify-center items-center" aria-label="Menu actions">
             {!showAll && (
               <Link to="/menu">
-                <Button 
-                  variant="outline" 
-                  size="lg" 
+                <Button
+                  variant="outline"
+                  size="lg"
                   className="w-full sm:w-auto"
                   aria-label="View complete menu"
                 >
@@ -304,9 +400,9 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                 </Button>
               </Link>
             )}
-            <Button 
-              variant="brand" 
-              size="lg" 
+            <Button
+              variant="brand"
+              size="lg"
               className="w-full sm:w-auto"
               onClick={() => window.open('https://wa.me/919321389985', '_blank')}
               aria-label="Order via WhatsApp"
@@ -317,7 +413,6 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
         </div>
       </div>
 
-      {/* Single Auth Dialog — rendered once, controlled by authDialogOpen */}
       <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
         <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
           <DialogTitle className="sr-only">Authentication</DialogTitle>

@@ -46,6 +46,10 @@ const Hero = () => {
             <p className="font-allura text-3xl md:text-4xl text-foreground mt-4" role="doc-subtitle">
               Rockin' homemade flavor
             </p>
+
+            <p className="font-montserrat text-sm md:text-base text-muted-foreground mt-2">
+              Rockin' burgers made with our homemade signature sauce.
+            </p>
             
             <p className="font-montserrat text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               Maximum taste, minimum drama. We're all about serving up affordable, 
@@ -85,7 +89,11 @@ const Hero = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-center gap-2 mt-6 px-4 py-2 bg-foreground/10 backdrop-blur-sm rounded-full border border-border/50 w-fit mx-auto">
+            <p className="font-montserrat text-xs text-muted-foreground mt-4 italic">
+              Fresh batches. Homemade sauce. Evening only.
+            </p>
+
+            <div className="flex items-center justify-center gap-2 mt-4 px-4 py-2 bg-foreground/10 backdrop-blur-sm rounded-full border border-border/50 w-fit mx-auto">
               <Clock className="h-4 w-4 text-primary" />
               <span className="font-montserrat text-sm text-foreground font-medium">
                 Orders open daily from 7 PM to 10 PM

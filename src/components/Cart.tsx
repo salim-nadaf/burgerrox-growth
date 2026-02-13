@@ -58,8 +58,15 @@ const Cart = () => {
   const onlineDiscount = paymentMethod === "online" ? ONLINE_DISCOUNT : 0;
   const grandTotal = totalAmount + deliveryCharge - onlineDiscount;
 
+  const generateOrderId = () => {
+    const lastNum = parseInt(localStorage.getItem("brx_last_order") || "0", 10);
+    const newNum = lastNum + 1;
+    localStorage.setItem("brx_last_order", String(newNum));
+    return `BRX-${String(newNum).padStart(3, "0")}`;
+  };
+
   const generateWhatsAppMessage = (orderNumber: string) => {
-    const orderItems = cartItems
+    const itemsList = cartItems
       .map((item) => `• ${item.item_name} x${item.quantity} — ₹${(item.item_price * item.quantity).toFixed(2)}`)
       .join("\n");
 
@@ -76,7 +83,7 @@ Order Type: PICKUP
 Customer: ${customerName}
 WhatsApp: ${customerWhatsApp}
 
-${orderItems}
+${itemsList}
 
 TOTAL: ₹${grandTotal.toFixed(2)}${onlineDiscount > 0 ? `\n(Online Payment Discount: -₹${onlineDiscount})` : ''}
 
@@ -98,7 +105,7 @@ Customer will arrive after confirmation.`;
         : "";
       const landmark = detailedAddress.building || "N/A";
 
-      return `--- BURGER ROX ORDER ---
+      let msg = `--- BURGER ROX ORDER ---
 
 Order ID: ${orderNumber}
 Order Type: DELIVERY
@@ -106,7 +113,7 @@ Order Type: DELIVERY
 Customer: ${customerName}
 WhatsApp: ${customerWhatsApp}
 
-${orderItems}
+${itemsList}
 
 ${subtotalLine}
 ${deliveryLine}${discountLine ? `\n${discountLine}` : ''}
@@ -121,6 +128,12 @@ ${fullAddr}
 Landmark: ${landmark}
 
 Please confirm delivery time.`;
+
+      if (paymentLabel === "Pay on Delivery") {
+        msg += `\n\nNote: Pay via UPI when rider arrives.\nUPI details will be shared here before delivery.`;
+      }
+
+      return msg;
     }
   };
 
@@ -157,11 +170,12 @@ Please confirm delivery time.`;
         return;
       }
 
-      const whatsappMessage = generateWhatsAppMessage(order.order_number);
-      setLastOrder({ orderNumber: order.order_number, whatsappMessage });
+      const brxId = generateOrderId();
+      const whatsappMessage = generateWhatsAppMessage(brxId);
+      setLastOrder({ orderNumber: brxId, whatsappMessage });
 
       // Send to Google Sheet (non-blocking)
-      sendToGoogleSheet(buildSheetPayload(order.order_number, pMethod));
+      sendToGoogleSheet(buildSheetPayload(brxId, pMethod));
 
       await clearCart();
       if (orderType === "delivery") clearDelivery();
@@ -180,84 +194,9 @@ Please confirm delivery time.`;
   };
 
   const COD_MINIMUM = 149;
-  const isCODAllowed = grandTotal >= COD_MINIMUM;
+  const isCODAllowed = orderType === "pickup" || grandTotal >= COD_MINIMUM;
 
-  const generateCODWhatsAppMessage = () => {
-    const orderItems = cartItems
-      .map((item) => `• ${item.item_name} x${item.quantity} — ₹${(item.item_price * item.quantity).toFixed(2)}`)
-      .join("\n");
-
-    const customerName = profile?.name || "Guest";
-    const customerWhatsApp = profile?.whatsapp_number || "N/A";
-    const paymentLabel = orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery";
-
-    if (orderType === "pickup") {
-      return `--- BURGER ROX ORDER ---
-
-Order Type: PICKUP
-
-Customer: ${customerName}
-WhatsApp: ${customerWhatsApp}
-
-${orderItems}
-
-TOTAL: ₹${totalAmount.toFixed(2)}
-
-Payment: ${paymentLabel}
-
-Pickup Location: ${RESTAURANT_ADDRESS}
-
-Please confirm preparation time.
-Customer will arrive after confirmation.`;
-    } else {
-      const subtotalLine = `Subtotal: ₹${totalAmount.toFixed(2)}`;
-      const deliveryLine = `Delivery Charge: ${deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}`;
-      const totalLine = `TOTAL: ₹${grandTotal.toFixed(2)}`;
-
-      const fullAddr = formatFullAddress(detailedAddress, deliveryInfo?.destinationAddress);
-      const mapsLink = deliveryInfo?.lat && deliveryInfo?.lng
-        ? `https://www.google.com/maps?q=${deliveryInfo.lat},${deliveryInfo.lng}`
-        : "";
-      const landmark = detailedAddress.building || "N/A";
-
-      return `--- BURGER ROX ORDER ---
-
-Order Type: DELIVERY
-
-Customer: ${customerName}
-WhatsApp: ${customerWhatsApp}
-
-${orderItems}
-
-${subtotalLine}
-${deliveryLine}
-${totalLine}
-
-Payment: ${paymentLabel}
-${mapsLink ? `\nGoogle Maps: ${mapsLink}` : ""}
-
-Delivery Address:
-${fullAddr}
-
-Landmark: ${landmark}
-
-Please confirm delivery time.`;
-    }
-  };
-
-  const sendToGoogleSheet = async (orderData: {
-    order_id: string;
-    order_type: string;
-    customer_name: string;
-    customer_phone: string;
-    delivery_address: string;
-    items: string;
-    subtotal: number;
-    discount: number;
-    total_amount: number;
-    payment_method: string;
-    status: string;
-  }) => {
+  const sendToGoogleSheet = async (orderData: Record<string, unknown>) => {
     try {
       await fetch(
         "https://script.google.com/macros/s/AKfycbwhTIw0hZ_WPwwwrAxv1wRDsUIVRLTIKquXbl0mW8zQ8flJpUqUPRp-Lzl1lpiyiH6zsQ/exec",
@@ -279,19 +218,19 @@ Please confirm delivery time.`;
       .join(", ");
     const fullAddr = orderType === "delivery"
       ? formatFullAddress(detailedAddress, deliveryInfo?.destinationAddress)
-      : RESTAURANT_ADDRESS;
+      : "";
     return {
       order_id: orderId,
       order_type: orderType === "pickup" ? "PICKUP" : "DELIVERY",
-      customer_name: profile?.name || "Guest",
-      customer_phone: profile?.whatsapp_number || "N/A",
-      delivery_address: orderType === "delivery" ? fullAddr : "",
+      name: profile?.name || "Guest",
+      phone: profile?.whatsapp_number || "N/A",
+      address: fullAddr,
       items: itemsSummary,
       subtotal: totalAmount,
+      delivery: deliveryCharge,
       discount: pMethod === "online" ? onlineDiscount : 0,
-      total_amount: grandTotal,
-      payment_method: pMethod === "online" ? "Online" : orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery",
-      status: "NEW",
+      total: grandTotal,
+      payment: pMethod === "online" ? "Paid Online" : orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery",
     };
   };
 
@@ -302,10 +241,10 @@ Please confirm delivery time.`;
     }
     if (!canPlaceOrder() || !isCODAllowed) return;
 
-    const whatsappMessage = generateCODWhatsAppMessage();
+    const orderId = generateOrderId();
+    const whatsappMessage = generateWhatsAppMessage(orderId);
 
     // Send to Google Sheet (non-blocking)
-    const orderId = `COD_${Date.now()}`;
     sendToGoogleSheet(buildSheetPayload(orderId, "cod"));
 
     window.open(`https://wa.me/919321389985?text=${encodeURIComponent(whatsappMessage)}`, "_blank");
@@ -547,9 +486,7 @@ Please confirm delivery time.`;
                       disabled={!canPlaceOrder() || isProcessing || !isCODAllowed}
                     >
                       <Banknote className="h-4 w-4 mr-2" />
-                      {isCODAllowed
-                        ? (orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery")
-                        : (orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery")}
+                      {orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery"}
                     </Button>
     {!isCODAllowed && (
                       <p className="text-xs text-center text-destructive font-montserrat">

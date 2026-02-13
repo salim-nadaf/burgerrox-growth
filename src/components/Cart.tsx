@@ -160,6 +160,9 @@ Please confirm delivery time.`;
       const whatsappMessage = generateWhatsAppMessage(order.order_number);
       setLastOrder({ orderNumber: order.order_number, whatsappMessage });
 
+      // Send to Google Sheet (non-blocking)
+      sendToGoogleSheet(buildSheetPayload(order.order_number, pMethod));
+
       await clearCart();
       if (orderType === "delivery") clearDelivery();
       setDetailedAddress({ flatNo: "", building: "", area: "", pincode: "" });
@@ -242,6 +245,56 @@ Please confirm delivery time.`;
     }
   };
 
+  const sendToGoogleSheet = async (orderData: {
+    order_id: string;
+    order_type: string;
+    customer_name: string;
+    customer_phone: string;
+    delivery_address: string;
+    items: string;
+    subtotal: number;
+    discount: number;
+    total_amount: number;
+    payment_method: string;
+    status: string;
+  }) => {
+    try {
+      await fetch(
+        "https://script.google.com/macros/s/AKfycbwhTIw0hZ_WPwwwrAxv1wRDsUIVRLTIKquXbl0mW8zQ8flJpUqUPRp-Lzl1lpiyiH6zsQ/exec",
+        {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(orderData),
+        }
+      );
+    } catch (err) {
+      console.error("Google Sheet webhook error:", err);
+    }
+  };
+
+  const buildSheetPayload = (orderId: string, pMethod: string) => {
+    const itemsSummary = cartItems
+      .map((item) => `${item.item_name} x${item.quantity}`)
+      .join(", ");
+    const fullAddr = orderType === "delivery"
+      ? formatFullAddress(detailedAddress, deliveryInfo?.destinationAddress)
+      : RESTAURANT_ADDRESS;
+    return {
+      order_id: orderId,
+      order_type: orderType === "pickup" ? "PICKUP" : "DELIVERY",
+      customer_name: profile?.name || "Guest",
+      customer_phone: profile?.whatsapp_number || "N/A",
+      delivery_address: orderType === "delivery" ? fullAddr : "",
+      items: itemsSummary,
+      subtotal: totalAmount,
+      discount: pMethod === "online" ? onlineDiscount : 0,
+      total_amount: grandTotal,
+      payment_method: pMethod === "online" ? "Online" : orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery",
+      status: "NEW",
+    };
+  };
+
   const handleCODOrder = () => {
     if (!user) {
       toast({ title: "Login Required", description: "Please login to place an order", variant: "destructive" });
@@ -250,6 +303,11 @@ Please confirm delivery time.`;
     if (!canPlaceOrder() || !isCODAllowed) return;
 
     const whatsappMessage = generateCODWhatsAppMessage();
+
+    // Send to Google Sheet (non-blocking)
+    const orderId = `COD_${Date.now()}`;
+    sendToGoogleSheet(buildSheetPayload(orderId, "cod"));
+
     window.open(`https://wa.me/919321389985?text=${encodeURIComponent(whatsappMessage)}`, "_blank");
 
     // Clear cart after sending to WhatsApp
@@ -493,9 +551,9 @@ Please confirm delivery time.`;
                         ? (orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery")
                         : (orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery")}
                     </Button>
-                    {!isCODAllowed && (
+    {!isCODAllowed && (
                       <p className="text-xs text-center text-destructive font-montserrat">
-                        {orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery"} available only for orders ₹{COD_MINIMUM} and above.
+                        Minimum order value is ₹{COD_MINIMUM}
                       </p>
                     )}
                     {isCODAllowed && (

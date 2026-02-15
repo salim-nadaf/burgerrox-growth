@@ -243,6 +243,15 @@ Please confirm order and expected time.`;
 
     const prepared = await prepareOrder("cod");
 
+    // Save order to database
+    await createOrder({
+      items: prepared.items,
+      totalAmount: prepared.total,
+      paymentMethod: "cod",
+      paymentStatus: "pending",
+      orderNumber: prepared.orderId,
+    });
+
     // Send to Google Sheet (non-blocking)
     sendToGoogleSheet(buildSheetPayload(prepared.orderId, "cod"));
 
@@ -303,16 +312,15 @@ Please confirm order and expected time.`;
         order_id: data.orderId,
         handler: async (response: any) => {
           // Create order in DB
+          const prepared = await prepareOrder("online");
+
           const order = await createOrder({
-            items: cartItems.map((item) => ({
-              item_name: item.item_name,
-              item_price: item.item_price,
-              quantity: item.quantity,
-            })),
-            totalAmount: grandTotal,
+            items: prepared.items,
+            totalAmount: prepared.total,
             paymentMethod: "online",
             paymentStatus: "paid",
             paymentId: response.razorpay_payment_id,
+            orderNumber: prepared.orderId,
           });
 
           if (!order) {
@@ -320,8 +328,6 @@ Please confirm order and expected time.`;
             setIsProcessing(false);
             return;
           }
-
-          const prepared = await prepareOrder("online");
 
           // Send to Google Sheet
           sendToGoogleSheet(buildSheetPayload(prepared.orderId, "online"));

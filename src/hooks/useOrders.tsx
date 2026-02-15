@@ -35,6 +35,7 @@ interface OrdersContextType {
     paymentMethod: string;
     paymentStatus: string;
     paymentId?: string;
+    orderNumber?: string;
   }) => Promise<Order | null>;
   refreshOrders: () => Promise<void>;
 }
@@ -118,11 +119,12 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     paymentMethod: string;
     paymentStatus: string;
     paymentId?: string;
+    orderNumber?: string;
   }): Promise<Order | null> => {
     if (!user) return null;
 
     try {
-      const orderNumber = generateOrderNumber();
+      const orderNumber = orderData.orderNumber || generateOrderNumber();
       
       const { data, error } = await supabase
         .from('orders')

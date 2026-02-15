@@ -23,18 +23,20 @@ const Hero = () => {
 
       {/* Restaurant Guru Recommended Badge - Top Right Position */}
       <aside className="absolute top-4 right-2 sm:right-4 md:top-8 md:right-8 z-20" aria-label="Awards">
-        <a 
-          id="b-circledLeaves27" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          href="https://restaurant-guru.in/Burger-Rox-Pimpri-Chinchwad" 
-          className="b-circledLeaves27--light b-circledLeaves27--2025 transform scale-[0.4] sm:scale-50 md:scale-75 lg:scale-100 origin-top-right"
-          aria-label="Burger Rox recommended by Restaurant Guru 2025"
-        >
-          <span className="b-circledLeaves27__title">Recommended</span>
-          <span className="b-circledLeaves27__separator"></span>
-          <span className="b-circledLeaves27__name">Burger Rox</span>
-        </a>
+        <div className="bg-white rounded-full p-2 shadow-lg shadow-black/20">
+          <a 
+            id="b-circledLeaves27" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            href="https://restaurant-guru.in/Burger-Rox-Pimpri-Chinchwad" 
+            className="b-circledLeaves27--light b-circledLeaves27--2025 transform scale-[0.45] sm:scale-[0.55] md:scale-[0.85] lg:scale-110 origin-top-right"
+            aria-label="Burger Rox recommended by Restaurant Guru 2025"
+          >
+            <span className="b-circledLeaves27__title">Recommended</span>
+            <span className="b-circledLeaves27__separator"></span>
+            <span className="b-circledLeaves27__name">Burger Rox</span>
+          </a>
+        </div>
       </aside>
 
       <div className="container mx-auto px-4 z-10">

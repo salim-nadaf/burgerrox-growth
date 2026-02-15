@@ -17,6 +17,19 @@ import comboMealImage from "@/assets/combo-meal.jpg";
 import cokeImage from "@/assets/coca-cola.jpg";
 import lavaCakeImage from "@/assets/lava-cake.jpg";
 import restaurantGuruCertificate from "@/assets/RestaurantGuru_Certificate1 (1).png";
+// Specific menu item images
+import blazeChickenImg from "@/assets/Blaze Chicken Burger.jpg";
+import blazeVegImg from "@/assets/Blaze Veg Burger.jpg";
+import alooRockImg from "@/assets/Aloo Rock Burger.jpg";
+import doubleChickenImg from "@/assets/Double Blaze Chicken.png";
+import doubleVegImg from "@/assets/Double Blaze Veg.jpg";
+import zingerImg from "@/assets/Burger Rox Zinger.jpg";
+import blazeComboImg from "@/assets/Blaze Combo.jpeg";
+import zingerComboImg from "@/assets/Zinger Combo.jpeg";
+import saltedFriesImg from "@/assets/Salted Fries.jpg";
+import periPeriFriesImg from "@/assets/Peri Peri Fries.jpg";
+import potatoWedgesImg from "@/assets/Potato Wedges.jpeg";
+import chickenPopcornImg from "@/assets/Chicken Popcorn.jpeg";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
 import AuthForm from "./AuthForm";
@@ -36,15 +49,25 @@ const FoodTypeIndicator = ({ type }: { type: 'veg' | 'nonveg' | 'egg' }) => {
   );
 };
 
-const getItemImage = (name: string, category: string) => {
-  if (name.includes("Fries") || name.includes("Wedges")) return friesImage;
-  if (name.includes("Popcorn")) return nuggetsImage;
-  if (name.includes("Lava Cake")) return lavaCakeImage;
-  if (name.includes("Coke") || name.includes("drink")) return cokeImage;
-  if (name.includes("Egg")) return eggBurgerImage;
-  if (name.includes("Veg") || name.includes("Aloo")) return veggieBurgerImage;
-  if (category === "Combos") return comboMealImage;
-  return chickenBurgerImage;
+const ITEM_IMAGE_MAP: Record<string, string> = {
+  "Blaze Chicken Burger": blazeChickenImg,
+  "Blaze Veg Burger": blazeVegImg,
+  "Aloo Rock Burger": alooRockImg,
+  "Egg Blaze Smash": eggBurgerImage, // Keep existing egg burger image
+  "Double Blaze Chicken": doubleChickenImg,
+  "Double Blaze Veg": doubleVegImg,
+  "Burger Rox Zinger": zingerImg,
+  "Blaze Combo": blazeComboImg,
+  "Zinger Combo": zingerComboImg,
+  "Salted Fries": saltedFriesImg,
+  "Peri Peri Fries": periPeriFriesImg,
+  "Potato Wedges": potatoWedgesImg,
+  "Chicken Popcorn": chickenPopcornImg,
+  "Choco Lava Cake": lavaCakeImage, // Keep existing lava cake image
+};
+
+const getItemImage = (name: string, _category: string) => {
+  return ITEM_IMAGE_MAP[name] || chickenBurgerImage;
 };
 
 interface AddOn {
@@ -205,9 +228,9 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
               <img
                 src={getItemImage(item.name, item.category)}
                 alt={`${item.name} - ${item.description}`}
-                className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
-                width="64"
-                height="64"
+                className="w-20 h-20 rounded-lg object-cover object-center flex-shrink-0 aspect-square"
+                width="80"
+                height="80"
                 loading="lazy"
                 decoding="async"
               />

@@ -1,14 +1,18 @@
 import { Link } from "react-router-dom";
+import brLogo from "@/assets/BR Logo Transparent BG.png";
 
 const Footer = () => {
   return (
     <footer className="py-12 bg-accent" role="contentinfo" aria-label="Site footer">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-3 gap-8 items-center">
-          <div>
-            <p className="font-bebas text-3xl tracking-wider mb-2 text-accent-foreground">
-              BURGER ROX
-            </p>
+          <div className="flex flex-col items-center md:items-start">
+            <img 
+              src={brLogo} 
+              alt="Burger Rox Logo" 
+              className="h-16 md:h-20 w-auto mb-2"
+              loading="lazy"
+            />
             <p className="font-allura text-xl tracking-wide text-accent-foreground/80">
               Rockin' homemade flavor
             </p>

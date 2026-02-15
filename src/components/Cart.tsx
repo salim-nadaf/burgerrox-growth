@@ -83,11 +83,33 @@ const Cart = () => {
   const onlineDiscount = paymentMethod === "online" ? ONLINE_DISCOUNT : 0;
   const grandTotal = totalAmount + deliveryCharge - onlineDiscount;
 
-  const generateOrderId = () => {
-    const lastNum = parseInt(localStorage.getItem("brx_last_order") || "0", 10);
-    const newNum = lastNum + 1;
-    localStorage.setItem("brx_last_order", String(newNum));
-    return `BRX-${String(newNum).padStart(3, "0")}`;
+  const generateOrderId = async (): Promise<string> => {
+    try {
+      // Fetch last order number from database
+      const { data, error } = await supabase
+        .from("orders")
+        .select("order_number")
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      let lastNum = 0;
+      if (!error && data && data.length > 0) {
+        const match = data[0].order_number.match(/BRX-(\d+)/);
+        if (match) lastNum = parseInt(match[1], 10);
+      }
+      // Also check localStorage in case DB is behind
+      const localNum = parseInt(localStorage.getItem("brx_last_order") || "0", 10);
+      const maxNum = Math.max(lastNum, localNum);
+      const newNum = maxNum + 1;
+      localStorage.setItem("brx_last_order", String(newNum));
+      return `BRX-${String(newNum).padStart(3, "0")}`;
+    } catch {
+      // Fallback to localStorage only
+      const lastNum = parseInt(localStorage.getItem("brx_last_order") || "0", 10);
+      const newNum = lastNum + 1;
+      localStorage.setItem("brx_last_order", String(newNum));
+      return `BRX-${String(newNum).padStart(3, "0")}`;
+    }
   };
 
   const getPaymentLabel = (pMethod: string) => {
@@ -190,8 +212,8 @@ Please confirm order and expected time.`;
     };
   };
 
-  const prepareOrder = (pMethod: "cod" | "online") => {
-    const orderId = generateOrderId();
+  const prepareOrder = async (pMethod: "cod" | "online") => {
+    const orderId = await generateOrderId();
     const whatsappMessage = generateWhatsAppMessage(orderId);
     const paymentLabel = getPaymentLabel(pMethod);
 
@@ -208,7 +230,7 @@ Please confirm order and expected time.`;
     };
   };
 
-  const handleCODOrder = () => {
+  const handleCODOrder = async () => {
     if (!user) {
       toast({ title: "Login Required", description: "Please login to place an order", variant: "destructive" });
       return;
@@ -219,7 +241,7 @@ Please confirm order and expected time.`;
     }
     if (!canPlaceOrder() || isBelowDeliveryMinimum) return;
 
-    const prepared = prepareOrder("cod");
+    const prepared = await prepareOrder("cod");
 
     // Send to Google Sheet (non-blocking)
     sendToGoogleSheet(buildSheetPayload(prepared.orderId, "cod"));
@@ -299,7 +321,7 @@ Please confirm order and expected time.`;
             return;
           }
 
-          const prepared = prepareOrder("online");
+          const prepared = await prepareOrder("online");
 
           // Send to Google Sheet
           sendToGoogleSheet(buildSheetPayload(prepared.orderId, "online"));
@@ -510,7 +532,7 @@ Please confirm order and expected time.`;
               </div>
 
               {/* Minimum order warning for delivery */}
-              {isBelowDeliveryMinimum && paymentMethod === "cod" && (
+              {isBelowDeliveryMinimum && (
                 <p className="text-xs text-center text-destructive font-montserrat font-medium">
                   Minimum ₹149 required for delivery
                 </p>
@@ -538,7 +560,7 @@ Please confirm order and expected time.`;
                   <Button
                     className="w-full" variant="default" size="lg"
                     onClick={handleOnlinePayment}
-                    disabled={!canPlaceOrder() || isProcessing}
+                    disabled={!canPlaceOrder() || isProcessing || isBelowDeliveryMinimum}
                   >
                     <CreditCard className="h-4 w-4 mr-2" />
                     Pay Online (UPI / Card) — Save ₹10

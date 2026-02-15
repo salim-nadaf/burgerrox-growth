@@ -112,8 +112,14 @@ const Header = () => {
                 variant="brand" 
                 size="lg" 
                 className="hidden lg:flex"
-                onClick={() => window.open('https://wa.me/919321389985', '_blank')}
-                aria-label="Order now on WhatsApp"
+                onClick={() => {
+                  if (location.pathname === '/') {
+                    document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' });
+                  } else {
+                    navigate('/menu');
+                  }
+                }}
+                aria-label="Order now"
               >
                 Order Now
               </Button>
@@ -251,10 +257,16 @@ const Header = () => {
                     size="lg" 
                     className="w-full mt-6"
                     onClick={() => {
-                      window.open('https://wa.me/919321389985', '_blank');
                       setMobileMenuOpen(false);
+                      if (location.pathname === '/') {
+                        setTimeout(() => {
+                          document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' });
+                        }, 300);
+                      } else {
+                        navigate('/menu');
+                      }
                     }}
-                    aria-label="Order now on WhatsApp"
+                    aria-label="Order now"
                   >
                     Order Now
                   </Button>

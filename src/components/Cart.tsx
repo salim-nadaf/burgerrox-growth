@@ -21,7 +21,7 @@ declare global {
   }
 }
 
-const GOOGLE_SHEET_WEBHOOK = "https://script.google.com/macros/s/AKfycbwhTIw0hZ_WPwwwrAxv1wRDsUIVRLTIKquXbl0mW8zQ8flJpUqUPRp-Lzl1lpiyiH6zsQ/exec";
+const GOOGLE_SHEET_WEBHOOK = "https://script.google.com/macros/s/AKfycbxKYdD8h58iJRY5QKlVWLFwXwTwPYBGItMm1CewkMpjywV9L6ROnnXgLXA_coio5Rnxwg/exec";
 
 export const sendToGoogleSheet = async (orderData: Record<string, unknown>) => {
   try {

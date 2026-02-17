@@ -18,6 +18,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://awards.infcdn.net" />
     
+    <!-- Preload hero image for faster LCP/FCP -->
+    <link rel="preload" as="image" href="/hero-burger.jpg" fetchpriority="high" />
+    
     <!-- Critical CSS inline for faster FCP -->
     <style>
       body{margin:0;font-family:system-ui,-apple-system,sans-serif}

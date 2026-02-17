@@ -11,7 +11,7 @@ export default function OrdersSheet() {
     return (
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" aria-label="View orders">
             <ClipboardList className="h-4 w-4" />
           </Button>
         </SheetTrigger>
@@ -30,7 +30,7 @@ export default function OrdersSheet() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button variant="outline" size="icon" aria-label="View orders">
           <ClipboardList className="h-4 w-4" />
         </Button>
       </SheetTrigger>

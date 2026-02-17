@@ -1,24 +1,27 @@
 import { Button } from "@/components/ui/button";
 
-const heroImage = "/hero-burger.jpg";
-
 const Hero = () => {
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden max-w-full" aria-labelledby="hero-heading">
       {/* Background Image */}
       <div className="absolute inset-0 z-0" aria-hidden="true">
-        <img 
-          src={heroImage} 
-          srcSet="/hero-burger-mobile.webp 768w, /hero-burger.jpg 1920w"
-          sizes="100vw"
-          alt="" 
-          className="w-full h-full object-cover"
-          width="1920"
-          height="1080"
-          loading="eager"
-          fetchPriority="high"
-          decoding="async"
-        />
+        <picture>
+          <source
+            type="image/webp"
+            srcSet="/hero-burger-mobile.webp 768w, /hero-burger.webp 1920w"
+            sizes="100vw"
+          />
+          <img 
+            src="/hero-burger.jpg"
+            alt="" 
+            className="w-full h-full object-cover"
+            width="1920"
+            height="1080"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+          />
+        </picture>
         <div className="absolute inset-0 bg-[#FFD939]/40"></div>
       </div>
 

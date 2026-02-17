@@ -20,7 +20,7 @@
     <link rel="preconnect" href="https://awards.infcdn.net" crossorigin />
     
     <!-- Preload hero image for faster LCP/FCP -->
-    <link rel="preload" as="image" href="/hero-burger.jpg" fetchpriority="high" />
+    <link rel="preload" as="image" href="/hero-burger.webp" type="image/webp" fetchpriority="high" />
     
     <!-- Critical CSS inline for faster FCP -->
     <style>
@@ -114,7 +114,10 @@
     <div id="root">
       <!-- Static hero placeholder for instant FCP/LCP - replaced by React on mount -->
       <div class="hero-placeholder" aria-hidden="true">
-        <img src="/hero-burger.jpg" alt="" width="1920" height="1080" fetchpriority="high" decoding="async" />
+        <picture>
+          <source type="image/webp" srcset="/hero-burger-mobile.webp 768w, /hero-burger.webp 1920w" sizes="100vw" />
+          <img src="/hero-burger.jpg" alt="" width="1920" height="1080" fetchpriority="high" decoding="async" />
+        </picture>
         <div class="overlay"></div>
         <div class="content">
           <h1>CRAVE-WORTHY BURGERS</h1>

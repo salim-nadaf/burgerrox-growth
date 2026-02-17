@@ -60,15 +60,19 @@ const Hero = () => {
               Order Your Fix
             </Button>
             <Button 
-              variant="outline" 
+              variant="hero" 
               size="xl" 
-              className="w-full sm:w-auto border-white text-white hover:bg-white/20 hover:text-white font-bebas text-lg tracking-wider"
+              className="w-full sm:w-auto"
               onClick={() => window.location.href = '/menu'}
               aria-label="View full menu"
             >
               View Menu
             </Button>
           </div>
+
+          <p className="font-montserrat text-xs md:text-sm text-white/90 bg-black/30 inline-block px-4 py-1.5 rounded-full mt-4 drop-shadow-md">
+            🕖 Orders open daily from 7 PM to 10 PM
+          </p>
         </div>
       </div>
     </section>

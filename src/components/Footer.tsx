@@ -16,30 +16,30 @@ const Footer = () => {
               loading="lazy"
               decoding="async"
             />
-            <p className="font-allura text-xl tracking-wide text-accent-foreground/80">
+            <p className="font-allura text-xl tracking-wide text-accent-foreground">
               Rockin' homemade flavor
             </p>
           </div>
 
           <div className="text-center space-y-3">
             <nav className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm" aria-label="Legal and info links">
-              <Link to="/privacy" className="text-accent-foreground/90 hover:text-accent-foreground underline">
+              <Link to="/privacy" className="text-accent-foreground hover:text-accent-foreground/90 underline">
                 Privacy
               </Link>
-              <Link to="/refund-policy" className="text-accent-foreground/90 hover:text-accent-foreground underline">
+              <Link to="/refund-policy" className="text-accent-foreground hover:text-accent-foreground/90 underline">
                 Refund Policy
               </Link>
-              <Link to="/terms" className="text-accent-foreground/90 hover:text-accent-foreground underline">
+              <Link to="/terms" className="text-accent-foreground hover:text-accent-foreground/90 underline">
                 Terms & Conditions
               </Link>
-              <Link to="/delivery-area" className="text-accent-foreground/90 hover:text-accent-foreground underline">
+              <Link to="/delivery-area" className="text-accent-foreground hover:text-accent-foreground/90 underline">
                 Delivery Area
               </Link>
             </nav>
-            <p className="font-montserrat text-sm text-accent-foreground/80">
+            <p className="font-montserrat text-sm text-accent-foreground">
               © 2026 Burger Rox. All rights reserved.
             </p>
-            <p className="font-montserrat text-xs text-accent-foreground/60 mt-1">
+            <p className="font-montserrat text-xs text-accent-foreground mt-1">
               Made with <span aria-label="love">❤️</span> by a brother-sister duo
             </p>
           </div>

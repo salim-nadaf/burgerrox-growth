@@ -48,7 +48,7 @@ const Hero = () => {
             CRAVE-WORTHY BURGERS
           </h1>
           
-          <p className="font-allura text-3xl md:text-4xl text-primary-foreground drop-shadow-md" role="doc-subtitle">
+          <p className="font-allura text-3xl md:text-4xl text-primary drop-shadow-md" role="doc-subtitle">
             Rockin' homemade flavor
           </p>
 

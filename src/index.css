@@ -18,7 +18,7 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 24 32% 26%;
 
-    --primary: 20 100% 36%; /* Darkened orange for WCAG AA contrast */
+    --primary: 21 100% 51%; /* #FF5D05 - Brand orange accent */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 48 95% 85%; /* Lighter yellow */
@@ -27,7 +27,7 @@ All colors MUST be HSL.
     --muted: 48 80% 90%;
     --muted-foreground: 24 30% 28%;
 
-    --accent: 20 100% 36%;
+    --accent: 21 100% 51%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -35,12 +35,12 @@ All colors MUST be HSL.
 
     --border: 48 50% 80%;
     --input: 0 0% 100%;
-    --ring: 20 100% 36%;
+    --ring: 21 100% 51%;
 
     /* Custom brand gradients */
     --gradient-brand: linear-gradient(135deg, hsl(48 100% 62%), hsl(48 95% 75%));
-    --gradient-accent: linear-gradient(135deg, hsl(20 100% 36%), hsl(15 100% 30%));
-    --shadow-brand: 0 10px 30px -10px hsl(20 100% 36% / 0.3);
+    --gradient-accent: linear-gradient(135deg, hsl(21 100% 51%), hsl(18 100% 44%));
+    --shadow-brand: 0 10px 30px -10px hsl(21 100% 51% / 0.3);
     --shadow-warm: 0 4px 20px hsl(48 80% 40% / 0.2);
 
     --radius: 0.5rem;
@@ -65,7 +65,7 @@ All colors MUST be HSL.
     --popover: 24 30% 20%;
     --popover-foreground: 48 90% 85%;
 
-    --primary: 20 100% 36%;
+    --primary: 21 100% 51%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 24 25% 25%;
@@ -74,7 +74,7 @@ All colors MUST be HSL.
     --muted: 24 20% 30%;
     --muted-foreground: 48 50% 65%;
 
-    --accent: 20 100% 36%;
+    --accent: 21 100% 51%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 50%;
@@ -82,7 +82,7 @@ All colors MUST be HSL.
 
     --border: 24 20% 35%;
     --input: 24 20% 35%;
-    --ring: 20 100% 36%;
+    --ring: 21 100% 51%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;

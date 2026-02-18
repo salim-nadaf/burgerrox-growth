@@ -110,8 +110,7 @@ const Header = () => {
               
               <Button 
                 variant="brand" 
-                size="lg" 
-                className="hidden lg:flex"
+                className="hidden lg:flex h-12 px-7 text-base"
                 onClick={() => navigate('/menu')}
                 aria-label="View menu"
               >

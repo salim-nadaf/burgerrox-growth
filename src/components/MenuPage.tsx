@@ -346,9 +346,10 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
     <section id="menu" className="py-12 sm:py-20 bg-secondary/30" aria-labelledby="menu-heading">
       <div className="container mx-auto px-4">
         <header className="text-center mb-12 sm:mb-16">
-          <h2 id="menu-heading" className="font-bebas text-5xl sm:text-6xl md:text-7xl text-foreground tracking-wider mb-4">
+          <h2 id="menu-heading" className="font-bebas text-5xl sm:text-6xl md:text-7xl text-foreground tracking-wider mb-2">
             {showAll ? 'FULL MENU' : 'MENU FAVORITES'}
           </h2>
+          <div className="w-16 h-1 bg-primary mx-auto mb-3" aria-hidden="true" />
           <p className="font-allura text-2xl md:text-3xl text-primary mb-6" role="doc-subtitle">
             Rockin' homemade flavor
           </p>

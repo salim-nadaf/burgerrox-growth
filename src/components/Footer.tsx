@@ -3,63 +3,66 @@ import brLogo from "@/assets/BR Logo Transparent BG.png";
 
 const Footer = () => {
   return (
-    <footer className="py-12 bg-accent" role="contentinfo" aria-label="Site footer">
+    <footer className="py-12 bg-foreground" role="contentinfo" aria-label="Site footer">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-3 gap-8 items-center">
-          <div className="flex flex-col items-center">
-            <img 
-              src={brLogo} 
-              alt="Burger Rox Logo" 
-              className="h-16 md:h-20 w-auto mb-3"
-              width="80"
-              height="80"
-              loading="lazy"
-              decoding="async"
-            />
-            <p className="font-allura text-xl tracking-wide text-accent-foreground text-center">
-              Rockin' homemade flavor
-            </p>
-          </div>
+        {/* Centered Logo + Tagline */}
+        <div className="flex flex-col items-center mb-8">
+          <img 
+            src={brLogo} 
+            alt="Burger Rox Logo" 
+            className="h-16 md:h-20 w-auto mb-3"
+            width="80"
+            height="80"
+            loading="lazy"
+            decoding="async"
+          />
+          <p className="font-allura text-xl tracking-wide text-background text-center">
+            Rockin' homemade flavor
+          </p>
+        </div>
 
-          <div className="text-center space-y-3">
-            <nav className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm" aria-label="Legal and info links">
-              <Link to="/privacy" className="text-accent-foreground hover:text-accent-foreground/90 underline">
+        <div className="grid md:grid-cols-2 gap-8 items-start max-w-4xl mx-auto">
+          {/* Links + Copyright */}
+          <div className="text-center md:text-left space-y-3">
+            <nav className="flex flex-wrap justify-center md:justify-start gap-x-4 gap-y-1 text-sm" aria-label="Legal and info links">
+              <Link to="/privacy" className="text-background/80 hover:text-primary transition-colors">
                 Privacy
               </Link>
-              <Link to="/refund-policy" className="text-accent-foreground hover:text-accent-foreground/90 underline">
+              <Link to="/refund-policy" className="text-background/80 hover:text-primary transition-colors">
                 Refund Policy
               </Link>
-              <Link to="/terms" className="text-accent-foreground hover:text-accent-foreground/90 underline">
+              <Link to="/terms" className="text-background/80 hover:text-primary transition-colors">
                 Terms & Conditions
               </Link>
-              <Link to="/delivery-area" className="text-accent-foreground hover:text-accent-foreground/90 underline">
+              <Link to="/delivery-area" className="text-background/80 hover:text-primary transition-colors">
                 Delivery Area
               </Link>
             </nav>
-            <p className="font-montserrat text-sm text-accent-foreground">
+            <p className="font-montserrat text-sm text-background/60">
               © 2026 Burger Rox. All rights reserved.
             </p>
-            <p className="font-montserrat text-xs text-accent-foreground mt-1">
+            <p className="font-montserrat text-xs text-background/50">
               Made with <span aria-label="love">❤️</span> by a brother-sister duo
             </p>
           </div>
 
-          <address className="text-right not-italic">
-            <div className="font-montserrat text-sm text-accent-foreground space-y-2">
+          {/* Contact */}
+          <address className="text-center md:text-right not-italic">
+            <div className="font-montserrat text-sm text-background/80 space-y-2">
               <p>Urban Forest, Mamurdi</p>
-              <p className="font-semibold text-accent-foreground text-base">
+              <p className="font-semibold text-primary text-base">
                 <a href="tel:+919321389985" aria-label="Call us at 9321389985">9321389985</a>
               </p>
               <p>
-                <a href="mailto:cloudspicepvtltd@gmail.com" aria-label="Email us">cloudspicepvtltd@gmail.com</a>
+                <a href="mailto:cloudspicepvtltd@gmail.com" className="hover:text-primary transition-colors" aria-label="Email us">cloudspicepvtltd@gmail.com</a>
               </p>
               
-              <nav className="flex justify-end space-x-4 mt-4" aria-label="Social media links">
+              <nav className="flex justify-center md:justify-end space-x-4 mt-4" aria-label="Social media links">
                 <a 
                   href="https://www.instagram.com/burgerroxx" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-accent-foreground hover:text-accent-foreground/80 transition-colors"
+                  className="text-background/70 hover:text-primary transition-colors"
                   aria-label="Follow us on Instagram"
                 >
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -70,7 +73,7 @@ const Footer = () => {
                   href="https://www.facebook.com/burgerroxx/" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-accent-foreground hover:text-accent-foreground/80 transition-colors"
+                  className="text-background/70 hover:text-primary transition-colors"
                   aria-label="Follow us on Facebook"
                 >
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">

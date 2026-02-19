@@ -6,9 +6,10 @@ const Contact = () => {
     <section id="contact" className="py-20 bg-background" aria-labelledby="contact-heading">
       <div className="container mx-auto px-4">
         <header className="text-center mb-14">
-          <h2 id="contact-heading" className="font-bebas text-6xl md:text-8xl text-foreground tracking-wider mb-3">
+          <h2 id="contact-heading" className="font-bebas text-5xl md:text-7xl text-foreground tracking-wider mb-2">
             FIND US
           </h2>
+          <div className="w-16 h-1 bg-primary mx-auto mb-3" aria-hidden="true" />
           <p className="font-allura text-2xl md:text-3xl text-primary mb-6" role="doc-subtitle">
             We're right where you need us to be
           </p>
@@ -17,7 +18,7 @@ const Contact = () => {
         <div className="grid lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
           {/* Info Cards */}
           <div className="space-y-6">
-            <div className="flex items-start space-x-4 p-5 rounded-xl bg-card border border-border/50 hover:border-primary transition-all duration-300" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.06)' }}>
+            <div className="flex items-start space-x-4 p-5 rounded-xl bg-card border border-border hover:border-primary transition-all duration-300" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.06)' }}>
               <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary flex items-center justify-center">
                 <MapPin className="text-primary-foreground" size={20} />
               </div>
@@ -27,7 +28,7 @@ const Contact = () => {
               </div>
             </div>
 
-            <div className="flex items-start space-x-4 p-5 rounded-xl bg-card border border-border/50 hover:border-primary transition-all duration-300" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.06)' }}>
+            <div className="flex items-start space-x-4 p-5 rounded-xl bg-card border border-border hover:border-primary transition-all duration-300" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.06)' }}>
               <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary flex items-center justify-center">
                 <Clock className="text-primary-foreground" size={20} />
               </div>
@@ -40,7 +41,7 @@ const Contact = () => {
               </div>
             </div>
 
-            <div className="flex items-start space-x-4 p-5 rounded-xl bg-card border border-border/50 hover:border-primary transition-all duration-300" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.06)' }}>
+            <div className="flex items-start space-x-4 p-5 rounded-xl bg-card border border-border hover:border-primary transition-all duration-300" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.06)' }}>
               <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary flex items-center justify-center">
                 <Phone className="text-primary-foreground" size={20} />
               </div>
@@ -83,7 +84,7 @@ const Contact = () => {
               </div>
             </div>
 
-            <div className="text-center p-6 rounded-xl bg-card border border-border/50" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.06)' }}>
+            <div className="text-center p-6 rounded-xl bg-card border border-border" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.06)' }}>
               <h3 className="font-bebas text-2xl text-foreground tracking-wide mb-3">
                 FOLLOW THE ROX
               </h3>

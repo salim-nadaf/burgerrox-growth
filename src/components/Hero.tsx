@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 
 const Hero = () => {
   return (
-    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden max-w-full" aria-labelledby="hero-heading">
+    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden max-w-full bg-background" aria-labelledby="hero-heading">
       {/* Background Image */}
       <div className="absolute inset-0 z-0" aria-hidden="true">
         <picture>
@@ -22,13 +22,13 @@ const Hero = () => {
             decoding="async"
           />
         </picture>
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.75))' }}></div>
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, hsla(45, 100%, 55%, 0.55), hsla(45, 100%, 55%, 0.75))' }}></div>
       </div>
 
 
       <div className="container mx-auto px-4 z-10">
         <div className="max-w-4xl mx-auto text-center space-y-6">
-          <h1 id="hero-heading" className="font-bebas text-6xl sm:text-7xl md:text-9xl text-primary-foreground leading-none tracking-wider font-bold" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+          <h1 id="hero-heading" className="font-bebas text-6xl sm:text-7xl md:text-9xl text-foreground leading-none tracking-wider font-bold" style={{ textShadow: '0 2px 8px rgba(255,217,57,0.3)' }}>
             CRAVE-WORTHY BURGERS
           </h1>
           
@@ -36,11 +36,11 @@ const Hero = () => {
             Rockin' homemade flavor
           </p>
 
-          <p className="font-montserrat text-sm md:text-base text-primary-foreground/90 max-w-[420px] mx-auto drop-shadow-md">
+          <p className="font-montserrat text-sm md:text-base text-foreground/80 max-w-[420px] mx-auto">
             Freshly made burgers with our homemade signature sauce.
           </p>
 
-          <p className="font-montserrat text-xs text-primary-foreground/70 mt-2.5">
+          <p className="font-montserrat text-xs text-foreground/60 mt-2.5">
             1000+ burgers served to students and families
           </p>
 
@@ -55,7 +55,7 @@ const Hero = () => {
             </Button>
           </div>
 
-          <p className="font-montserrat text-xs md:text-sm text-primary-foreground/80 mt-3">
+          <p className="font-montserrat text-xs md:text-sm text-foreground/70 mt-3">
             Open daily from 7 PM to 10 PM
           </p>
         </div>

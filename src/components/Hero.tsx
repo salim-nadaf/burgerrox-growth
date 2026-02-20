@@ -32,16 +32,16 @@ const Hero = () => {
             CRAVE-WORTHY BURGERS
           </h1>
           
-          <p className="font-allura text-3xl md:text-5xl text-primary drop-shadow-md" role="doc-subtitle">
+          <p className="font-allura text-3xl md:text-5xl text-primary font-bold" role="doc-subtitle" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.25)' }}>
             Rockin' homemade flavor
           </p>
 
-          <p className="font-montserrat text-sm md:text-base text-foreground/80 max-w-[420px] mx-auto">
+          <p className="font-montserrat text-sm md:text-base text-foreground font-semibold max-w-[420px] mx-auto" style={{ textShadow: '0 1px 4px rgba(255,217,57,0.5)' }}>
             Freshly made burgers with our homemade signature sauce.
           </p>
 
-          <p className="font-montserrat text-xs text-foreground/60 mt-2.5">
-            1000+ burgers served to students and families
+          <p className="font-montserrat text-xs md:text-sm text-foreground/90 font-medium mt-2.5 bg-foreground/10 inline-block px-4 py-1 rounded-full">
+            🔥 1000+ burgers served to students and families
           </p>
 
           <div className="pt-4 flex justify-center">
@@ -55,8 +55,8 @@ const Hero = () => {
             </Button>
           </div>
 
-          <p className="font-montserrat text-xs md:text-sm text-foreground/70 mt-3">
-            Open daily from 7 PM to 10 PM
+          <p className="font-montserrat text-xs md:text-sm text-foreground font-semibold mt-3">
+            🕖 Open daily from 7 PM to 10 PM
           </p>
         </div>
       </div>

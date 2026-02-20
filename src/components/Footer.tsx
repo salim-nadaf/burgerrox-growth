@@ -42,7 +42,7 @@ const Footer = () => {
               © 2026 Burger Rox. All rights reserved.
             </p>
             <p className="font-montserrat text-xs text-background/50">
-              Made with <span aria-label="love">❤️</span> by a brother-sister duo
+              Made with <span aria-label="love" className="text-primary">❤️</span> by a brother-sister duo
             </p>
           </div>
 

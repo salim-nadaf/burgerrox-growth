@@ -92,17 +92,18 @@ interface MenuItem {
   variants?: { size: string; price: number }[];
   hasAddons?: boolean;
   comboChoice?: boolean;
+  customTag?: string;
 }
 
 const allMenuItems: MenuItem[] = [
   // Burgers
-  { name: "Blaze Chicken Burger", description: "Crispy chicken patty with fresh veggies and our rockin' homemade blaze sauce.", price: 129, popular: true, category: "Burgers", foodType: "nonveg", section: ["Most Popular", "All Burgers"], hasAddons: true },
-  { name: "Blaze Veg Burger", description: "Golden veg patty, crunchy lettuce, and signature blaze sauce in a soft bun.", price: 89, popular: true, category: "Burgers", foodType: "veg", section: ["Most Popular", "All Burgers"], hasAddons: true },
+  { name: "Blaze Chicken Burger", description: "Crispy chicken patty with fresh veggies and our rockin' homemade blaze sauce.", price: 129, popular: true, category: "Burgers", foodType: "nonveg", section: ["Most Popular", "All Burgers"], hasAddons: true, customTag: "Most Ordered" },
+  { name: "Blaze Veg Burger", description: "Golden veg patty, crunchy lettuce, and signature blaze sauce in a soft bun.", price: 89, popular: true, category: "Burgers", foodType: "veg", section: ["Most Popular", "All Burgers"], hasAddons: true, customTag: "Student Favorite" },
   { name: "Aloo Rock Burger", description: "Classic aloo tikki with onions, lettuce, and our homemade signature sauce.", price: 99, popular: false, category: "Burgers", foodType: "veg", section: ["All Burgers"], hasAddons: true },
   { name: "Egg Blaze Smash", description: "Crispy aloo tikki topped with scrambled egg and loaded with blaze sauce.", price: 169, popular: false, category: "Burgers", foodType: "egg", section: ["All Burgers"], hasAddons: true },
   { name: "Double Blaze Chicken", description: "Two crispy chicken patties stacked with fresh veggies and double blaze flavor.", price: 199, popular: false, category: "Burgers", foodType: "nonveg", section: ["All Burgers"], hasAddons: true },
   { name: "Double Blaze Veg", description: "Double veg patties with crunchy lettuce and extra signature sauce.", price: 149, popular: false, category: "Burgers", foodType: "veg", section: ["All Burgers"], hasAddons: true },
-  { name: "Burger Rox Zinger", description: "Our premium zinger-style chicken burger with bold spices and signature sauce.", price: 259, popular: true, category: "Burgers", foodType: "nonveg", section: ["All Burgers"], hasAddons: true },
+  { name: "Burger Rox Zinger", description: "Our premium zinger-style chicken burger with bold spices and signature sauce.", price: 259, popular: true, category: "Burgers", foodType: "nonveg", section: ["All Burgers"], hasAddons: true, customTag: "Premium Pick" },
 
   // Combos
   { name: "Blaze Combo", description: "Blaze Chicken Burger with fries and your choice of drink or lava cake.", price: 229, popular: true, category: "Combos", foodType: "nonveg", section: ["Combos"], comboChoice: true },
@@ -245,9 +246,9 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                           {item.name}
                         </h3>
                       </div>
-                      {item.popular && (
-                        <Badge variant="default" className="bg-primary text-primary-foreground text-xs mt-1" aria-label="Popular item">
-                          POPULAR
+                      {item.customTag && (
+                        <Badge variant="default" className="bg-primary text-primary-foreground text-[10px] mt-1" aria-label={item.customTag}>
+                          {item.customTag.toUpperCase()}
                         </Badge>
                       )}
                     </div>
@@ -266,7 +267,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
 
             {/* Combo choice */}
             {item.comboChoice && (
-              <div className="mb-4 p-3 border border-border/50 rounded-lg bg-muted/20">
+              <div className="mb-4 p-3 border border-border/30 rounded-lg bg-muted/10">
                 <p className="font-montserrat text-xs font-medium text-foreground mb-2">Choose one:</p>
                 <RadioGroup value={comboChoice} onValueChange={(v) => setComboChoice(item.name, v)} className="space-y-1">
                   <div className="flex items-center space-x-2">
@@ -283,7 +284,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
 
             {/* Add-ons for burgers */}
             {item.hasAddons && (
-              <div className="mb-4 p-3 border border-border/50 rounded-lg bg-muted/20">
+              <div className="mb-4 p-3 border border-border/30 rounded-lg bg-muted/10">
                 <p className="font-montserrat text-xs font-medium text-foreground mb-2">Add-ons:</p>
                 <div className="space-y-1.5">
                   {BURGER_ADDONS.map(addon => (

@@ -25,22 +25,6 @@ const Hero = () => {
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.6))' }}></div>
       </div>
 
-      {/* Restaurant Guru Badge - Desktop only */}
-      <aside className="hidden md:block absolute top-6 right-6 z-20" aria-label="Awards">
-        <a 
-          id="b-circledLeaves27" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          href="https://restaurant-guru.in/Burger-Rox-Pimpri-Chinchwad" 
-          className="b-circledLeaves27--light b-circledLeaves27--2025 block"
-          style={{ maxWidth: '120px' }}
-          aria-label="Burger Rox recommended by Restaurant Guru 2025"
-        >
-          <span className="b-circledLeaves27__title">Recommended</span>
-          <span className="b-circledLeaves27__separator"></span>
-          <span className="b-circledLeaves27__name">Burger Rox</span>
-        </a>
-      </aside>
 
       <div className="container mx-auto px-4 z-10">
         <div className="max-w-4xl mx-auto text-center space-y-6">
@@ -56,7 +40,11 @@ const Hero = () => {
             Freshly made burgers with our homemade signature sauce.
           </p>
 
-          <div className="pt-2 flex justify-center">
+          <p className="font-montserrat text-xs text-primary-foreground/70 mt-2.5">
+            1000+ burgers served to students and families
+          </p>
+
+          <div className="pt-4 flex justify-center">
             <Button 
               variant="hero" 
               className="w-full max-w-[260px] sm:w-auto sm:max-w-none h-12 sm:h-[52px] px-7 text-[15px] sm:text-base md:text-lg"
@@ -67,25 +55,9 @@ const Hero = () => {
             </Button>
           </div>
 
-          <p className="font-montserrat text-xs md:text-sm text-primary-foreground/90 bg-black/30 inline-block px-4 py-1.5 rounded-full mt-2 drop-shadow-md">
-            🕖 Orders open daily from 7 PM to 10 PM
+          <p className="font-montserrat text-xs md:text-sm text-primary-foreground/80 mt-3">
+            Open daily from 7 PM to 10 PM
           </p>
-
-          {/* Mobile badge */}
-          <div className="md:hidden flex justify-center mt-3" aria-label="Awards">
-            <a 
-              target="_blank" 
-              rel="noopener noreferrer"
-              href="https://restaurant-guru.in/Burger-Rox-Pimpri-Chinchwad" 
-              className="b-circledLeaves27--light b-circledLeaves27--2025 block"
-              style={{ maxWidth: '80px' }}
-              aria-label="Burger Rox recommended by Restaurant Guru 2025"
-            >
-              <span className="b-circledLeaves27__title">Recommended</span>
-              <span className="b-circledLeaves27__separator"></span>
-              <span className="b-circledLeaves27__name">Burger Rox</span>
-            </a>
-          </div>
         </div>
       </div>
     </section>

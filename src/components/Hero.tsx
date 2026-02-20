@@ -22,7 +22,7 @@ const Hero = () => {
             decoding="async"
           />
         </picture>
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.6))' }}></div>
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.75))' }}></div>
       </div>
 
 

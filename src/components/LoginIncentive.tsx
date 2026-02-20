@@ -12,10 +12,10 @@ const LoginIncentive = () => {
   if (user) return null;
 
   return (
-    <section className="py-16 bg-foreground relative overflow-hidden">
+    <section className="py-16 bg-background relative overflow-hidden">
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="font-bebas text-5xl md:text-6xl text-background tracking-wider mb-2">
+          <h2 className="font-bebas text-5xl md:text-6xl text-foreground tracking-wider mb-2">
             WHY ORDER DIRECT?
           </h2>
           <div className="w-16 h-1 bg-primary mx-auto mb-3" aria-hidden="true" />

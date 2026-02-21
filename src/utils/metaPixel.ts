@@ -16,11 +16,12 @@ export const pageView = () => {
   }
 };
 
-export const trackViewContent = (contentName: string, contentCategory: string) => {
+export const trackViewContent = (contentName: string, contentCategory: string, value?: number, currency = 'INR') => {
   if (typeof window.fbq === 'function') {
     window.fbq('track', 'ViewContent', {
       content_name: contentName,
       content_category: contentCategory,
+      ...(value !== undefined && { value, currency }),
     });
   }
 };
@@ -29,28 +30,32 @@ export const trackAddToCart = (itemName: string, price: number, currency = 'INR'
   if (typeof window.fbq === 'function') {
     window.fbq('track', 'AddToCart', {
       content_name: itemName,
+      contents: [{ id: itemName, quantity: 1 }],
+      content_type: 'product',
       value: price,
       currency,
     });
   }
 };
 
-export const trackInitiateCheckout = (totalValue: number, numItems: number, currency = 'INR') => {
+export const trackInitiateCheckout = (totalValue: number, numItems: number, contents: { id: string; quantity: number }[] = [], currency = 'INR') => {
   if (typeof window.fbq === 'function') {
     window.fbq('track', 'InitiateCheckout', {
       value: totalValue,
       currency,
       num_items: numItems,
+      ...(contents.length > 0 && { contents, content_type: 'product' }),
     });
   }
 };
 
-export const trackPurchase = (orderId: string, totalValue: number, currency = 'INR') => {
+export const trackPurchase = (orderId: string, totalValue: number, contents: { id: string; quantity: number }[] = [], currency = 'INR') => {
   if (typeof window.fbq === 'function') {
     window.fbq('track', 'Purchase', {
       value: totalValue,
       currency,
       content_name: orderId,
+      ...(contents.length > 0 && { contents, content_type: 'product' }),
     });
   }
 };

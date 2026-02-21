@@ -73,7 +73,8 @@ const Cart = () => {
   // Track InitiateCheckout when cart opens with items
   useEffect(() => {
     if (isOpen && cartItems.length > 0) {
-      trackInitiateCheckout(totalAmount, itemCount);
+      const contents = cartItems.map(i => ({ id: i.item_name, quantity: i.quantity }));
+      trackInitiateCheckout(totalAmount, itemCount, contents);
     }
   }, [isOpen]);
 
@@ -255,7 +256,8 @@ Please confirm order and expected time.`;
 
     // Send to Google Sheet (non-blocking)
     sendToGoogleSheet(buildSheetPayload(prepared.orderId, "cod"));
-    trackPurchase(prepared.orderId, prepared.total);
+    const purchaseContents = prepared.items.map(i => ({ id: i.item_name, quantity: i.quantity }));
+    trackPurchase(prepared.orderId, prepared.total, purchaseContents);
 
     setLastOrder({
       orderNumber: prepared.orderId,
@@ -335,7 +337,8 @@ Please confirm order and expected time.`;
 
           // Send to Google Sheet
           sendToGoogleSheet(buildSheetPayload(prepared.orderId, "online"));
-          trackPurchase(prepared.orderId, prepared.total);
+          const purchaseContents = prepared.items.map(i => ({ id: i.item_name, quantity: i.quantity }));
+          trackPurchase(prepared.orderId, prepared.total, purchaseContents);
 
           setLastOrder({
             orderNumber: prepared.orderId,

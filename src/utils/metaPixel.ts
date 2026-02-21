@@ -1,5 +1,5 @@
 // Meta Pixel (Facebook Pixel) utility
-// Pixel ID: 715141415840716
+// Pixel ID: 1524642025268726
 
 declare global {
   interface Window {
@@ -8,7 +8,7 @@ declare global {
   }
 }
 
-export const FB_PIXEL_ID = '715141415840716';
+export const FB_PIXEL_ID = '1524642025268726';
 
 export const pageView = () => {
   if (typeof window.fbq === 'function') {

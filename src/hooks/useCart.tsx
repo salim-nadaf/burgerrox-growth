@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from '@/components/ui/use-toast';
 import { trackAddToCart } from '@/utils/metaPixel';
+import { recordCartActivity, markOrderCompleted, startAbandonmentChecker } from '@/utils/cartAbandonment';
 
 interface CartItem {
   id: string;
@@ -46,6 +47,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setCartItems([]);
     }
   }, [user]);
+
+  // Start abandonment checker
+  useEffect(() => {
+    const cleanup = startAbandonmentChecker(
+      () => cartItems.length,
+      () => cartItems.reduce((t, i) => t + i.item_price * i.quantity, 0),
+      () => user?.user_metadata?.name || null,
+    );
+    return cleanup;
+  }, [cartItems, user]);
 
   const mergeGuestCart = async () => {
     try {
@@ -142,6 +153,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       
       if (existingItem) {
         await updateQuantity(existingItem.id, existingItem.quantity + 1);
+        recordCartActivity();
         toast({
           title: "Added to Cart ✓",
           description: `${itemName} quantity updated`,
@@ -172,6 +184,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setCartItems(prev => [...prev, data]);
         window.dispatchEvent(new CustomEvent('cart-item-added'));
         trackAddToCart(itemName, itemPrice);
+        recordCartActivity();
         toast({
           title: "Added to Cart ✓",
           description: `${itemName} added to your cart`,
@@ -251,6 +264,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
 
       setCartItems([]);
+      markOrderCompleted();
       toast({
         title: "Cart Cleared",
         description: "All items removed from cart",

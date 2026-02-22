@@ -10,6 +10,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { CartProvider } from "@/hooks/useCart";
 import { OrdersProvider } from "@/hooks/useOrders";
 import { DeliveryProvider } from "@/hooks/useDelivery";
+import CartAbandonmentBanner from "@/components/CartAbandonmentBanner";
 import Index from "./pages/Index";
 import Menu from "./pages/Menu";
 import Admin from "./pages/Admin";
@@ -58,6 +59,7 @@ const App = () => (
             <DeliveryProvider>
               <Toaster />
               <Sonner />
+              <CartAbandonmentBanner />
               <AppContent />
             </DeliveryProvider>
           </OrdersProvider>

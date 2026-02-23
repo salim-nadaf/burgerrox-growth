@@ -16,6 +16,7 @@ import { trackInitiateCheckout, trackPurchase } from "@/utils/metaPixel";
 import OrderTypeSelector, { OrderType, RESTAURANT_ADDRESS } from "./OrderTypeSelector";
 import DeliveryAddressInput from "./DeliveryAddressInput";
 import { DetailedAddress, isAddressComplete, formatFullAddress } from "./DetailedAddressForm";
+import AuthForm from "./AuthForm";
 
 declare global {
   interface Window {
@@ -39,6 +40,7 @@ export const sendToGoogleSheet = async (orderData: Record<string, unknown>) => {
 };
 
 const Cart = () => {
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [orderType, setOrderType] = useState<OrderType>("pickup");
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "online">("cod");
@@ -234,7 +236,9 @@ Please confirm order and expected time.`;
 
   const handleCODOrder = async () => {
     if (!user) {
-      toast({ title: "Login Required", description: "Please login to place an order", variant: "destructive" });
+      setIsOpen(false);
+      document.body.style.pointerEvents = "auto";
+      setTimeout(() => setAuthDialogOpen(true), 300);
       return;
     }
     if (!profile?.name || !profile?.whatsapp_number) {
@@ -282,7 +286,9 @@ Please confirm order and expected time.`;
 
   const handleOnlinePayment = async () => {
     if (!user) {
-      toast({ title: "Login Required", description: "Please login to place an order", variant: "destructive" });
+      setIsOpen(false);
+      document.body.style.pointerEvents = "auto";
+      setTimeout(() => setAuthDialogOpen(true), 300);
       return;
     }
     if (!profile?.name || !profile?.whatsapp_number) {
@@ -513,6 +519,11 @@ Please confirm order and expected time.`;
                 </div>
               )}
 
+              {/* WhatsApp confirmation note */}
+              <p className="text-xs text-center text-muted-foreground font-montserrat">
+                We'll confirm your order on WhatsApp at checkout.
+              </p>
+
               {/* Urgency + USP messages */}
               <p className="text-xs text-center text-muted-foreground font-montserrat italic">
                 Fresh batches made daily – limited evening slots.
@@ -589,6 +600,20 @@ Please confirm order and expected time.`;
           )}
         </SheetContent>
       </Sheet>
+
+      {/* Auth Dialog for checkout */}
+      <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
+        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogTitle className="sr-only">Sign in to complete your order</DialogTitle>
+          <DialogDescription className="sr-only">Login or create an account to place your order</DialogDescription>
+          <AuthForm onClose={() => {
+            setAuthDialogOpen(false);
+            if (user) {
+              toast({ title: "Account ready!", description: "You can now place your order." });
+            }
+          }} />
+        </DialogContent>
+      </Dialog>
 
       {/* Confirm Your Order Modal */}
       <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>

@@ -1,9 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -31,8 +30,6 @@ import periPeriFriesImg from "@/assets/Peri Peri Fries.jpg";
 import potatoWedgesImg from "@/assets/Potato Wedges.jpeg";
 import chickenPopcornImg from "@/assets/Chicken Popcorn.jpeg";
 import { useCart } from "@/hooks/useCart";
-import { useAuth } from "@/hooks/useAuth";
-import AuthForm from "./AuthForm";
 
 const FoodTypeIndicator = ({ type }: { type: 'veg' | 'nonveg' | 'egg' }) => {
   const colors = {
@@ -131,23 +128,12 @@ interface MenuPageProps {
 
 const MenuPage = ({ showAll = false }: MenuPageProps) => {
   const { addToCart } = useCart();
-  const { user } = useAuth();
-  const [authDialogOpen, setAuthDialogOpen] = useState(false);
-  const [pendingAddItem, setPendingAddItem] = useState<{ itemName: string; itemPrice: number } | null>(null);
-  const prevUserRef = useRef(user);
 
   // Addon state per item
   const [selectedAddons, setSelectedAddons] = useState<Record<string, string[]>>({});
   // Combo choice state per item
   const [comboChoices, setComboChoices] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    if (!prevUserRef.current && user && pendingAddItem) {
-      addToCart(pendingAddItem.itemName, pendingAddItem.itemPrice);
-      setPendingAddItem(null);
-    }
-    prevUserRef.current = user;
-  }, [user, pendingAddItem, addToCart]);
 
   const toggleAddon = (itemName: string, addonName: string) => {
     setSelectedAddons(prev => {
@@ -195,19 +181,11 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
       }
     }
 
-    if (!user) {
-      setPendingAddItem({ itemName: finalName, itemPrice: finalPrice });
-      setAuthDialogOpen(true);
-      return;
-    }
     await addToCart(finalName, finalPrice);
     // Reset addons/combo choice for this item after adding
     setSelectedAddons(prev => ({ ...prev, [item.name]: [] }));
   };
 
-  const handleAuthClose = () => {
-    setAuthDialogOpen(false);
-  };
 
   // For homepage preview, show Most Popular + Combos only
   const sectionsToShow = showAll ? MENU_SECTIONS : ["Most Popular", "Combos"];
@@ -439,13 +417,6 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
         </div>
       </div>
 
-      <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
-        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-          <DialogTitle className="sr-only">Authentication</DialogTitle>
-          <DialogDescription className="sr-only">Login or create an account to add items to cart</DialogDescription>
-          <AuthForm onClose={handleAuthClose} />
-        </DialogContent>
-      </Dialog>
     </section>
   );
 };

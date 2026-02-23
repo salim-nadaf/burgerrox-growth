@@ -134,8 +134,11 @@ const AuthForm = ({ onClose }: AuthFormProps) => {
                 type="tel"
                 value={whatsapp}
                 onChange={(e) => setWhatsapp(e.target.value)}
-                placeholder="9876543210"
+                placeholder="Enter your WhatsApp number"
               />
+              <p className="text-xs text-muted-foreground font-montserrat">
+                We'll send order updates on WhatsApp.
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="area">Area / Society</Label>

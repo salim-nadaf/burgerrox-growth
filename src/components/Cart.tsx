@@ -16,7 +16,7 @@ import { trackInitiateCheckout, trackPurchase } from "@/utils/metaPixel";
 import OrderTypeSelector, { OrderType, RESTAURANT_ADDRESS } from "./OrderTypeSelector";
 import DeliveryAddressInput from "./DeliveryAddressInput";
 import { DetailedAddress, isAddressComplete, formatFullAddress } from "./DetailedAddressForm";
-import AuthForm from "./AuthForm";
+import CheckoutInfoForm from "./CheckoutInfoForm";
 
 declare global {
   interface Window {
@@ -40,7 +40,9 @@ export const sendToGoogleSheet = async (orderData: Record<string, unknown>) => {
 };
 
 const Cart = () => {
-  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [checkoutInfoOpen, setCheckoutInfoOpen] = useState(false);
+  const [pendingPaymentMethod, setPendingPaymentMethod] = useState<"cod" | "online">("cod");
+  const [guestInfo, setGuestInfo] = useState<{ name: string; whatsapp: string } | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [orderType, setOrderType] = useState<OrderType>("pickup");
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "online">("cod");
@@ -65,6 +67,10 @@ const Cart = () => {
   const { user, profile } = useAuth();
   const { createOrder } = useOrders();
   const { deliveryInfo, clearDelivery } = useDelivery();
+
+  // Resolve customer info: logged-in profile or guest info
+  const customerName = user ? (profile?.name || "Guest") : (guestInfo?.name || "Guest");
+  const customerWhatsApp = user ? (profile?.whatsapp_number || "N/A") : (guestInfo?.whatsapp || "N/A");
 
   useEffect(() => {
     const handleCartItemAdded = () => setIsOpen(true);
@@ -126,8 +132,6 @@ const Cart = () => {
       .map((item) => `• ${item.item_name} x${item.quantity} — ₹${(item.item_price * item.quantity).toFixed(2)}`)
       .join("\n");
 
-    const customerName = profile?.name || "Guest";
-    const customerWhatsApp = profile?.whatsapp_number || "N/A";
     const paymentLabel = getPaymentLabel(paymentMethod);
 
     let msg = `--- BURGER ROX ORDER ---
@@ -201,8 +205,8 @@ Please confirm order and expected time.`;
     return {
       order_id: orderId,
       order_type: orderType === "pickup" ? "PICKUP" : "DELIVERY",
-      name: profile?.name || "Guest",
-      phone: profile?.whatsapp_number || "N/A",
+      name: customerName,
+      phone: customerWhatsApp,
       address: fullAddr,
       items: itemsSummary,
       subtotal: totalAmount,
@@ -233,29 +237,33 @@ Please confirm order and expected time.`;
     };
   };
 
-  const handleCODOrder = async () => {
-    if (!user) {
+  // Gate: if not logged in AND no guest info, show checkout info form
+  const handleCODOrder = () => {
+    if (!user && !guestInfo) {
+      setPendingPaymentMethod("cod");
       setIsOpen(false);
       document.body.style.pointerEvents = "auto";
-      setTimeout(() => setAuthDialogOpen(true), 300);
+      setTimeout(() => setCheckoutInfoOpen(true), 300);
       return;
     }
-    if (!profile?.name || !profile?.whatsapp_number) {
-      toast({ title: "Profile Incomplete", description: "Please complete your profile before placing an order.", variant: "destructive" });
-      return;
-    }
+    proceedWithCODOrder();
+  };
+
+  const proceedWithCODOrder = async () => {
     if (!canPlaceOrder() || isBelowDeliveryMinimum) return;
 
     const prepared = await prepareOrder("cod");
 
-    // Save order to database
-    await createOrder({
-      items: prepared.items,
-      totalAmount: prepared.total,
-      paymentMethod: "cod",
-      paymentStatus: "pending",
-      orderNumber: prepared.orderId,
-    });
+    // Save order to database only if logged in
+    if (user) {
+      await createOrder({
+        items: prepared.items,
+        totalAmount: prepared.total,
+        paymentMethod: "cod",
+        paymentStatus: "pending",
+        orderNumber: prepared.orderId,
+      });
+    }
 
     // Send to Google Sheet (non-blocking)
     sendToGoogleSheet(buildSheetPayload(prepared.orderId, "cod"));
@@ -283,17 +291,18 @@ Please confirm order and expected time.`;
     setTimeout(() => setConfirmDialogOpen(true), 300);
   };
 
-  const handleOnlinePayment = async () => {
-    if (!user) {
+  const handleOnlinePayment = () => {
+    if (!user && !guestInfo) {
+      setPendingPaymentMethod("online");
       setIsOpen(false);
       document.body.style.pointerEvents = "auto";
-      setTimeout(() => setAuthDialogOpen(true), 300);
+      setTimeout(() => setCheckoutInfoOpen(true), 300);
       return;
     }
-    if (!profile?.name || !profile?.whatsapp_number) {
-      toast({ title: "Profile Incomplete", description: "Please complete your profile before placing an order.", variant: "destructive" });
-      return;
-    }
+    proceedWithOnlinePayment();
+  };
+
+  const proceedWithOnlinePayment = async () => {
     if (!canPlaceOrder()) return;
 
     setIsProcessing(true);
@@ -322,22 +331,24 @@ Please confirm order and expected time.`;
         description: "Food Order",
         order_id: data.orderId,
         handler: async (response: any) => {
-          // Create order in DB
           const prepared = await prepareOrder("online");
 
-          const order = await createOrder({
-            items: prepared.items,
-            totalAmount: prepared.total,
-            paymentMethod: "online",
-            paymentStatus: "paid",
-            paymentId: response.razorpay_payment_id,
-            orderNumber: prepared.orderId,
-          });
+          // Save order to database only if logged in
+          if (user) {
+            const order = await createOrder({
+              items: prepared.items,
+              totalAmount: prepared.total,
+              paymentMethod: "online",
+              paymentStatus: "paid",
+              paymentId: response.razorpay_payment_id,
+              orderNumber: prepared.orderId,
+            });
 
-          if (!order) {
-            toast({ title: "Error", description: "Failed to create order.", variant: "destructive" });
-            setIsProcessing(false);
-            return;
+            if (!order) {
+              toast({ title: "Error", description: "Failed to create order.", variant: "destructive" });
+              setIsProcessing(false);
+              return;
+            }
           }
 
           // Send to Google Sheet
@@ -365,8 +376,8 @@ Please confirm order and expected time.`;
           setTimeout(() => setConfirmDialogOpen(true), 300);
         },
         prefill: {
-          name: profile?.name || "",
-          contact: profile?.whatsapp_number ? `91${profile.whatsapp_number}` : "",
+          name: customerName,
+          contact: customerWhatsApp !== "N/A" ? `91${customerWhatsApp}` : "",
         },
         theme: { color: "#FF5D05" },
         modal: {
@@ -405,6 +416,23 @@ Please confirm order and expected time.`;
       setIsProcessing(false);
       toast({ title: "Payment Error", description: "Could not open payment gateway. Please try again.", variant: "destructive" });
     }
+  };
+
+  const handleCheckoutInfoSubmit = (info: { name: string; whatsapp: string }) => {
+    setGuestInfo(info);
+    setCheckoutInfoOpen(false);
+    toast({ title: "Details saved!", description: "Complete your order." });
+    // Re-open cart and proceed
+    setTimeout(() => {
+      setIsOpen(true);
+      setTimeout(() => {
+        if (pendingPaymentMethod === "online") {
+          proceedWithOnlinePayment();
+        } else {
+          proceedWithCODOrder();
+        }
+      }, 300);
+    }, 300);
   };
 
   const handleSendWhatsApp = () => {
@@ -600,17 +628,12 @@ Please confirm order and expected time.`;
         </SheetContent>
       </Sheet>
 
-      {/* Auth Dialog for checkout */}
-      <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
+      {/* Checkout Info Dialog for guests */}
+      <Dialog open={checkoutInfoOpen} onOpenChange={setCheckoutInfoOpen}>
         <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-          <DialogTitle className="sr-only">Sign in to complete your order</DialogTitle>
-          <DialogDescription className="sr-only">Login or create an account to place your order</DialogDescription>
-          <AuthForm onClose={() => {
-            setAuthDialogOpen(false);
-            if (user) {
-              toast({ title: "Account ready!", description: "You can now place your order." });
-            }
-          }} />
+          <DialogTitle className="sr-only">Complete your order details</DialogTitle>
+          <DialogDescription className="sr-only">Enter your name and WhatsApp number</DialogDescription>
+          <CheckoutInfoForm onSubmit={handleCheckoutInfoSubmit} />
         </DialogContent>
       </Dialog>
 

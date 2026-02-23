@@ -44,7 +44,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (user) {
       mergeGuestCart().then(() => fetchCartItems());
     } else {
-      setCartItems([]);
+      // Load guest cart from localStorage
+      loadGuestCart();
     }
   }, [user]);
 
@@ -57,6 +58,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     );
     return cleanup;
   }, [cartItems, user]);
+
+  const loadGuestCart = () => {
+    try {
+      const raw = localStorage.getItem('guest_cart');
+      if (raw) {
+        const guestItems: { item_name: string; item_price: number; quantity: number }[] = JSON.parse(raw);
+        setCartItems(guestItems.map((g, idx) => ({ ...g, id: `guest-${idx}` })));
+      } else {
+        setCartItems([]);
+      }
+    } catch {
+      setCartItems([]);
+    }
+  };
 
   const mergeGuestCart = async () => {
     try {
@@ -122,7 +137,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (!user) {
       // Save to localStorage for guest users
       try {
-      const raw = localStorage.getItem('guest_cart');
+        const raw = localStorage.getItem('guest_cart');
         const guestItems: { item_name: string; item_price: number; quantity: number }[] = raw ? JSON.parse(raw) : [];
         const newItem = { item_name: itemName, item_price: itemPrice, quantity: 1 };
         if (!validateCartItem(newItem)) {
@@ -136,14 +151,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           guestItems.push(newItem);
         }
         localStorage.setItem('guest_cart', JSON.stringify(guestItems));
+        // Update local state for guest cart display
+        setCartItems([...guestItems.map((g, idx) => ({ ...g, id: `guest-${idx}` }))]);
+        window.dispatchEvent(new CustomEvent('cart-item-added'));
+        trackAddToCart(itemName, itemPrice);
+        recordCartActivity();
+        toast({
+          title: "Added to Cart ✓",
+          description: `${itemName} added to your cart`,
+          duration: 2000,
+        });
       } catch (e) {
         console.error('Error saving guest cart:', e);
       }
-      toast({
-        title: "Login Required",
-        description: "Please login to add items to cart. Your item has been saved!",
-        variant: "destructive"
-      });
       return;
     }
 
@@ -202,7 +222,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const removeFromCart = async (itemId: string) => {
-    if (!user) return;
+    if (!user) {
+      // Guest cart: remove from localStorage
+      try {
+        const raw = localStorage.getItem('guest_cart');
+        const guestItems: { item_name: string; item_price: number; quantity: number }[] = raw ? JSON.parse(raw) : [];
+        const idx = parseInt(itemId.replace('guest-', ''), 10);
+        guestItems.splice(idx, 1);
+        localStorage.setItem('guest_cart', JSON.stringify(guestItems));
+        setCartItems(guestItems.map((g, i) => ({ ...g, id: `guest-${i}` })));
+      } catch (e) {
+        console.error('Error removing guest cart item:', e);
+      }
+      toast({ title: "Removed from Cart", description: "Item removed from your cart" });
+      return;
+    }
 
     try {
       const { error } = await (supabase as any)
@@ -226,7 +260,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateQuantity = async (itemId: string, quantity: number) => {
-    if (!user || quantity < 1) return;
+    if (quantity < 1) return;
+
+    if (!user) {
+      // Guest cart: update localStorage
+      try {
+        const raw = localStorage.getItem('guest_cart');
+        const guestItems: { item_name: string; item_price: number; quantity: number }[] = raw ? JSON.parse(raw) : [];
+        const idx = parseInt(itemId.replace('guest-', ''), 10);
+        if (guestItems[idx]) {
+          guestItems[idx].quantity = quantity;
+          localStorage.setItem('guest_cart', JSON.stringify(guestItems));
+          setCartItems(guestItems.map((g, i) => ({ ...g, id: `guest-${i}` })));
+        }
+      } catch (e) {
+        console.error('Error updating guest cart:', e);
+      }
+      return;
+    }
 
     try {
       const { data, error } = await (supabase as any)
@@ -250,7 +301,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const clearCart = async () => {
-    if (!user) return;
+    if (!user) {
+      localStorage.removeItem('guest_cart');
+      setCartItems([]);
+      toast({ title: "Cart Cleared", description: "All items removed from cart" });
+      return;
+    }
 
     try {
       const { error } = await (supabase as any)

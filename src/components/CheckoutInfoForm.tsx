@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,18 +13,59 @@ interface CheckoutInfoFormProps {
   loading?: boolean;
 }
 
+const GUEST_INFO_KEY = "brx_guest_info";
+
+const isAllSameDigits = (num: string) => /^(.)\1{9}$/.test(num);
+
+const isValidIndianMobile = (num: string): { valid: boolean; message?: string } => {
+  if (!/^\d{10}$/.test(num)) {
+    return { valid: false, message: "Please enter a valid 10-digit WhatsApp number" };
+  }
+  if (!/^[6-9]/.test(num)) {
+    return { valid: false, message: "Number must start with 6, 7, 8, or 9" };
+  }
+  if (isAllSameDigits(num)) {
+    return { valid: false, message: "Please enter a valid WhatsApp number for order confirmation" };
+  }
+  return { valid: true };
+};
+
+export const saveGuestInfo = (info: CheckoutInfo) => {
+  try {
+    localStorage.setItem(GUEST_INFO_KEY, JSON.stringify(info));
+  } catch {}
+};
+
+export const loadGuestInfo = (): CheckoutInfo | null => {
+  try {
+    const raw = localStorage.getItem(GUEST_INFO_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return null;
+};
+
 const CheckoutInfoForm = ({ onSubmit, loading }: CheckoutInfoFormProps) => {
   const [name, setName] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [errors, setErrors] = useState<{ name?: string; whatsapp?: string }>({});
+
+  // Prefill from localStorage for returning users
+  useEffect(() => {
+    const saved = loadGuestInfo();
+    if (saved) {
+      setName(saved.name || "");
+      setWhatsapp(saved.whatsapp || "");
+    }
+  }, []);
 
   const validate = () => {
     const newErrors: typeof errors = {};
     if (!name.trim() || name.trim().length < 2) {
       newErrors.name = "Please enter your name (min 2 characters)";
     }
-    if (!/^\d{10}$/.test(whatsapp)) {
-      newErrors.whatsapp = "Please enter a valid 10-digit number";
+    const phoneCheck = isValidIndianMobile(whatsapp);
+    if (!phoneCheck.valid) {
+      newErrors.whatsapp = phoneCheck.message;
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -33,7 +74,9 @@ const CheckoutInfoForm = ({ onSubmit, loading }: CheckoutInfoFormProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    onSubmit({ name: name.trim(), whatsapp });
+    const info = { name: name.trim(), whatsapp };
+    saveGuestInfo(info);
+    onSubmit(info);
   };
 
   return (
@@ -61,7 +104,9 @@ const CheckoutInfoForm = ({ onSubmit, loading }: CheckoutInfoFormProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="checkout-whatsapp">WhatsApp Number *</Label>
+          <Label htmlFor="checkout-whatsapp">
+            WhatsApp Number (order updates will be sent here) *
+          </Label>
           <Input
             id="checkout-whatsapp"
             type="tel"
@@ -69,12 +114,12 @@ const CheckoutInfoForm = ({ onSubmit, loading }: CheckoutInfoFormProps) => {
             maxLength={10}
             value={whatsapp}
             onChange={(e) => setWhatsapp(e.target.value.replace(/\D/g, "").slice(0, 10))}
-            placeholder="Enter your WhatsApp number"
+            placeholder="Enter active WhatsApp number"
             autoComplete="tel"
             required
           />
           <p className="text-xs text-muted-foreground font-montserrat">
-            We'll send order updates on WhatsApp.
+            We'll send order updates on this WhatsApp number.
           </p>
           {errors.whatsapp && <p className="text-xs text-destructive font-montserrat">{errors.whatsapp}</p>}
         </div>

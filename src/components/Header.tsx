@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Menu, Phone, MapPin, User, LogOut } from "lucide-react";
+import { Menu, Phone, MapPin, LogOut } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import AuthForm from "./AuthForm";
 import Cart from "./Cart";
 import OrdersSheet from "./OrdersSheet";
 import ProfileSheet from "./ProfileSheet";
+import GuestProfileSheet from "./GuestProfileSheet";
 
 const Header = () => {
-  const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, signOut, profile } = useAuth();
   const location = useLocation();
@@ -19,11 +17,6 @@ const Header = () => {
 
   const handleSignOut = async () => {
     await signOut();
-    setMobileMenuOpen(false);
-  };
-
-  const handleAuthClose = () => {
-    setAuthDialogOpen(false);
     setMobileMenuOpen(false);
   };
 
@@ -94,18 +87,7 @@ const Header = () => {
                   </Button>
                 </div>
               ) : (
-                <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="ghost" size="icon" aria-label="Login">
-                      <User className="h-4 w-4" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogTitle className="sr-only">Authentication</DialogTitle>
-                    <DialogDescription className="sr-only">Login or create an account</DialogDescription>
-                    <AuthForm onClose={() => setAuthDialogOpen(false)} />
-                  </DialogContent>
-                </Dialog>
+                <GuestProfileSheet />
               )}
               
               <Button 
@@ -149,19 +131,7 @@ const Header = () => {
                           </Button>
                         </div>
                       ) : (
-                        <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
-                          <DialogTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <User className="h-4 w-4 mr-2" />
-                              Login
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogTitle className="sr-only">Authentication</DialogTitle>
-                            <DialogDescription className="sr-only">Login or create an account</DialogDescription>
-                            <AuthForm onClose={handleAuthClose} />
-                          </DialogContent>
-                        </Dialog>
+                        <GuestProfileSheet />
                       )}
                     </div>
                   </div>

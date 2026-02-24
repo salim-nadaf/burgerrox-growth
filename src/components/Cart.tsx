@@ -636,6 +636,16 @@ Please confirm order and expected time.`;
                 )}
               </div>
 
+              {/* Urgency + Trust lines below Place Order */}
+              <div className="space-y-1 pt-1">
+                <p className="text-xs text-center text-muted-foreground font-montserrat">
+                  Limited evening delivery slots
+                </p>
+                <p className="text-xs text-center font-montserrat text-primary">
+                  ✅ Orders confirmed instantly on WhatsApp
+                </p>
+              </div>
+
               <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={clearCart}>
                 Clear Cart
               </Button>
@@ -710,6 +720,9 @@ Please confirm order and expected time.`;
           )}
 
           <DialogFooter className="flex flex-col gap-2 sm:flex-col">
+            <p className="text-xs text-center font-montserrat text-muted-foreground">
+              📲 Our team will confirm shortly on WhatsApp
+            </p>
             <Button className="w-full" variant="brand" size="lg" onClick={handleSendWhatsApp}>
               <Send className="h-4 w-4 mr-2" />
               Send to WhatsApp

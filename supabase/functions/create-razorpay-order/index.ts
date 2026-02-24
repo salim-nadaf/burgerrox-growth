@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -7,57 +6,25 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    // Authentication check - verify JWT token
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader?.startsWith('Bearer ')) {
-      console.error('Missing or invalid Authorization header')
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized - missing auth token' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!
-    
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } }
-    })
-
-    // Verify the user's JWT
-    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
-    
-    if (authError || !authUser) {
-      console.error('JWT verification failed:', authError)
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized - invalid token' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    const userId = authUser.id
-    console.log('Authenticated user:', userId)
-
     const body = await req.json()
     const amount = body.amount
     const currency = body.currency || 'INR'
     const receipt = typeof body.receipt === 'string' ? body.receipt.trim().substring(0, 200).replace(/[^a-zA-Z0-9_\-]/g, '') : undefined
 
-    // Enhanced amount validation
+    // Amount validation (in rupees)
     if (!amount || typeof amount !== 'number' || amount <= 0) {
+      console.error('Invalid amount:', amount)
       return new Response(
         JSON.stringify({ error: 'Invalid amount - must be a positive number' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    // Set reasonable min/max limits for amount (in rupees)
     const MIN_AMOUNT = 1
     const MAX_AMOUNT = 50000
     if (amount < MIN_AMOUNT || amount > MAX_AMOUNT) {
@@ -78,9 +45,9 @@ serve(async (req) => {
       )
     }
 
-    console.log('Creating Razorpay order for user:', userId, 'amount:', amount)
+    const amountInPaise = Math.round(amount * 100)
+    console.log('Creating Razorpay order — amount:', amount, 'paise:', amountInPaise)
 
-    // Create Razorpay order
     const auth = btoa(`${keyId}:${keySecret}`)
     const response = await fetch('https://api.razorpay.com/v1/orders', {
       method: 'POST',
@@ -89,7 +56,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        amount: Math.round(amount * 100), // Razorpay expects amount in paise
+        amount: amountInPaise,
         currency,
         receipt: receipt || `o_${Date.now()}`.substring(0, 40),
       }),
@@ -98,7 +65,7 @@ serve(async (req) => {
     const data = await response.json()
 
     if (!response.ok) {
-      console.error('Razorpay error:', data)
+      console.error('Razorpay API error:', JSON.stringify(data))
       return new Response(
         JSON.stringify({ error: data.error?.description || 'Failed to create order' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

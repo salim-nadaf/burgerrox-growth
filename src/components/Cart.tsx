@@ -303,26 +303,46 @@ Please confirm order and expected time.`;
   };
 
   const proceedWithOnlinePayment = async () => {
-    if (!canPlaceOrder()) return;
+    if (!canPlaceOrder() || isProcessing) return;
 
     setIsProcessing(true);
+    console.log('[Payment] Starting online payment, amount:', grandTotal);
+
     try {
+      // Step 1: Load Razorpay SDK
+      console.log('[Payment] Loading Razorpay SDK...');
       await loadRazorpay();
+      console.log('[Payment] Razorpay SDK loaded, window.Razorpay:', !!window.Razorpay);
 
-      const { data, error } = await supabase.functions.invoke("create-razorpay-order", {
-        body: { amount: grandTotal, currency: "INR" },
-      });
+      if (!window.Razorpay) {
+        throw new Error('Razorpay SDK loaded but constructor not available');
+      }
 
-      if (error || !data?.orderId) {
-        toast({ title: "Payment Error", description: "Could not initiate payment. Please try again.", variant: "destructive" });
+      // Step 2: Create Razorpay order via edge function
+      console.log('[Payment] Creating Razorpay order...');
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-razorpay-order`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+          body: JSON.stringify({ amount: grandTotal, currency: 'INR' }),
+        }
+      );
+
+      const data = await response.json();
+      console.log('[Payment] Edge function response:', { status: response.status, orderId: data?.orderId, error: data?.error });
+
+      if (!response.ok || !data?.orderId) {
+        toast({ title: "Payment Error", description: data?.error || "Could not initiate payment. Please try again.", variant: "destructive" });
         setIsProcessing(false);
         return;
       }
 
-      // Close cart sheet before opening Razorpay modal
+      // Step 3: Close cart sheet before opening Razorpay modal
       setIsOpen(false);
       document.body.style.pointerEvents = "auto";
 
+      // Step 4: Open Razorpay checkout
       const options = {
         key: data.keyId,
         amount: data.amount,
@@ -330,28 +350,27 @@ Please confirm order and expected time.`;
         name: "Burger Rox",
         description: "Food Order",
         order_id: data.orderId,
-        handler: async (response: any) => {
+        handler: async (rzpResponse: any) => {
+          console.log('[Payment] Payment successful, payment_id:', rzpResponse.razorpay_payment_id);
           const prepared = await prepareOrder("online");
 
-          // Save order to database only if logged in
           if (user) {
             const order = await createOrder({
               items: prepared.items,
               totalAmount: prepared.total,
               paymentMethod: "online",
               paymentStatus: "paid",
-              paymentId: response.razorpay_payment_id,
+              paymentId: rzpResponse.razorpay_payment_id,
               orderNumber: prepared.orderId,
             });
 
             if (!order) {
-              toast({ title: "Error", description: "Failed to create order.", variant: "destructive" });
+              toast({ title: "Error", description: "Payment received but failed to save order. Please contact support.", variant: "destructive" });
               setIsProcessing(false);
               return;
             }
           }
 
-          // Send to Google Sheet
           sendToGoogleSheet(buildSheetPayload(prepared.orderId, "online"));
           const purchaseContents = prepared.items.map(i => ({ id: i.item_name, quantity: i.quantity }));
           trackPurchase(prepared.total, purchaseContents);
@@ -382,16 +401,12 @@ Please confirm order and expected time.`;
         theme: { color: "#FF5D05" },
         modal: {
           ondismiss: () => {
+            console.log('[Payment] Modal dismissed by user');
             setIsProcessing(false);
             toast({ title: "Payment Cancelled", description: "You can try again anytime.", variant: "default" });
           },
         },
-        method: {
-          upi: true,
-          card: true,
-          netbanking: true,
-          wallet: true,
-        },
+        method: { upi: true, card: true, netbanking: true, wallet: true },
         config: {
           display: {
             blocks: { utib: { name: "Pay using UPI", instruments: [{ method: "upi", flows: ["intent", "collect", "qr"] }] } },
@@ -402,17 +417,18 @@ Please confirm order and expected time.`;
       };
 
       const rzp = new window.Razorpay(options);
-      rzp.on("payment.failed", (response: any) => {
+      rzp.on("payment.failed", (failResponse: any) => {
+        console.error('[Payment] Payment failed:', failResponse.error);
         setIsProcessing(false);
         toast({
           title: "Payment Failed",
-          description: response.error?.description || "Payment was not successful. Please try again.",
+          description: failResponse.error?.description || "Payment was not successful. Please try again.",
           variant: "destructive",
         });
       });
       rzp.open();
     } catch (error) {
-      console.error("Razorpay error:", error);
+      console.error("[Payment] Razorpay error:", error);
       setIsProcessing(false);
       toast({ title: "Payment Error", description: "Could not open payment gateway. Please try again.", variant: "destructive" });
     }

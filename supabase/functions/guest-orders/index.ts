@@ -1,0 +1,61 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    const url = new URL(req.url);
+    const customerId = url.searchParams.get("customer_id");
+
+    if (!customerId) {
+      return new Response(
+        JSON.stringify({ error: "customer_id is required" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validate UUID format
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(customerId)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid customer_id format" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { data: orders, error } = await supabase
+      .from("orders")
+      .select("id, order_number, items, total_amount, payment_method, payment_status, payment_id, status, created_at, updated_at")
+      .eq("customer_id", customerId)
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    if (error) {
+      console.error("[guest-orders] Error:", error);
+      throw error;
+    }
+
+    return new Response(
+      JSON.stringify({ orders: orders || [] }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    console.error("[guest-orders] Error:", error);
+    return new Response(
+      JSON.stringify({ error: error.message || "Failed to fetch orders" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+});

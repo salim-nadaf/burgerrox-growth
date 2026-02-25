@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.google-distance]
 verify_jwt = false
+
+[functions.place-order]
+verify_jwt = false
+
+[functions.guest-orders]
+verify_jwt = false

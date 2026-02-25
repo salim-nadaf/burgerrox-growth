@@ -7,10 +7,8 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogHeader, Di
 import { ShoppingCart, Plus, Minus, Trash2, Send, CreditCard, Banknote } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
-import { useOrders } from "@/hooks/useOrders";
 import { useDelivery } from "@/hooks/useDelivery";
 import { toast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { loadRazorpay } from "@/utils/loadRazorpay";
 import { trackInitiateCheckout, trackPurchase } from "@/utils/metaPixel";
 import OrderTypeSelector, { OrderType, RESTAURANT_ADDRESS } from "./OrderTypeSelector";
@@ -39,6 +37,29 @@ export const sendToGoogleSheet = async (orderData: Record<string, unknown>) => {
   }
 };
 
+// Helper: resolve customer info from auth profile, guestInfo param, or localStorage
+const resolveCustomerInfo = (
+  user: any,
+  profile: any,
+  guestInfoParam?: { name: string; whatsapp: string } | null
+): { name: string; whatsapp: string } => {
+  if (user && profile?.name && profile?.whatsapp_number) {
+    return { name: profile.name, whatsapp: profile.whatsapp_number };
+  }
+  if (guestInfoParam?.name && guestInfoParam?.whatsapp) {
+    return { name: guestInfoParam.name, whatsapp: guestInfoParam.whatsapp };
+  }
+  // Fallback: try localStorage
+  try {
+    const raw = localStorage.getItem("brx_guest_info");
+    if (raw) {
+      const saved = JSON.parse(raw);
+      if (saved.name && saved.whatsapp) return saved;
+    }
+  } catch {}
+  return { name: "Guest", whatsapp: "" };
+};
+
 const Cart = () => {
   const [checkoutInfoOpen, setCheckoutInfoOpen] = useState(false);
   const [pendingPaymentMethod, setPendingPaymentMethod] = useState<"cod" | "online">("cod");
@@ -65,12 +86,15 @@ const Cart = () => {
 
   const { cartItems, addToCart, removeFromCart, updateQuantity, clearCart, totalAmount, itemCount } = useCart();
   const { user, profile } = useAuth();
-  const { createOrder } = useOrders();
   const { deliveryInfo, clearDelivery } = useDelivery();
 
-  // Resolve customer info: logged-in profile or guest info
-  const customerName = user ? (profile?.name || "Guest") : (guestInfo?.name || "Guest");
-  const customerWhatsApp = user ? (profile?.whatsapp_number || "N/A") : (guestInfo?.whatsapp || "N/A");
+  // Load guestInfo from localStorage on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("brx_guest_info");
+      if (raw) setGuestInfo(JSON.parse(raw));
+    } catch {}
+  }, []);
 
   useEffect(() => {
     const handleCartItemAdded = () => setIsOpen(true);
@@ -86,48 +110,17 @@ const Cart = () => {
     }
   }, [isOpen]);
 
-  // Razorpay is now loaded on-demand via loadRazorpay() when Pay Online is clicked
-
   const deliveryCharge = orderType === "delivery" && deliveryInfo ? deliveryInfo.charge : 0;
   const ONLINE_DISCOUNT = 10;
   const onlineDiscount = paymentMethod === "online" ? ONLINE_DISCOUNT : 0;
   const grandTotal = totalAmount + deliveryCharge - onlineDiscount;
-
-  const generateOrderId = async (): Promise<string> => {
-    try {
-      // Fetch last order number from database
-      const { data, error } = await supabase
-        .from("orders")
-        .select("order_number")
-        .order("created_at", { ascending: false })
-        .limit(1);
-
-      let lastNum = 0;
-      if (!error && data && data.length > 0) {
-        const match = data[0].order_number.match(/BRX-(\d+)/);
-        if (match) lastNum = parseInt(match[1], 10);
-      }
-      // Also check localStorage in case DB is behind
-      const localNum = parseInt(localStorage.getItem("brx_last_order") || "0", 10);
-      const maxNum = Math.max(lastNum, localNum);
-      const newNum = maxNum + 1;
-      localStorage.setItem("brx_last_order", String(newNum));
-      return `BRX-${String(newNum).padStart(3, "0")}`;
-    } catch {
-      // Fallback to localStorage only
-      const lastNum = parseInt(localStorage.getItem("brx_last_order") || "0", 10);
-      const newNum = lastNum + 1;
-      localStorage.setItem("brx_last_order", String(newNum));
-      return `BRX-${String(newNum).padStart(3, "0")}`;
-    }
-  };
 
   const getPaymentLabel = (pMethod: string) => {
     if (pMethod === "online") return "Paid Online";
     return orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery";
   };
 
-  const generateWhatsAppMessage = (orderNumber: string) => {
+  const generateWhatsAppMessage = (orderNumber: string, custInfo: { name: string; whatsapp: string }) => {
     const itemsList = cartItems
       .map((item) => `• ${item.item_name} x${item.quantity} — ₹${(item.item_price * item.quantity).toFixed(2)}`)
       .join("\n");
@@ -139,8 +132,8 @@ const Cart = () => {
 Order ID: ${orderNumber}
 Order Type: ${orderType === "pickup" ? "PICKUP" : "DELIVERY"}
 
-Customer: ${customerName}
-WhatsApp: ${customerWhatsApp}
+Customer: ${custInfo.name}
+WhatsApp: ${custInfo.whatsapp}
 
 Items:
 ${itemsList}
@@ -195,7 +188,7 @@ Please confirm order and expected time.`;
   const COD_MINIMUM = 149;
   const isBelowDeliveryMinimum = orderType === "delivery" && grandTotal < COD_MINIMUM;
 
-  const buildSheetPayload = (orderId: string, pMethod: string) => {
+  const buildSheetPayload = (orderId: string, pMethod: string, custInfo: { name: string; whatsapp: string }) => {
     const itemsSummary = cartItems
       .map((item) => `${item.item_name} x${item.quantity}`)
       .join(", ");
@@ -205,8 +198,8 @@ Please confirm order and expected time.`;
     return {
       order_id: orderId,
       order_type: orderType === "pickup" ? "PICKUP" : "DELIVERY",
-      name: customerName,
-      phone: customerWhatsApp,
+      name: custInfo.name,
+      phone: custInfo.whatsapp,
       address: fullAddr,
       items: itemsSummary,
       subtotal: totalAmount,
@@ -219,91 +212,132 @@ Please confirm order and expected time.`;
     };
   };
 
-  const prepareOrder = async (pMethod: "cod" | "online") => {
-    const orderId = await generateOrderId();
-    const whatsappMessage = generateWhatsAppMessage(orderId);
-    const paymentLabel = getPaymentLabel(pMethod);
+  /** Place order via edge function (works for both guest and auth users) */
+  const placeOrderViaAPI = async (
+    pMethod: "cod" | "online",
+    custInfo: { name: string; whatsapp: string },
+    paymentId?: string
+  ): Promise<{ orderNumber: string; customerId: string } | null> => {
+    try {
+      const fullAddr = orderType === "delivery"
+        ? formatFullAddress(detailedAddress, deliveryInfo?.destinationAddress)
+        : "";
 
-    return {
-      orderId,
-      whatsappMessage,
-      orderType: orderType === "pickup" ? "PICKUP" : "DELIVERY",
-      items: cartItems.map(i => ({ item_name: i.item_name, item_price: i.item_price, quantity: i.quantity })),
-      subtotal: totalAmount,
-      delivery: deliveryCharge,
-      discount: pMethod === "online" ? onlineDiscount : 0,
-      total: grandTotal,
-      payment: paymentLabel,
-    };
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/place-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({
+            customer_name: custInfo.name,
+            customer_whatsapp: custInfo.whatsapp,
+            customer_address: fullAddr,
+            items: cartItems.map(i => ({ item_name: i.item_name, item_price: i.item_price, quantity: i.quantity })),
+            total_amount: grandTotal,
+            payment_method: pMethod === "online" ? "online" : "cod",
+            payment_status: pMethod === "online" ? "paid" : "pending",
+            payment_id: paymentId || null,
+            user_id: user?.id || null,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      console.log("[Order] place-order response:", { status: response.status, data });
+
+      if (!response.ok || !data.order_number) {
+        toast({ title: "Order Error", description: data.error || "Could not place order", variant: "destructive" });
+        return null;
+      }
+
+      // Save customer_id to localStorage for returning user recognition
+      if (data.customer_id) {
+        localStorage.setItem("brx_customer_id", data.customer_id);
+      }
+
+      return { orderNumber: data.order_number, customerId: data.customer_id };
+    } catch (err) {
+      console.error("[Order] placeOrderViaAPI error:", err);
+      toast({ title: "Order Error", description: "Failed to place order. Please try again.", variant: "destructive" });
+      return null;
+    }
   };
 
-  // Gate: if not logged in AND no guest info, show checkout info form
+  // Gate: if no customer info available, show checkout info form
   const handleCODOrder = () => {
-    if (!user && !guestInfo) {
+    const info = resolveCustomerInfo(user, profile, guestInfo);
+    if (!info.whatsapp) {
       setPendingPaymentMethod("cod");
       setIsOpen(false);
       document.body.style.pointerEvents = "auto";
       setTimeout(() => setCheckoutInfoOpen(true), 300);
       return;
     }
-    proceedWithCODOrder();
+    proceedWithCODOrder(info);
   };
 
-  const proceedWithCODOrder = async () => {
-    if (!canPlaceOrder() || isBelowDeliveryMinimum) return;
+  const proceedWithCODOrder = async (custInfo?: { name: string; whatsapp: string }) => {
+    if (!canPlaceOrder() || isBelowDeliveryMinimum || isProcessing) return;
 
-    const prepared = await prepareOrder("cod");
+    const info = custInfo || resolveCustomerInfo(user, profile, guestInfo);
+    if (!info.whatsapp) return;
 
-    // Save order to database only if logged in
-    if (user) {
-      await createOrder({
-        items: prepared.items,
-        totalAmount: prepared.total,
-        paymentMethod: "cod",
-        paymentStatus: "pending",
-        orderNumber: prepared.orderId,
-      });
+    setIsProcessing(true);
+
+    const result = await placeOrderViaAPI("cod", info);
+    if (!result) {
+      setIsProcessing(false);
+      return;
     }
 
+    const whatsappMessage = generateWhatsAppMessage(result.orderNumber, info);
+
     // Send to Google Sheet (non-blocking)
-    sendToGoogleSheet(buildSheetPayload(prepared.orderId, "cod"));
-    const purchaseContents = prepared.items.map(i => ({ id: i.item_name, quantity: i.quantity }));
-    trackPurchase(prepared.total, purchaseContents);
+    sendToGoogleSheet(buildSheetPayload(result.orderNumber, "cod", info));
+    const purchaseContents = cartItems.map(i => ({ id: i.item_name, quantity: i.quantity }));
+    trackPurchase(grandTotal, purchaseContents);
 
     setLastOrder({
-      orderNumber: prepared.orderId,
-      whatsappMessage: prepared.whatsappMessage,
-      orderType: prepared.orderType,
-      items: prepared.items,
-      subtotal: prepared.subtotal,
-      delivery: prepared.delivery,
-      discount: prepared.discount,
-      total: prepared.total,
-      payment: prepared.payment,
+      orderNumber: result.orderNumber,
+      whatsappMessage,
+      orderType: orderType === "pickup" ? "PICKUP" : "DELIVERY",
+      items: cartItems.map(i => ({ item_name: i.item_name, item_price: i.item_price, quantity: i.quantity })),
+      subtotal: totalAmount,
+      delivery: deliveryCharge,
+      discount: 0,
+      total: grandTotal,
+      payment: getPaymentLabel("cod"),
     });
 
-    // Clear cart
     clearCart();
     if (orderType === "delivery") clearDelivery();
     setDetailedAddress({ flatNo: "", building: "", area: "", pincode: "" });
     setIsOpen(false);
+    setIsProcessing(false);
     document.body.style.pointerEvents = "auto";
     setTimeout(() => setConfirmDialogOpen(true), 300);
   };
 
   const handleOnlinePayment = () => {
-    if (!user && !guestInfo) {
+    const info = resolveCustomerInfo(user, profile, guestInfo);
+    if (!info.whatsapp) {
       setPendingPaymentMethod("online");
       setIsOpen(false);
       document.body.style.pointerEvents = "auto";
       setTimeout(() => setCheckoutInfoOpen(true), 300);
       return;
     }
-    proceedWithOnlinePayment();
+    proceedWithOnlinePayment(info);
   };
 
-  const proceedWithOnlinePayment = async () => {
+  const proceedWithOnlinePayment = async (custInfo?: { name: string; whatsapp: string }) => {
     if (!canPlaceOrder() || isProcessing) return;
+
+    const info = custInfo || resolveCustomerInfo(user, profile, guestInfo);
+    if (!info.whatsapp) return;
 
     setIsProcessing(true);
     console.log('[Payment] Starting online payment, amount:', grandTotal);
@@ -343,6 +377,14 @@ Please confirm order and expected time.`;
       document.body.style.pointerEvents = "auto";
 
       // Step 4: Open Razorpay checkout
+      // Capture cart state before Razorpay opens (cart may clear during handler)
+      const capturedItems = cartItems.map(i => ({ item_name: i.item_name, item_price: i.item_price, quantity: i.quantity }));
+      const capturedSubtotal = totalAmount;
+      const capturedDelivery = deliveryCharge;
+      const capturedDiscount = onlineDiscount;
+      const capturedTotal = grandTotal;
+      const capturedOrderType = orderType;
+
       const options = {
         key: data.keyId,
         amount: data.amount,
@@ -352,51 +394,42 @@ Please confirm order and expected time.`;
         order_id: data.orderId,
         handler: async (rzpResponse: any) => {
           console.log('[Payment] Payment successful, payment_id:', rzpResponse.razorpay_payment_id);
-          const prepared = await prepareOrder("online");
 
-          if (user) {
-            const order = await createOrder({
-              items: prepared.items,
-              totalAmount: prepared.total,
-              paymentMethod: "online",
-              paymentStatus: "paid",
-              paymentId: rzpResponse.razorpay_payment_id,
-              orderNumber: prepared.orderId,
-            });
-
-            if (!order) {
-              toast({ title: "Error", description: "Payment received but failed to save order. Please contact support.", variant: "destructive" });
-              setIsProcessing(false);
-              return;
-            }
+          // Place order with payment_id
+          const result = await placeOrderViaAPI("online", info, rzpResponse.razorpay_payment_id);
+          if (!result) {
+            toast({ title: "Error", description: "Payment received but failed to save order. Please contact support.", variant: "destructive" });
+            setIsProcessing(false);
+            return;
           }
 
-          sendToGoogleSheet(buildSheetPayload(prepared.orderId, "online"));
-          const purchaseContents = prepared.items.map(i => ({ id: i.item_name, quantity: i.quantity }));
-          trackPurchase(prepared.total, purchaseContents);
+          const whatsappMessage = generateWhatsAppMessage(result.orderNumber, info);
+          sendToGoogleSheet(buildSheetPayload(result.orderNumber, "online", info));
+          const purchaseContents = capturedItems.map(i => ({ id: i.item_name, quantity: i.quantity }));
+          trackPurchase(capturedTotal, purchaseContents);
 
           setLastOrder({
-            orderNumber: prepared.orderId,
-            whatsappMessage: prepared.whatsappMessage,
-            orderType: prepared.orderType,
-            items: prepared.items,
-            subtotal: prepared.subtotal,
-            delivery: prepared.delivery,
-            discount: prepared.discount,
-            total: prepared.total,
-            payment: prepared.payment,
+            orderNumber: result.orderNumber,
+            whatsappMessage,
+            orderType: capturedOrderType === "pickup" ? "PICKUP" : "DELIVERY",
+            items: capturedItems,
+            subtotal: capturedSubtotal,
+            delivery: capturedDelivery,
+            discount: capturedDiscount,
+            total: capturedTotal,
+            payment: "Paid Online",
           });
 
           await clearCart();
-          if (orderType === "delivery") clearDelivery();
+          if (capturedOrderType === "delivery") clearDelivery();
           setDetailedAddress({ flatNo: "", building: "", area: "", pincode: "" });
 
           setIsProcessing(false);
           setTimeout(() => setConfirmDialogOpen(true), 300);
         },
         prefill: {
-          name: customerName,
-          contact: customerWhatsApp !== "N/A" ? `91${customerWhatsApp}` : "",
+          name: info.name,
+          contact: info.whatsapp ? `91${info.whatsapp}` : "",
         },
         theme: { color: "#FF5D05" },
         modal: {
@@ -438,14 +471,14 @@ Please confirm order and expected time.`;
     setGuestInfo(info);
     setCheckoutInfoOpen(false);
     toast({ title: "Details saved!", description: "Complete your order." });
-    // Re-open cart and proceed
+    // Pass info directly to avoid React state timing issues
     setTimeout(() => {
       setIsOpen(true);
       setTimeout(() => {
         if (pendingPaymentMethod === "online") {
-          proceedWithOnlinePayment();
+          proceedWithOnlinePayment(info);
         } else {
-          proceedWithCODOrder();
+          proceedWithCODOrder(info);
         }
       }, 300);
     }, 300);
@@ -616,7 +649,7 @@ Please confirm order and expected time.`;
                       disabled={!canPlaceOrder() || isProcessing || isBelowDeliveryMinimum}
                     >
                       <Banknote className="h-4 w-4 mr-2" />
-                      {orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery"}
+                      {isProcessing ? "Placing Order..." : orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery"}
                     </Button>
                     {!isBelowDeliveryMinimum && (
                       <p className="text-xs text-center text-muted-foreground font-montserrat">
@@ -631,18 +664,24 @@ Please confirm order and expected time.`;
                     disabled={!canPlaceOrder() || isProcessing || isBelowDeliveryMinimum}
                   >
                     <CreditCard className="h-4 w-4 mr-2" />
-                    Pay Online (UPI / Card) — Save ₹10
+                    {isProcessing ? "Processing..." : "Pay Online (UPI / Card) — Save ₹10"}
                   </Button>
                 )}
               </div>
 
-              {/* Urgency + Trust lines below Place Order */}
+              {/* Trust + Urgency lines below Place Order */}
               <div className="space-y-1 pt-1">
                 <p className="text-xs text-center text-muted-foreground font-montserrat">
-                  Limited evening delivery slots
+                  🔒 Secure checkout
                 </p>
                 <p className="text-xs text-center font-montserrat text-primary">
-                  ✅ Orders confirmed instantly on WhatsApp
+                  📲 WhatsApp confirmation within minutes
+                </p>
+                <p className="text-xs text-center text-muted-foreground font-montserrat">
+                  🚚 Fresh batches made daily
+                </p>
+                <p className="text-xs text-center text-muted-foreground font-montserrat">
+                  ⚡ Limited evening slots
                 </p>
               </div>
 

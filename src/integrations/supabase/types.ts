@@ -44,10 +44,38 @@ export type Database = {
         }
         Relationships: []
       }
+      customers: {
+        Row: {
+          address: string | null
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          whatsapp: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+          whatsapp: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string
           customer_area: string | null
+          customer_id: string | null
           customer_name: string | null
           customer_whatsapp: string | null
           id: string
@@ -64,6 +92,7 @@ export type Database = {
         Insert: {
           created_at?: string
           customer_area?: string | null
+          customer_id?: string | null
           customer_name?: string | null
           customer_whatsapp?: string | null
           id?: string
@@ -80,6 +109,7 @@ export type Database = {
         Update: {
           created_at?: string
           customer_area?: string | null
+          customer_id?: string | null
           customer_name?: string | null
           customer_whatsapp?: string | null
           id?: string
@@ -93,7 +123,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -130,7 +168,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      next_order_number: { Args: never; Returns: string }
     }
     Enums: {
       order_status:

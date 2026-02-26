@@ -5,10 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ClipboardList, Clock, CheckCircle, ChefHat, Truck, XCircle, ShoppingBag } from 'lucide-react';
+import { ClipboardList, Clock, CheckCircle, ChefHat, Truck, XCircle, ShoppingBag, Send } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import OrderHistory from './OrderHistory';
+import { RESTAURANT_ADDRESS } from './OrderTypeSelector';
 
 type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'out_for_delivery' | 'delivered' | 'cancelled';
 
@@ -20,6 +21,9 @@ interface GuestOrder {
   payment_method: string;
   status: OrderStatus;
   created_at: string;
+  customer_name?: string;
+  customer_whatsapp?: string;
+  customer_area?: string;
 }
 
 const statusConfig: Record<OrderStatus, { label: string; color: string; icon: React.ReactNode }> = {
@@ -29,6 +33,38 @@ const statusConfig: Record<OrderStatus, { label: string; color: string; icon: Re
   out_for_delivery: { label: 'Out for Delivery', color: 'bg-purple-500', icon: <Truck className="h-3 w-3" /> },
   delivered: { label: 'Delivered', color: 'bg-green-500', icon: <CheckCircle className="h-3 w-3" /> },
   cancelled: { label: 'Cancelled', color: 'bg-red-500', icon: <XCircle className="h-3 w-3" /> },
+};
+
+const buildWhatsAppMessage = (order: GuestOrder) => {
+  const itemsList = order.items
+    .map((item) => `• ${item.item_name} x${item.quantity} — ₹${(item.item_price * item.quantity).toFixed(2)}`)
+    .join("\n");
+
+  const isDelivery = !!(order.customer_area);
+  const paymentLabel = order.payment_method === 'online' ? 'Paid Online' : isDelivery ? 'Pay on Delivery' : 'Pay on Pickup';
+
+  let msg = `--- BURGER ROX ORDER ---
+
+Order ID: ${order.order_number}
+Order Type: ${isDelivery ? "DELIVERY" : "PICKUP"}
+
+Customer: ${order.customer_name || "Customer"}
+WhatsApp: ${order.customer_whatsapp || ""}
+
+Items:
+${itemsList}
+
+TOTAL: ₹${order.total_amount.toFixed(2)}
+
+Payment: ${paymentLabel}`;
+
+  if (isDelivery && order.customer_area) {
+    msg += `\n\nDelivery Address:\n${order.customer_area}\n\nPlease confirm order and expected time.`;
+  } else {
+    msg += `\n\nPickup Location: ${RESTAURANT_ADDRESS}\n\nPlease confirm order and expected time.`;
+  }
+
+  return msg;
 };
 
 export default function OrdersSheet() {
@@ -66,6 +102,11 @@ export default function OrdersSheet() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleResendWhatsApp = (order: GuestOrder) => {
+    const msg = buildWhatsAppMessage(order);
+    window.open(`https://wa.me/919321389985?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
   // Authenticated user → use existing OrderHistory component
@@ -125,8 +166,9 @@ export default function OrdersSheet() {
           ) : (
             <ScrollArea className="h-[calc(100vh-150px)]">
               <div className="space-y-3 pr-2">
-                {guestOrders.map((order) => {
+                {guestOrders.map((order, index) => {
                   const status = statusConfig[order.status] || statusConfig.pending;
+                  const isLatest = index === 0;
                   return (
                     <Card key={order.id} className="overflow-hidden">
                       <CardHeader className="py-2 px-3 bg-muted/50">
@@ -157,6 +199,18 @@ export default function OrdersSheet() {
                           <span className="text-muted-foreground">Total</span>
                           <span className="font-semibold text-primary">₹{order.total_amount.toFixed(2)}</span>
                         </div>
+                        {/* Send to WhatsApp button — latest order only */}
+                        {isLatest && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full mt-2 text-xs"
+                            onClick={() => handleResendWhatsApp(order)}
+                          >
+                            <Send className="h-3 w-3 mr-1" />
+                            Send to WhatsApp
+                          </Button>
+                        )}
                       </CardContent>
                     </Card>
                   );

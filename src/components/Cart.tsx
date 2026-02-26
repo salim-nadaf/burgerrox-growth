@@ -253,10 +253,13 @@ Please confirm order and expected time.`;
         return null;
       }
 
-      // Save customer_id to localStorage for returning user recognition
+      // Save customer session to localStorage for returning user recognition
       if (data.customer_id) {
         localStorage.setItem("brx_customer_id", data.customer_id);
       }
+      // Also persist name/whatsapp for session consistency
+      localStorage.setItem("brx_customer_name", custInfo.name);
+      localStorage.setItem("brx_customer_whatsapp", custInfo.whatsapp);
 
       return { orderNumber: data.order_number, customerId: data.customer_id };
     } catch (err) {

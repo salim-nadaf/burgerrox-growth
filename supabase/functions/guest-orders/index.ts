@@ -37,7 +37,7 @@ serve(async (req) => {
 
     const { data: orders, error } = await supabase
       .from("orders")
-      .select("id, order_number, items, total_amount, payment_method, payment_status, payment_id, status, created_at, updated_at")
+      .select("id, order_number, items, total_amount, payment_method, payment_status, payment_id, status, created_at, updated_at, customer_name, customer_whatsapp, customer_area")
       .eq("customer_id", customerId)
       .order("created_at", { ascending: false })
       .limit(20);

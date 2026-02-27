@@ -1,27 +1,21 @@
 import { Button } from "@/components/ui/button";
+import zingerHero from "@/assets/Zinger hero.webp";
 
 const Hero = () => {
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden max-w-full bg-background" aria-labelledby="hero-heading">
       {/* Background Image */}
       <div className="absolute inset-0 z-0" aria-hidden="true">
-        <picture>
-          <source
-            type="image/webp"
-            srcSet="/hero-burger-mobile.webp 768w, /hero-burger.webp 1920w"
-            sizes="100vw"
-          />
-          <img 
-            src="/hero-burger.jpg"
-            alt="" 
-            className="w-full h-full object-cover"
-            width="1920"
-            height="1080"
-            loading="eager"
-            fetchPriority="high"
-            decoding="async"
-          />
-        </picture>
+        <img 
+          src={zingerHero}
+          alt="" 
+          className="w-full h-full object-cover object-center"
+          width="1920"
+          height="1080"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+        />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, hsla(45, 100%, 55%, 0.55), hsla(45, 100%, 55%, 0.75))' }}></div>
       </div>
 

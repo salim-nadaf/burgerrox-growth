@@ -5,6 +5,7 @@ import TrustStrip from "@/components/TrustStrip";
 import Footer from "@/components/Footer";
 
 // Lazy load below-the-fold components for better performance
+const GoogleReviews = lazy(() => import("@/components/GoogleReviews"));
 const MenuHighlights = lazy(() => import("@/components/MenuHighlights"));
 const About = lazy(() => import("@/components/About"));
 const Contact = lazy(() => import("@/components/Contact"));
@@ -27,6 +28,9 @@ const Index = () => {
       <main id="main-content" role="main">
         <Hero />
         <TrustStrip />
+        <Suspense fallback={<SectionLoader />}>
+          <GoogleReviews />
+        </Suspense>
         <Suspense fallback={<SectionLoader />}>
           <WelcomeMessage />
         </Suspense>

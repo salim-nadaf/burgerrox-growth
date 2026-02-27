@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MenuPage from "@/components/MenuPage";
+import FoodPhotoStrip from "@/components/FoodPhotoStrip";
+import GoogleReviews from "@/components/GoogleReviews";
 import { trackViewContent } from "@/utils/metaPixel";
 
 const Menu = () => {
@@ -19,6 +21,8 @@ const Menu = () => {
       <Header />
       <main id="main-content" role="main">
         <MenuPage showAll={true} />
+        <FoodPhotoStrip />
+        <GoogleReviews />
       </main>
       <Footer />
     </div>

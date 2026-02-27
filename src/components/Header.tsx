@@ -38,6 +38,9 @@ const Header = () => {
                   Menu
                 </Link>
               )}
+              <Link to="/delivery-area" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
+                Delivery Areas
+              </Link>
               {location.pathname === '/menu' ? (
                 <>
                   <Link to="/#about" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
@@ -164,6 +167,13 @@ const Header = () => {
                         </a>
                       </>
                     )}
+                    <Link 
+                      to="/delivery-area" 
+                      className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Delivery Areas
+                    </Link>
                     <button 
                       className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2 text-left"
                       onClick={() => {

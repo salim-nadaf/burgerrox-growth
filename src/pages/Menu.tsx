@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import MenuPage from "@/components/MenuPage";
 import FoodPhotoStrip from "@/components/FoodPhotoStrip";
 import GoogleReviews from "@/components/GoogleReviews";
+import TrustStrip from "@/components/TrustStrip";
 import { trackViewContent } from "@/utils/metaPixel";
 
 const Menu = () => {
@@ -20,9 +21,10 @@ const Menu = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main id="main-content" role="main">
-        <MenuPage showAll={true} />
+        <TrustStrip />
         <FoodPhotoStrip />
         <GoogleReviews />
+        <MenuPage showAll={true} />
       </main>
       <Footer />
     </div>

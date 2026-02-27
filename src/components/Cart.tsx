@@ -588,21 +588,6 @@ Please confirm order and expected time.`;
 
               <Separator />
 
-              {/* Wedges upsell */}
-              {!cartItems.some(i => i.item_name.toLowerCase().includes('wedges')) && (
-                <div className="flex items-center justify-between p-2 border border-primary/20 rounded-lg bg-primary/5">
-                  <p className="font-montserrat text-xs text-foreground">Make it a combo: add crispy potato wedges for just ₹69</p>
-                  <Button size="sm" variant="outline" className="text-xs ml-2 flex-shrink-0" onClick={() => addToCart("Potato Wedges (Upsell)", 69)}>
-                    + Add
-                  </Button>
-                </div>
-              )}
-
-              {/* Signature sauce note */}
-              <p className="text-xs text-center text-muted-foreground font-montserrat">
-                Every burger made with our homemade signature sauce.
-              </p>
-
               {/* Payment method selector */}
               <div className="space-y-2">
                 <p className="font-montserrat text-xs font-medium text-foreground">Payment Method:</p>
@@ -619,12 +604,9 @@ Please confirm order and expected time.`;
                     onClick={() => setPaymentMethod("online")}
                   >
                     <CreditCard className="h-4 w-4 mr-1" />
-                    Pay Online
+                    Pay Online {paymentMethod !== "online" && "(Save ₹10)"}
                   </Button>
                 </div>
-                <p className="text-xs text-center text-green-600 font-montserrat">
-                  Pay online and save ₹10 on your order.
-                </p>
               </div>
 
               {/* Minimum order warning for delivery */}
@@ -634,42 +616,43 @@ Please confirm order and expected time.`;
                 </p>
               )}
 
-              {/* Action Buttons */}
-              <div className="space-y-2">
-                {paymentMethod === "cod" ? (
-                  <>
-                    <Button
-                      className="w-full" variant="brand" size="lg"
-                      onClick={handleCODOrder}
-                      disabled={!canPlaceOrder() || isProcessing || isBelowDeliveryMinimum}
-                    >
-                      <Banknote className="h-4 w-4 mr-2" />
-                      {isProcessing ? "Placing Order..." : orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery"}
-                    </Button>
-                    {!isBelowDeliveryMinimum && (
-                      <p className="text-xs text-center text-muted-foreground font-montserrat">
-                        Our team will confirm your order on WhatsApp before {orderType === "pickup" ? "preparation" : "delivery"}.
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  <Button
-                    className="w-full" variant="default" size="lg"
-                    onClick={handleOnlinePayment}
-                    disabled={!canPlaceOrder() || isProcessing || isBelowDeliveryMinimum}
-                  >
-                    <CreditCard className="h-4 w-4 mr-2" />
-                    {isProcessing ? "Processing..." : "Pay Online (UPI / Card) — Save ₹10"}
-                  </Button>
-                )}
-              </div>
+              {/* Primary CTA */}
+              {paymentMethod === "cod" ? (
+                <Button
+                  className="w-full" variant="brand" size="lg"
+                  onClick={handleCODOrder}
+                  disabled={!canPlaceOrder() || isProcessing || isBelowDeliveryMinimum}
+                >
+                  <Banknote className="h-4 w-4 mr-2" />
+                  {isProcessing ? "Placing Order..." : `Place Order — ₹${grandTotal.toFixed(0)}`}
+                </Button>
+              ) : (
+                <Button
+                  className="w-full" variant="default" size="lg"
+                  onClick={handleOnlinePayment}
+                  disabled={!canPlaceOrder() || isProcessing || isBelowDeliveryMinimum}
+                >
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  {isProcessing ? "Processing..." : `Pay ₹${grandTotal.toFixed(0)} Online`}
+                </Button>
+              )}
 
-              {/* Minimal trust line */}
-              <p className="text-xs text-center text-muted-foreground font-montserrat pt-1">
-                🔒 Secure checkout · 📲 WhatsApp confirmation
+              {/* Single reassurance line */}
+              <p className="text-[11px] text-center text-muted-foreground font-montserrat">
+                📲 WhatsApp confirmation in minutes · 🔒 Secure
               </p>
 
-              <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={clearCart}>
+              {/* Wedges upsell */}
+              {!cartItems.some(i => i.item_name.toLowerCase().includes('wedges')) && (
+                <div className="flex items-center justify-between p-2 border border-border/50 rounded-lg">
+                  <p className="font-montserrat text-xs text-foreground">Add potato wedges — ₹69</p>
+                  <Button size="sm" variant="outline" className="text-xs ml-2 flex-shrink-0 h-7" onClick={() => addToCart("Potato Wedges (Upsell)", 69)}>
+                    + Add
+                  </Button>
+                </div>
+              )}
+
+              <Button variant="ghost" size="sm" className="w-full text-muted-foreground text-xs" onClick={clearCart}>
                 Clear Cart
               </Button>
             </div>

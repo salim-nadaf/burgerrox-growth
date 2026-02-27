@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
+import TrustStrip from "@/components/TrustStrip";
 import Footer from "@/components/Footer";
 
 // Lazy load below-the-fold components for better performance
@@ -25,6 +26,7 @@ const Index = () => {
       <Header />
       <main id="main-content" role="main">
         <Hero />
+        <TrustStrip />
         <Suspense fallback={<SectionLoader />}>
           <WelcomeMessage />
         </Suspense>

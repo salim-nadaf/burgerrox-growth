@@ -664,21 +664,10 @@ Please confirm order and expected time.`;
                 )}
               </div>
 
-              {/* Trust + Urgency lines below Place Order */}
-              <div className="space-y-1 pt-1">
-                <p className="text-xs text-center text-muted-foreground font-montserrat">
-                  🔒 Secure checkout
-                </p>
-                <p className="text-xs text-center font-montserrat text-primary">
-                  📲 WhatsApp confirmation within minutes
-                </p>
-                <p className="text-xs text-center text-muted-foreground font-montserrat">
-                  🚚 Fresh batches made daily
-                </p>
-                <p className="text-xs text-center text-muted-foreground font-montserrat">
-                  ⚡ Limited evening slots
-                </p>
-              </div>
+              {/* Minimal trust line */}
+              <p className="text-xs text-center text-muted-foreground font-montserrat pt-1">
+                🔒 Secure checkout · 📲 WhatsApp confirmation
+              </p>
 
               <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={clearCart}>
                 Clear Cart

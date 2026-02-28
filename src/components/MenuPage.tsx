@@ -213,6 +213,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                 height="80"
                 loading="lazy"
                 decoding="async"
+                sizes="80px"
               />
               <div className="flex-1 min-w-0">
                 <div className="flex flex-col gap-1 mb-2">

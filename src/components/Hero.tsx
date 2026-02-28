@@ -3,15 +3,15 @@ import zingerHero from "@/assets/Zinger hero.webp";
 
 const Hero = () => {
   return (
-    <section className="relative min-h-[70vh] sm:min-h-[75vh] flex items-center justify-center overflow-hidden max-w-full bg-background" aria-labelledby="hero-heading">
-      {/* Background Image — zoomed out for clarity */}
+    <section className="relative min-h-[60vh] sm:min-h-[70vh] md:min-h-[75vh] flex items-center justify-center overflow-hidden max-w-full bg-background" aria-labelledby="hero-heading">
+      {/* Background Image — properly fitted */}
       <div className="absolute inset-0 z-0" aria-hidden="true">
         <img 
           src={zingerHero}
           alt="" 
-          className="w-full h-full object-cover object-center scale-[0.85] sm:scale-100"
-          width="1920"
-          height="1080"
+          className="w-full h-full object-cover object-[center_60%] sm:object-center"
+          width="800"
+          height="600"
           loading="eager"
           fetchPriority="high"
           decoding="async"

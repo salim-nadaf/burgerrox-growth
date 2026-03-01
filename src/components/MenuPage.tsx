@@ -1,25 +1,15 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import burgerTrio from "@/assets/burger-trio.jpg";
-import friesImage from "@/assets/fries.jpg";
-import nuggetsImage from "@/assets/nuggets.jpg";
-import chickenBurgerImage from "@/assets/chicken-burger.jpg";
-import eggBurgerImage from "@/assets/egg-burger.jpg";
-import veggieBurgerImage from "@/assets/veggie-burger.jpg";
-import comboMealImage from "@/assets/combo-meal.jpg";
-import cokeImage from "@/assets/coca-cola.jpg";
-import lavaCakeImage from "@/assets/lava-cake.jpg";
-import restaurantGuruCertificate from "@/assets/RestaurantGuru_Certificate1 (1).png";
 // Specific menu item images
 import blazeChickenImg from "@/assets/Blaze Chicken Burger.jpg";
 import blazeVegImg from "@/assets/Blaze Veg Burger.jpg";
 import alooRockImg from "@/assets/Aloo Rock Burger.jpg";
+import eggBurgerImage from "@/assets/egg-burger.jpg";
 import doubleChickenImg from "@/assets/Double Blaze Chicken.png";
 import doubleVegImg from "@/assets/Double Blaze Veg.jpg";
 import zingerImg from "@/assets/Burger Rox Zinger.jpg";
@@ -29,6 +19,8 @@ import saltedFriesImg from "@/assets/Salted Fries.jpg";
 import periPeriFriesImg from "@/assets/Peri Peri Fries.jpg";
 import potatoWedgesImg from "@/assets/Potato Wedges.jpeg";
 import chickenPopcornImg from "@/assets/Chicken Popcorn.jpeg";
+import lavaCakeImage from "@/assets/lava-cake.jpg";
+import chickenBurgerImage from "@/assets/chicken-burger.jpg";
 import { useCart } from "@/hooks/useCart";
 
 const FoodTypeIndicator = ({ type }: { type: 'veg' | 'nonveg' | 'egg' }) => {
@@ -50,7 +42,7 @@ const ITEM_IMAGE_MAP: Record<string, string> = {
   "Blaze Chicken Burger": blazeChickenImg,
   "Blaze Veg Burger": blazeVegImg,
   "Aloo Rock Burger": alooRockImg,
-  "Egg Blaze Smash": eggBurgerImage, // Keep existing egg burger image
+  "Egg Blaze Smash": eggBurgerImage,
   "Double Blaze Chicken": doubleChickenImg,
   "Double Blaze Veg": doubleVegImg,
   "Burger Rox Zinger": zingerImg,
@@ -60,17 +52,12 @@ const ITEM_IMAGE_MAP: Record<string, string> = {
   "Peri Peri Fries": periPeriFriesImg,
   "Potato Wedges": potatoWedgesImg,
   "Chicken Popcorn": chickenPopcornImg,
-  "Choco Lava Cake": lavaCakeImage, // Keep existing lava cake image
+  "Choco Lava Cake": lavaCakeImage,
 };
 
-const getItemImage = (name: string, _category: string) => {
-  return ITEM_IMAGE_MAP[name] || chickenBurgerImage;
-};
+const getItemImage = (name: string) => ITEM_IMAGE_MAP[name] || chickenBurgerImage;
 
-interface AddOn {
-  name: string;
-  price: number;
-}
+interface AddOn { name: string; price: number; }
 
 const BURGER_ADDONS: AddOn[] = [
   { name: "Signature Sauce", price: 49 },
@@ -93,7 +80,6 @@ interface MenuItem {
 }
 
 const allMenuItems: MenuItem[] = [
-  // Burgers
   { name: "Blaze Chicken Burger", description: "Crispy chicken patty with fresh veggies and our rockin' homemade blaze sauce.", price: 129, popular: true, category: "Burgers", foodType: "nonveg", section: ["Most Popular", "All Burgers"], hasAddons: true, customTag: "Most Ordered" },
   { name: "Blaze Veg Burger", description: "Golden veg patty, crunchy lettuce, and signature blaze sauce in a soft bun.", price: 89, popular: true, category: "Burgers", foodType: "veg", section: ["Most Popular", "All Burgers"], hasAddons: true, customTag: "Student Favorite" },
   { name: "Aloo Rock Burger", description: "Classic aloo tikki with onions, lettuce, and our homemade signature sauce.", price: 99, popular: false, category: "Burgers", foodType: "veg", section: ["All Burgers"], hasAddons: true },
@@ -101,12 +87,8 @@ const allMenuItems: MenuItem[] = [
   { name: "Double Blaze Chicken", description: "Two crispy chicken patties stacked with fresh veggies and double blaze flavor.", price: 199, popular: false, category: "Burgers", foodType: "nonveg", section: ["All Burgers"], hasAddons: true },
   { name: "Double Blaze Veg", description: "Double veg patties with crunchy lettuce and extra signature sauce.", price: 149, popular: false, category: "Burgers", foodType: "veg", section: ["All Burgers"], hasAddons: true },
   { name: "Burger Rox Zinger", description: "Our premium zinger-style chicken burger with bold spices and signature sauce.", price: 259, popular: true, category: "Burgers", foodType: "nonveg", section: ["All Burgers"], hasAddons: true, customTag: "Premium Pick" },
-
-  // Combos
   { name: "Blaze Combo", description: "Blaze Chicken Burger with fries and your choice of drink or lava cake.", price: 229, popular: true, category: "Combos", foodType: "nonveg", section: ["Combos"], comboChoice: true },
   { name: "Zinger Combo", description: "Burger Rox Zinger with fries and your choice of drink or lava cake.", price: 349, popular: true, category: "Combos", foodType: "nonveg", section: ["Combos"], comboChoice: true },
-
-  // Sides
   { name: "Salted Fries", description: "Hot, crunchy and irresistibly delicious.", price: 79, popular: true, category: "Sides", foodType: "veg", section: ["Sides"], variants: [
     { size: "Small", price: 79 },
     { size: "Regular", price: 109 },
@@ -128,12 +110,8 @@ interface MenuPageProps {
 
 const MenuPage = ({ showAll = false }: MenuPageProps) => {
   const { addToCart } = useCart();
-
-  // Addon state per item
   const [selectedAddons, setSelectedAddons] = useState<Record<string, string[]>>({});
-  // Combo choice state per item
   const [comboChoices, setComboChoices] = useState<Record<string, string>>({});
-
 
   const toggleAddon = (itemName: string, addonName: string) => {
     setSelectedAddons(prev => {
@@ -161,18 +139,15 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
     let finalName = item.name;
     let finalPrice = variantPrice ?? item.price;
 
-    // Append combo choice
     if (item.comboChoice) {
       const choice = comboChoices[item.name] || "Soft Drink";
       finalName = `${item.name} (with ${choice})`;
     }
 
-    // Append variant
     if (variantSize) {
       finalName = `${item.name} (${variantSize})`;
     }
 
-    // Handle add-ons for burgers
     if (item.hasAddons) {
       const addons = selectedAddons[item.name] || [];
       if (addons.length > 0) {
@@ -182,12 +157,9 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
     }
 
     await addToCart(finalName, finalPrice);
-    // Reset addons/combo choice for this item after adding
     setSelectedAddons(prev => ({ ...prev, [item.name]: [] }));
   };
 
-
-  // For homepage preview, show Most Popular + Combos only
   const sectionsToShow = showAll ? MENU_SECTIONS : ["Most Popular", "Combos"];
 
   const getItemsForSection = (section: string) => {
@@ -200,207 +172,159 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
     const comboChoice = comboChoices[item.name] || "Soft Drink";
 
     return (
-      <article key={item.name} role="listitem">
-        <Card className="border border-border hover:border-primary transition-all duration-300 h-full" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
-          <CardContent className="p-4">
-            <div className="flex gap-3 mb-4">
-              <img
-                src={getItemImage(item.name, item.category)}
-                alt={`${item.name} - ${item.description}`}
-                className="w-20 h-20 rounded-lg object-cover object-center flex-shrink-0"
-                style={{ aspectRatio: '1/1' }}
-                width="80"
-                height="80"
-                loading="lazy"
-                decoding="async"
-                sizes="80px"
-              />
+      <article key={item.name} className="bg-card rounded-lg border border-border/40 p-3 hover:border-primary/50 transition-colors" role="listitem">
+        <div className="flex gap-3">
+          <img
+            src={getItemImage(item.name)}
+            alt={item.name}
+            className="w-[72px] h-[72px] rounded-lg object-cover flex-shrink-0"
+            width="72" height="72" loading="lazy" decoding="async"
+          />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-1">
               <div className="flex-1 min-w-0">
-                <div className="flex flex-col gap-1 mb-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <FoodTypeIndicator type={item.foodType} />
-                        <h3 className="font-bebas text-lg sm:text-xl text-foreground tracking-wide leading-tight">
-                          {item.name}
-                        </h3>
-                      </div>
-                      {item.customTag && (
-                        <Badge variant="default" className="bg-primary text-primary-foreground text-[10px] mt-1" aria-label={item.customTag}>
-                          {item.customTag.toUpperCase()}
-                        </Badge>
-                      )}
-                    </div>
-                    {!item.variants && (
-                      <span className="font-bebas text-lg sm:text-xl text-primary flex-shrink-0" aria-label={`Price ${item.price} rupees`}>
-                        ₹{item.price}
-                      </span>
-                    )}
-                  </div>
+                <div className="flex items-center gap-1.5">
+                  <FoodTypeIndicator type={item.foodType} />
+                  <h3 className="font-bebas text-base sm:text-lg text-foreground tracking-wide leading-tight truncate">
+                    {item.name}
+                  </h3>
                 </div>
-              </div>
-            </div>
-            <p className="font-montserrat text-sm text-muted-foreground leading-relaxed mb-4">
-              {item.description}
-            </p>
-
-            {/* Combo choice */}
-            {item.comboChoice && (
-              <div className="mb-4 p-3 border border-border/30 rounded-lg bg-muted/10">
-                <p className="font-montserrat text-xs font-medium text-foreground mb-2">Choose one:</p>
-                <RadioGroup value={comboChoice} onValueChange={(v) => setComboChoice(item.name, v)} className="space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Soft Drink" id={`${item.name}-drink`} />
-                    <Label htmlFor={`${item.name}-drink`} className="text-sm font-montserrat">Soft Drink</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Choco Lava Cake" id={`${item.name}-cake`} />
-                    <Label htmlFor={`${item.name}-cake`} className="text-sm font-montserrat">Choco Lava Cake</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            )}
-
-            {/* Add-ons for burgers */}
-            {item.hasAddons && (
-              <div className="mb-4 p-3 border border-border/30 rounded-lg bg-muted/10">
-                <p className="font-montserrat text-xs font-medium text-foreground mb-2">Add-ons:</p>
-                <div className="space-y-1.5">
-                  {BURGER_ADDONS.map(addon => (
-                    <div key={addon.name} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`${item.name}-${addon.name}`}
-                          checked={addons.includes(addon.name)}
-                          onCheckedChange={() => toggleAddon(item.name, addon.name)}
-                        />
-                        <Label htmlFor={`${item.name}-${addon.name}`} className="text-sm font-montserrat">{addon.name}</Label>
-                      </div>
-                      <span className="font-bebas text-sm text-primary">+₹{addon.price}</span>
-                    </div>
-                  ))}
-                </div>
-                {addonTotal > 0 && (
-                  <p className="font-montserrat text-xs text-primary mt-2">Add-ons total: +₹{addonTotal}</p>
+                {item.customTag && (
+                  <Badge variant="default" className="bg-primary text-primary-foreground text-[9px] px-1.5 py-0 mt-0.5">
+                    {item.customTag.toUpperCase()}
+                  </Badge>
                 )}
               </div>
-            )}
+              {!item.variants && (
+                <span className="font-bebas text-lg text-primary flex-shrink-0">₹{item.price}</span>
+              )}
+            </div>
+            <p className="font-montserrat text-xs text-muted-foreground leading-relaxed mt-1 line-clamp-2">
+              {item.description}
+            </p>
+          </div>
+        </div>
 
-            {/* Variants */}
-            {item.variants ? (
-              <div className="space-y-2" role="group" aria-label={`${item.name} size options`}>
-                {item.variants.map((variant, i) => (
-                  <div key={i} className="flex justify-between items-center p-2 border rounded-lg">
-                    <span className="font-montserrat text-sm text-foreground">{variant.size}</span>
-                    <div className="flex items-center space-x-2">
-                      <span className="font-bebas text-base text-primary" aria-label={`${variant.size} price ${variant.price} rupees`}>₹{variant.price}</span>
-                      <Button
-                        onClick={() => handleAddToCart(item, variant.size, variant.price)}
-                        size="sm"
-                        className="text-xs px-2 py-1"
-                        aria-label={`Add ${item.name} ${variant.size} to cart`}
-                      >
-                        Add
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+        {/* Combo choice */}
+        {item.comboChoice && (
+          <div className="mt-3 p-2.5 border border-border/30 rounded-md bg-muted/10">
+            <p className="font-montserrat text-[11px] font-medium text-foreground mb-1.5">Choose one:</p>
+            <RadioGroup value={comboChoice} onValueChange={(v) => setComboChoice(item.name, v)} className="space-y-1">
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="Soft Drink" id={`${item.name}-drink`} />
+                <Label htmlFor={`${item.name}-drink`} className="text-xs font-montserrat">Soft Drink</Label>
               </div>
-            ) : (
-              <Button
-                onClick={() => handleAddToCart(item)}
-                className="w-full"
-                size="sm"
-                aria-label={`Add ${item.name} to cart for ${item.price + addonTotal} rupees`}
-              >
-                Add to Cart{addonTotal > 0 ? ` — ₹${item.price + addonTotal}` : ''}
-              </Button>
-            )}
-          </CardContent>
-        </Card>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="Choco Lava Cake" id={`${item.name}-cake`} />
+                <Label htmlFor={`${item.name}-cake`} className="text-xs font-montserrat">Choco Lava Cake</Label>
+              </div>
+            </RadioGroup>
+          </div>
+        )}
+
+        {/* Add-ons */}
+        {item.hasAddons && (
+          <div className="mt-3 p-2.5 border border-border/30 rounded-md bg-muted/10">
+            <p className="font-montserrat text-[11px] font-medium text-foreground mb-1.5">Add-ons:</p>
+            <div className="space-y-1">
+              {BURGER_ADDONS.map(addon => (
+                <div key={addon.name} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`${item.name}-${addon.name}`}
+                      checked={addons.includes(addon.name)}
+                      onCheckedChange={() => toggleAddon(item.name, addon.name)}
+                    />
+                    <Label htmlFor={`${item.name}-${addon.name}`} className="text-xs font-montserrat">{addon.name}</Label>
+                  </div>
+                  <span className="font-bebas text-xs text-primary">+₹{addon.price}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Variants or Add button */}
+        <div className="mt-3">
+          {item.variants ? (
+            <div className="space-y-1.5">
+              {item.variants.map((variant, i) => (
+                <div key={i} className="flex justify-between items-center p-2 border border-border/30 rounded-md">
+                  <span className="font-montserrat text-xs text-foreground">{variant.size}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bebas text-sm text-primary">₹{variant.price}</span>
+                    <Button onClick={() => handleAddToCart(item, variant.size, variant.price)} size="sm" className="text-xs px-3 h-7">
+                      Add
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <Button
+              onClick={() => handleAddToCart(item)}
+              className="w-full h-9"
+              size="sm"
+              aria-label={`Add ${item.name} to cart`}
+            >
+              {addonTotal > 0 ? `Add to Cart — ₹${item.price + addonTotal}` : 'Add to Cart'}
+            </Button>
+          )}
+        </div>
       </article>
     );
   };
 
   return (
-    <section id="menu" className="py-12 sm:py-20 bg-secondary/30" aria-labelledby="menu-heading">
+    <section id="menu" className="py-8 sm:py-12 bg-secondary/20" aria-labelledby="menu-heading">
       <div className="container mx-auto px-4">
-        <header className="text-center mb-12 sm:mb-16">
-          <h2 id="menu-heading" className="font-bebas text-5xl sm:text-6xl md:text-7xl text-foreground tracking-wider mb-2">
+        <header className="text-center mb-8">
+          <h2 id="menu-heading" className="font-bebas text-4xl sm:text-5xl md:text-6xl text-foreground tracking-wider mb-1">
             {showAll ? 'FULL MENU' : 'MENU FAVORITES'}
           </h2>
-          <div className="w-16 h-1 bg-primary mx-auto mb-3" aria-hidden="true" />
-          <p className="font-allura text-2xl md:text-3xl text-primary mb-6" role="doc-subtitle">
-            Rockin' homemade flavor
-          </p>
-          <p className="font-montserrat text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-            We keep it simple with burgers that actually slap. No weird ingredients, 
-            no pretentious names – just good food that won't break your budget.
+          <div className="w-12 h-1 bg-primary mx-auto mb-2" aria-hidden="true" />
+          <p className="font-montserrat text-sm text-muted-foreground max-w-lg mx-auto">
+            Fresh burgers that actually slap. No gimmicks — just good food that won't break your budget.
           </p>
         </header>
 
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row gap-6">
-            <div className="flex-1">
-              {sectionsToShow.map(section => {
-                const items = getItemsForSection(section);
-                if (items.length === 0) return null;
-                return (
-                  <div key={section} className="mb-10">
-                    <h3 className="font-bebas text-2xl sm:text-3xl text-foreground tracking-wider mb-4 border-b-2 border-primary/30 pb-2">
-                      {section}
-                    </h3>
-                    <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" role="list" aria-label={`${section} items`}>
-                      {items.map(item => renderItemCard(item))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Side Certificate Section - Only on full menu page */}
-            {showAll && (
-              <aside className="lg:w-64 xl:w-72 flex-shrink-0">
-                <div className="lg:sticky lg:top-24 space-y-4">
-                  <Card className="border-2 border-primary/20 bg-card/50 backdrop-blur-sm">
-                    <CardContent className="p-4 text-center">
-                      <p className="font-bebas text-lg text-foreground mb-3 tracking-wide">CERTIFIED QUALITY</p>
-                      <a
-                        href="https://restaurant-guru.in/Burger-Rox-Pimpri-Chinchwad"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block hover:opacity-90 transition-opacity"
-                        aria-label="View our Restaurant Guru certification"
-                      >
-                        <img
-                          src={restaurantGuruCertificate}
-                          alt="Restaurant Guru Certificate - Burger Rox Recommended 2025"
-                          className="w-full max-w-[200px] mx-auto rounded-lg shadow-md"
-                          width="200"
-                          height="283"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      </a>
-                      <p className="font-montserrat text-xs text-muted-foreground mt-3">
-                        Recommended by Restaurant Guru
-                      </p>
-                    </CardContent>
-                  </Card>
+        <div className="max-w-4xl mx-auto">
+          {sectionsToShow.map(section => {
+            const items = getItemsForSection(section);
+            if (items.length === 0) return null;
+            return (
+              <div key={section} className="mb-8">
+                <h3 className="font-bebas text-xl sm:text-2xl text-foreground tracking-wider mb-3 border-b border-primary/30 pb-1.5">
+                  {section}
+                </h3>
+                <div className="grid gap-3 grid-cols-1 sm:grid-cols-2" role="list" aria-label={`${section} items`}>
+                  {items.map(item => renderItemCard(item))}
                 </div>
-              </aside>
-            )}
-          </div>
+              </div>
+            );
+          })}
 
-          <nav className="pt-6 sm:pt-8 space-y-4 flex flex-col sm:flex-row sm:space-y-0 sm:space-x-4 justify-center items-center" aria-label="Menu actions">
+          {/* Delivery info on menu page */}
+          {showAll && (
+            <div className="mt-6 p-4 bg-card rounded-lg border border-border/40 text-center">
+              <p className="font-montserrat text-sm text-foreground font-medium mb-1">
+                📍 We deliver to Mamurdi, Kiwale, Ravet & Punawale
+              </p>
+              <p className="font-montserrat text-xs text-muted-foreground mb-3">
+                Free within 3km · Max 12km radius · ₹149 minimum for delivery
+              </p>
+              <Link to="/delivery-area">
+                <Button variant="outline" size="sm" className="text-xs">
+                  Check Delivery Area & Charges
+                </Button>
+              </Link>
+            </div>
+          )}
+
+          <nav className="pt-6 flex flex-col sm:flex-row gap-3 justify-center items-center" aria-label="Menu actions">
             {!showAll && (
               <Link to="/menu">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full sm:w-auto"
-                  aria-label="View complete menu"
-                >
+                <Button variant="outline" size="lg" className="w-full sm:w-auto">
                   View Full Menu
                 </Button>
               </Link>
@@ -410,14 +334,12 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
               size="lg"
               className="w-full sm:w-auto"
               onClick={() => window.open('https://wa.me/919321389985', '_blank')}
-              aria-label="Order via WhatsApp"
             >
-              Order on WhatsApp
+              📲 Order on WhatsApp
             </Button>
           </nav>
         </div>
       </div>
-
     </section>
   );
 };

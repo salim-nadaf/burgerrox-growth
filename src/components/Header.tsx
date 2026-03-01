@@ -21,223 +21,105 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-background border-b border-border shadow-warm sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4">
+    <header className="bg-card border-b border-border shadow-sm sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-8">
-            <a href="/" className="font-bebas text-4xl text-foreground tracking-wider hover:text-primary transition-colors" aria-label="Burger Rox home">
-              BURGER ROX
-            </a>
-            <nav className="hidden md:flex space-x-6" aria-label="Main navigation">
-              {location.pathname === '/menu' ? (
-                <Link to="/" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
-                  Home
-                </Link>
-              ) : (
-                <Link to="/menu" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
-                  Menu
-                </Link>
-              )}
-              <Link to="/delivery-area" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
-                Delivery Areas
-              </Link>
-              {location.pathname === '/menu' ? (
-                <>
-                  <Link to="/#about" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
-                    About
-                  </Link>
-                  <Link to="/#contact" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
-                    Contact
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <a href="#about" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
-                    About
-                  </a>
-                  <a href="#contact" className="font-montserrat font-medium text-foreground hover:text-primary transition-colors">
-                    Contact
-                  </a>
-                </>
-              )}
-            </nav>
-          </div>
+          {/* Logo */}
+          <a href="/" className="font-bebas text-2xl sm:text-3xl text-foreground tracking-wider hover:text-primary transition-colors" aria-label="Burger Rox home">
+            BURGER ROX
+          </a>
+
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-5" aria-label="Main navigation">
+            {location.pathname === '/menu' ? (
+              <Link to="/" className="font-montserrat text-sm font-medium text-foreground hover:text-primary transition-colors">Home</Link>
+            ) : (
+              <Link to="/menu" className="font-montserrat text-sm font-medium text-foreground hover:text-primary transition-colors">Menu</Link>
+            )}
+            <Link to="/delivery-area" className="font-montserrat text-sm font-medium text-foreground hover:text-primary transition-colors">Delivery Areas</Link>
+            {location.pathname === '/menu' ? (
+              <Link to="/#about" className="font-montserrat text-sm font-medium text-foreground hover:text-primary transition-colors">About</Link>
+            ) : (
+              <a href="#about" className="font-montserrat text-sm font-medium text-foreground hover:text-primary transition-colors">About</a>
+            )}
+          </nav>
           
-          <div className="hidden lg:flex items-center space-x-4 text-sm font-montserrat">
-            <div className="flex items-center space-x-1 text-muted-foreground">
-              <Phone size={16} />
-              <span>9321389985</span>
-            </div>
-            <div className="flex items-center space-x-1 text-muted-foreground">
-              <MapPin size={16} />
-              <span>Urban Forest, Mamurdi</span>
-            </div>
+          {/* Desktop actions */}
+          <div className="hidden md:flex items-center gap-2">
+            <OrdersSheet />
+            <Cart />
+            {user ? (
+              <div className="flex items-center gap-1">
+                <ProfileSheet />
+                <Button variant="ghost" size="icon" onClick={signOut} aria-label="Sign out" className="h-8 w-8">
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <GuestProfileSheet />
+            )}
+            <Link to="/menu">
+              <Button variant="brand" size="sm" className="h-9 px-4 text-sm font-montserrat font-semibold">
+                Order Now
+              </Button>
+            </Link>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <div className="hidden md:flex items-center space-x-2">
-              <OrdersSheet />
-              <Cart />
-              
-              {user ? (
-                <div className="flex items-center space-x-2">
-                  <span className="hidden lg:inline text-sm">
-                    {profile?.name || 'User'}
-                  </span>
-                  <ProfileSheet />
-                  <Button variant="ghost" size="icon" onClick={signOut} aria-label="Sign out">
-                    <LogOut className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <GuestProfileSheet />
-              )}
-              
-              <Button 
-                variant="brand" 
-                className="hidden lg:flex h-12 px-7 text-base"
-                onClick={() => navigate('/menu')}
-                aria-label="View menu"
-              >
-                View Menu
-              </Button>
-            </div>
-            
-            {/* Mobile Menu */}
+          {/* Mobile: cart + menu */}
+          <div className="flex items-center gap-1 md:hidden">
+            <OrdersSheet />
+            <Cart />
+            {user ? <ProfileSheet /> : <GuestProfileSheet />}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
-                  <Menu size={20} />
+                <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Open menu">
+                  <Menu size={18} />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-full sm:w-80">
+              <SheetContent side="right" className="w-72">
                 <SheetHeader>
-                  <SheetTitle className="font-bebas text-2xl tracking-wider text-left">
-                    BURGER ROX
-                  </SheetTitle>
+                  <SheetTitle className="font-bebas text-xl tracking-wider text-left">MENU</SheetTitle>
                 </SheetHeader>
                 
-                <div className="flex flex-col space-y-6 mt-8">
-                  {/* User Section */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <OrdersSheet />
-                      <Cart />
-                      {user ? (
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm font-medium">
-                            {profile?.name || 'User'}
-                          </span>
-                          <ProfileSheet />
-                          <Button variant="ghost" size="icon" onClick={handleSignOut}>
-                            <LogOut className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <GuestProfileSheet />
-                      )}
-                    </div>
+                <nav className="flex flex-col gap-3 mt-6" aria-label="Mobile navigation">
+                  {location.pathname === '/menu' ? (
+                    <Link to="/" className="font-montserrat font-medium text-foreground hover:text-primary py-1.5" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+                  ) : (
+                    <Link to="/menu" className="font-montserrat font-medium text-foreground hover:text-primary py-1.5" onClick={() => setMobileMenuOpen(false)}>Full Menu</Link>
+                  )}
+                  <Link to="/delivery-area" className="font-montserrat font-medium text-foreground hover:text-primary py-1.5" onClick={() => setMobileMenuOpen(false)}>Delivery Areas</Link>
+                  <button className="font-montserrat font-medium text-foreground hover:text-primary py-1.5 text-left" onClick={() => {
+                    setMobileMenuOpen(false);
+                    if (location.pathname !== '/') { navigate('/'); setTimeout(() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }), 100); }
+                    else { setTimeout(() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }), 300); }
+                  }}>About</button>
+                  <button className="font-montserrat font-medium text-foreground hover:text-primary py-1.5 text-left" onClick={() => {
+                    setMobileMenuOpen(false);
+                    if (location.pathname !== '/') { navigate('/'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100); }
+                    else { setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 300); }
+                  }}>Contact</button>
+                </nav>
+
+                <div className="space-y-2 pt-4 mt-4 border-t border-border/30">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Phone size={14} />
+                    <span className="font-montserrat text-xs">9321389985</span>
                   </div>
-
-                  {/* Navigation */}
-                  <nav className="flex flex-col space-y-4" aria-label="Mobile navigation">
-                    {location.pathname === '/menu' ? (
-                      <Link 
-                        to="/" 
-                        className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Home
-                      </Link>
-                    ) : (
-                      <>
-                        <Link 
-                          to="/menu" 
-                          className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          Full Menu
-                        </Link>
-                        <a 
-                          href="#menu" 
-                          className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          Menu Highlights
-                        </a>
-                      </>
-                    )}
-                    <Link 
-                      to="/delivery-area" 
-                      className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Delivery Areas
-                    </Link>
-                    <button 
-                      className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2 text-left"
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        if (location.pathname !== '/') {
-                          navigate('/');
-                          setTimeout(() => {
-                            document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
-                          }, 100);
-                        } else {
-                          setTimeout(() => {
-                            document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
-                          }, 300);
-                        }
-                      }}
-                    >
-                      About
-                    </button>
-                    <button 
-                      className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2 text-left"
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        if (location.pathname !== '/') {
-                          navigate('/');
-                          setTimeout(() => {
-                            document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-                          }, 100);
-                        } else {
-                          setTimeout(() => {
-                            document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-                          }, 300);
-                        }
-                      }}
-                    >
-                      Contact
-                    </button>
-                  </nav>
-
-                  {/* Contact Info */}
-                  <div className="space-y-3 pt-4 border-t">
-                    <div className="flex items-center space-x-2 text-muted-foreground">
-                      <Phone size={16} />
-                      <span className="font-montserrat text-sm">9321389985</span>
-                    </div>
-                    <div className="flex items-center space-x-2 text-muted-foreground">
-                      <MapPin size={16} />
-                      <span className="font-montserrat text-sm">Urban Forest, Mamurdi</span>
-                    </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <MapPin size={14} />
+                    <span className="font-montserrat text-xs">Urban Forest, Mamurdi</span>
                   </div>
-
-                  {/* Order Button */}
-                   <Button 
-                    variant="brand" 
-                    size="lg" 
-                    className="w-full mt-6"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      navigate('/menu');
-                    }}
-                    aria-label="View menu"
-                  >
-                    View Menu
-                  </Button>
                 </div>
+
+                <Button variant="brand" className="w-full mt-4 h-10" onClick={() => { setMobileMenuOpen(false); navigate('/menu'); }}>
+                  Order Now
+                </Button>
+
+                {user && (
+                  <Button variant="ghost" size="sm" className="w-full mt-2 text-muted-foreground text-xs" onClick={handleSignOut}>
+                    <LogOut className="h-3 w-3 mr-1" /> Sign Out
+                  </Button>
+                )}
               </SheetContent>
             </Sheet>
           </div>

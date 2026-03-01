@@ -1,56 +1,64 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import zingerHero from "@/assets/Zinger hero.webp";
 
 const Hero = () => {
   return (
-    <section className="relative min-h-[60vh] sm:min-h-[70vh] md:min-h-[75vh] flex items-center justify-center overflow-hidden max-w-full bg-background" aria-labelledby="hero-heading">
-      {/* Background Image — properly fitted */}
+    <section className="relative min-h-[65vh] sm:min-h-[70vh] flex items-end overflow-hidden bg-foreground" aria-labelledby="hero-heading">
+      {/* Background Image */}
       <div className="absolute inset-0 z-0" aria-hidden="true">
         <img 
           src={zingerHero}
           alt="" 
-          className="w-full h-full object-cover object-[center_60%] sm:object-center"
+          className="w-full h-full object-cover object-[center_40%] sm:object-center opacity-40"
           width="800"
           height="600"
           loading="eager"
           fetchPriority="high"
           decoding="async"
         />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, hsla(45, 100%, 55%, 0.55), hsla(45, 100%, 55%, 0.75))' }}></div>
       </div>
 
-
-      <div className="container mx-auto px-4 z-10">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          <h1 id="hero-heading" className="font-bebas text-6xl sm:text-7xl md:text-9xl text-foreground leading-none tracking-wider font-bold" style={{ textShadow: '0 2px 8px rgba(255,217,57,0.3)' }}>
-            CRAVE-WORTHY BURGERS
-          </h1>
-          
-          <p className="font-allura text-3xl md:text-5xl text-primary font-bold" role="doc-subtitle" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.25)' }}>
-            Rockin' homemade flavor
-          </p>
-
-          <p className="font-montserrat text-sm md:text-base text-foreground font-semibold max-w-[420px] mx-auto" style={{ textShadow: '0 1px 4px rgba(255,217,57,0.5)' }}>
-            Freshly made burgers with our homemade signature sauce.
-          </p>
-
-          <p className="font-montserrat text-xs md:text-sm text-foreground/90 font-medium mt-2.5 bg-foreground/10 inline-block px-4 py-1 rounded-full">
-            🔥 1000+ burgers served to students and families
-          </p>
-
-          <div className="pt-4 flex justify-center">
-            <Button 
-              variant="hero" 
-              className="w-full max-w-[260px] sm:w-auto sm:max-w-none h-12 sm:h-[52px] px-7 text-[15px] sm:text-base md:text-lg"
-              onClick={() => window.location.href = '/menu'}
-              aria-label="View full menu"
-            >
-              View Menu
-            </Button>
+      <div className="container mx-auto px-4 z-10 pb-8 sm:pb-12 pt-20">
+        <div className="max-w-xl space-y-4">
+          {/* Price anchor */}
+          <div className="inline-flex items-center gap-2 bg-primary px-3 py-1.5 rounded-full">
+            <span className="font-montserrat text-xs sm:text-sm font-bold text-primary-foreground">
+              Burgers from ₹89 · Free delivery within 3km
+            </span>
           </div>
 
-          <p className="font-montserrat text-xs md:text-sm text-foreground font-semibold mt-3">
-            🕖 Open daily from 7 PM to 10 PM
+          <h1 id="hero-heading" className="font-bebas text-5xl sm:text-6xl md:text-8xl text-card leading-[0.9] tracking-wider">
+            CRAVE-WORTHY<br />BURGERS
+          </h1>
+          
+          <p className="font-montserrat text-sm sm:text-base text-card/80 max-w-sm">
+            Fresh homemade burgers with our signature blaze sauce. Order now, get WhatsApp confirmation in minutes.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            <Link to="/menu">
+              <Button 
+                variant="brand" 
+                className="w-full sm:w-auto h-12 sm:h-14 px-8 text-base sm:text-lg font-montserrat font-bold"
+                aria-label="Order now - view menu"
+              >
+                Order Now
+              </Button>
+            </Link>
+            <a href="https://wa.me/919321389985" target="_blank" rel="noopener noreferrer">
+              <Button 
+                variant="outline" 
+                className="w-full sm:w-auto h-12 sm:h-14 px-6 text-sm font-montserrat border-card/30 text-card hover:bg-card/10"
+                aria-label="Order via WhatsApp"
+              >
+                📲 WhatsApp Order
+              </Button>
+            </a>
+          </div>
+
+          <p className="font-montserrat text-xs text-card/60 pt-1">
+            🕖 Open daily 7 PM – 10 PM · 📍 Mamurdi, Kiwale, Ravet, Punawale
           </p>
         </div>
       </div>

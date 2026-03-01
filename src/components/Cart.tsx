@@ -516,30 +516,30 @@ Please confirm order and expected time.`;
           {cartItems.length === 0 ? (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center text-muted-foreground">
-                <ShoppingCart className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p className="font-montserrat">Your cart is empty</p>
-                <p className="text-sm mt-1">Add items from the menu</p>
+                <ShoppingCart className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                <p className="font-montserrat text-sm">Your cart is empty</p>
+                <p className="text-xs mt-1">Add items from the menu to get started</p>
               </div>
             </div>
           ) : (
-            <div className="flex flex-col gap-4 mt-4">
-              {/* Cart Items */}
-              <div className="space-y-3">
+            <div className="flex flex-col gap-3 mt-3">
+              {/* Cart Items — compact */}
+              <div className="space-y-2">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div className="flex-1">
-                      <p className="font-montserrat font-medium text-sm">{item.item_name}</p>
-                      <p className="text-sm text-muted-foreground">₹{item.item_price.toFixed(2)}</p>
+                  <div key={item.id} className="flex items-center justify-between p-2.5 bg-muted/40 rounded-md">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-montserrat font-medium text-sm leading-tight truncate">{item.item_name}</p>
+                      <p className="text-xs text-muted-foreground">₹{item.item_price.toFixed(0)} each</p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <Button
-                        variant="outline" size="icon" className="h-7 w-7"
+                        variant="outline" size="icon" className="h-6 w-6"
                         onClick={() => item.quantity <= 1 ? removeFromCart(item.id) : updateQuantity(item.id, item.quantity - 1)}
                       >
                         {item.quantity <= 1 ? <Trash2 className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
                       </Button>
-                      <span className="w-6 text-center text-sm font-medium">{item.quantity}</span>
-                      <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQuantity(item.id, item.quantity + 1)}>
+                      <span className="w-5 text-center text-sm font-medium">{item.quantity}</span>
+                      <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.id, item.quantity + 1)}>
                         <Plus className="h-3 w-3" />
                       </Button>
                     </div>
@@ -547,114 +547,115 @@ Please confirm order and expected time.`;
                 ))}
               </div>
 
-              <Separator />
-
-              {/* Order Type */}
+              {/* Order Type — clean */}
               <OrderTypeSelector value={orderType} onChange={setOrderType} />
 
               {/* Delivery Address */}
               {orderType === "delivery" && (
-                <DeliveryAddressInput
-                  detailedAddress={detailedAddress}
-                  onDetailedAddressChange={setDetailedAddress}
-                />
+                <>
+                  <DeliveryAddressInput
+                    detailedAddress={detailedAddress}
+                    onDetailedAddressChange={setDetailedAddress}
+                  />
+                  {!deliveryInfo && (
+                    <p className="font-montserrat text-[11px] text-muted-foreground text-center -mt-1">
+                      Delivery charges calculated based on distance after address confirmation.
+                    </p>
+                  )}
+                </>
               )}
 
               <Separator />
 
-              {/* Price Summary */}
-              <div className="space-y-2 font-montserrat text-sm">
+              {/* Price Summary — tight */}
+              <div className="space-y-1 font-montserrat text-sm">
                 <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span>₹{totalAmount.toFixed(2)}</span>
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span>₹{totalAmount.toFixed(0)}</span>
                 </div>
                 {orderType === "delivery" && deliveryInfo && (
                   <div className="flex justify-between">
-                    <span>Delivery Charge</span>
+                    <span className="text-muted-foreground">Delivery</span>
                     <span>{deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}</span>
                   </div>
                 )}
                 {paymentMethod === "online" && (
                   <div className="flex justify-between text-green-600">
-                    <span>Online Payment Discount</span>
+                    <span>Online Discount</span>
                     <span>-₹{ONLINE_DISCOUNT}</span>
                   </div>
                 )}
-                <div className="flex justify-between font-semibold text-base">
+                <div className="flex justify-between font-bold text-base pt-1 border-t border-border/30">
                   <span>Total</span>
-                  <span className="text-primary">₹{grandTotal.toFixed(2)}</span>
+                  <span className="text-primary">₹{grandTotal.toFixed(0)}</span>
                 </div>
               </div>
 
-              <Separator />
-
-              {/* Payment method selector */}
-              <div className="space-y-2">
-                <p className="font-montserrat text-xs font-medium text-foreground">Payment Method:</p>
-                <div className="flex gap-2">
-                  <Button
-                    variant={paymentMethod === "cod" ? "default" : "outline"} size="sm" className="flex-1"
-                    onClick={() => setPaymentMethod("cod")}
-                  >
-                    <Banknote className="h-4 w-4 mr-1" />
-                    {orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery"}
-                  </Button>
-                  <Button
-                    variant={paymentMethod === "online" ? "default" : "outline"} size="sm" className="flex-1"
-                    onClick={() => setPaymentMethod("online")}
-                  >
-                    <CreditCard className="h-4 w-4 mr-1" />
-                    Pay Online {paymentMethod !== "online" && "(Save ₹10)"}
-                  </Button>
-                </div>
+              {/* Payment method — toggle buttons */}
+              <div className="flex gap-2">
+                <Button
+                  variant={paymentMethod === "cod" ? "default" : "outline"} size="sm" className="flex-1 h-9 text-xs"
+                  onClick={() => setPaymentMethod("cod")}
+                >
+                  <Banknote className="h-3.5 w-3.5 mr-1" />
+                  {orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery"}
+                </Button>
+                <Button
+                  variant={paymentMethod === "online" ? "default" : "outline"} size="sm" className="flex-1 h-9 text-xs"
+                  onClick={() => setPaymentMethod("online")}
+                >
+                  <CreditCard className="h-3.5 w-3.5 mr-1" />
+                  Pay Online{paymentMethod !== "online" ? " (₹10 off)" : ""}
+                </Button>
               </div>
 
-              {/* Minimum order warning for delivery */}
+              {/* Minimum order warning */}
               {isBelowDeliveryMinimum && (
-                <p className="text-xs text-center text-destructive font-montserrat font-medium">
-                  Minimum ₹149 required for delivery
+                <p className="text-xs text-center text-destructive font-montserrat font-medium bg-destructive/10 py-1.5 rounded-md">
+                  Minimum ₹149 required for delivery orders
                 </p>
               )}
 
-              {/* Primary CTA */}
+              {/* PRIMARY CTA — big, clear */}
               {paymentMethod === "cod" ? (
                 <Button
-                  className="w-full" variant="brand" size="lg"
+                  className="w-full h-12 text-base" variant="brand"
                   onClick={handleCODOrder}
                   disabled={!canPlaceOrder() || isProcessing || isBelowDeliveryMinimum}
                 >
-                  <Banknote className="h-4 w-4 mr-2" />
                   {isProcessing ? "Placing Order..." : `Place Order — ₹${grandTotal.toFixed(0)}`}
                 </Button>
               ) : (
                 <Button
-                  className="w-full" variant="default" size="lg"
+                  className="w-full h-12 text-base"
                   onClick={handleOnlinePayment}
                   disabled={!canPlaceOrder() || isProcessing || isBelowDeliveryMinimum}
                 >
-                  <CreditCard className="h-4 w-4 mr-2" />
                   {isProcessing ? "Processing..." : `Pay ₹${grandTotal.toFixed(0)} Online`}
                 </Button>
               )}
 
-              {/* Single reassurance line */}
+              {/* Single reassurance */}
               <p className="text-[11px] text-center text-muted-foreground font-montserrat">
-                📲 WhatsApp confirmation in minutes · 🔒 Secure
+                📲 WhatsApp confirmation · 🔒 Secure checkout · 🔥 Fresh batches daily
               </p>
 
-              {/* Wedges upsell */}
+              {/* Upsell — only if no wedges */}
               {!cartItems.some(i => i.item_name.toLowerCase().includes('wedges')) && (
-                <div className="flex items-center justify-between p-2 border border-border/50 rounded-lg">
-                  <p className="font-montserrat text-xs text-foreground">Add potato wedges — ₹69</p>
-                  <Button size="sm" variant="outline" className="text-xs ml-2 flex-shrink-0 h-7" onClick={() => addToCart("Potato Wedges (Upsell)", 69)}>
-                    + Add
+                <div className="flex items-center justify-between p-2 border border-border/40 rounded-md bg-muted/20">
+                  <p className="font-montserrat text-xs text-foreground">🥔 Add potato wedges</p>
+                  <Button size="sm" variant="outline" className="text-xs h-7 px-2" onClick={() => addToCart("Potato Wedges (Upsell)", 69)}>
+                    +₹69
                   </Button>
                 </div>
               )}
 
-              <Button variant="ghost" size="sm" className="w-full text-muted-foreground text-xs" onClick={clearCart}>
+              <button
+                className="font-montserrat text-[11px] text-muted-foreground hover:text-foreground text-center py-1 transition-colors"
+                onClick={clearCart}
+              >
                 Clear Cart
-              </Button>
+              </button>
             </div>
           )}
         </SheetContent>

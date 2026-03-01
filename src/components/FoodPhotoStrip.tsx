@@ -19,50 +19,45 @@ const FoodPhotoStrip = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
-    <section className="py-6 sm:py-10 bg-background" aria-label="Food gallery">
+    <section className="py-4 sm:py-6 bg-background" aria-label="Food gallery">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-5">
-          <p className="font-montserrat text-xs font-semibold tracking-widest text-primary uppercase mb-1">
-            Our Kitchen
-          </p>
-          <h2 className="font-bebas text-2xl sm:text-3xl text-foreground tracking-wider">
-            FRESHLY MADE, ALWAYS
-          </h2>
-        </div>
+        <p className="font-bebas text-lg sm:text-xl text-foreground tracking-wider text-center mb-3">
+          FROM OUR KITCHEN 🔥
+        </p>
 
-        {/* Desktop grid — 2 rows of 3, proper aspect ratio */}
-        <div className="hidden sm:grid sm:grid-cols-3 gap-3 max-w-3xl mx-auto">
+        {/* Desktop — single row auto-scroll feel */}
+        <div className="hidden sm:grid sm:grid-cols-6 gap-2 max-w-4xl mx-auto">
           {PHOTOS.map((p) => (
-            <div key={p.alt} className="overflow-hidden rounded-xl aspect-[4/3] group shadow-sm">
+            <div key={p.alt} className="overflow-hidden rounded-lg aspect-square group">
               <img
                 src={p.src}
                 alt={p.alt}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                 loading="lazy"
                 decoding="async"
-                width="400"
-                height="300"
+                width="200"
+                height="200"
               />
             </div>
           ))}
         </div>
 
-        {/* Mobile — larger cards with horizontal scroll */}
+        {/* Mobile horizontal scroll */}
         <div
           ref={scrollRef}
-          className="sm:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3 -mx-4 px-4 scrollbar-hide"
+          className="sm:hidden flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 scrollbar-hide"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
           {PHOTOS.map((p) => (
-            <div key={p.alt} className="flex-shrink-0 w-40 h-40 overflow-hidden rounded-xl snap-center shadow-sm">
+            <div key={p.alt} className="flex-shrink-0 w-28 h-28 overflow-hidden rounded-lg snap-center">
               <img
                 src={p.src}
                 alt={p.alt}
                 className="w-full h-full object-cover"
                 loading="lazy"
                 decoding="async"
-                width="160"
-                height="160"
+                width="112"
+                height="112"
               />
             </div>
           ))}

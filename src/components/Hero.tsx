@@ -36,7 +36,11 @@ const Hero = () => {
             Fresh homemade burgers with our signature blaze sauce. Order now, get WhatsApp confirmation in minutes.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <p className="font-montserrat text-xs text-card/70">
+            ⭐ Loved by burger fans in Mamurdi–Ravet
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3 pt-1">
             <Link to="/menu">
               <Button 
                 variant="brand" 
@@ -48,8 +52,8 @@ const Hero = () => {
             </Link>
             <a href="https://wa.me/919321389985" target="_blank" rel="noopener noreferrer">
               <Button 
-                variant="outline" 
-                className="w-full sm:w-auto h-12 sm:h-14 px-6 text-sm font-montserrat border-card/30 text-card hover:bg-card/10"
+                variant="ghost" 
+                className="w-full sm:w-auto h-12 sm:h-14 px-6 text-sm font-montserrat text-card/70 hover:text-card hover:bg-card/10"
                 aria-label="Order via WhatsApp"
               >
                 📲 WhatsApp Order
@@ -57,8 +61,8 @@ const Hero = () => {
             </a>
           </div>
 
-          <p className="font-montserrat text-xs text-card/60 pt-1">
-            🕖 Open daily 7 PM – 10 PM · 📍 Mamurdi, Kiwale, Ravet, Punawale
+          <p className="font-montserrat text-xs text-card/50 pt-1">
+            🕖 Open daily 7 PM – 10 PM · 📍 Mamurdi · Kiwale · Ravet · Punawale
           </p>
         </div>
       </div>

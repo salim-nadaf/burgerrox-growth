@@ -115,8 +115,11 @@ const GuestProfileSheet = () => {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="My profile">
+        <Button variant="ghost" size="icon" aria-label="My profile" className="relative">
           <User className="h-4 w-4" />
+          {localStorage.getItem("brx_customer_id") && (
+            <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-card" aria-label="Profile saved" />
+          )}
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-full sm:w-96">

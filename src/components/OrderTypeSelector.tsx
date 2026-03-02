@@ -43,7 +43,7 @@ export default function OrderTypeSelector({ value, onChange }: OrderTypeSelector
             <Truck className="h-4 w-4 text-primary shrink-0" />
             <div>
               <p className="font-montserrat font-medium text-sm">Delivery</p>
-              <p className="text-[11px] text-muted-foreground">Free within 3km · Min ₹149 · Max 12km</p>
+              <p className="text-[11px] text-muted-foreground">Free within 3km · Min order ₹149 · Up to 12km</p>
             </div>
           </Label>
         </div>

@@ -65,7 +65,7 @@ const Cart = () => {
   const [pendingPaymentMethod, setPendingPaymentMethod] = useState<"cod" | "online">("cod");
   const [guestInfo, setGuestInfo] = useState<{ name: string; whatsapp: string } | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [orderType, setOrderType] = useState<OrderType>("pickup");
+  const [orderType, setOrderType] = useState<OrderType>("delivery");
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "online">("cod");
   const [isProcessing, setIsProcessing] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
@@ -591,67 +591,70 @@ Please confirm order and expected time.`;
                 </div>
               </div>
 
-              {/* Payment method — toggle buttons */}
-              <div className="flex gap-2">
-                <Button
-                  variant={paymentMethod === "cod" ? "default" : "outline"} size="sm" className="flex-1 h-9 text-xs"
-                  onClick={() => setPaymentMethod("cod")}
-                >
-                  <Banknote className="h-3.5 w-3.5 mr-1" />
-                  {orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery"}
-                </Button>
-                <Button
-                  variant={paymentMethod === "online" ? "default" : "outline"} size="sm" className="flex-1 h-9 text-xs"
-                  onClick={() => setPaymentMethod("online")}
-                >
-                  <CreditCard className="h-3.5 w-3.5 mr-1" />
-                  Pay Online{paymentMethod !== "online" ? " (₹10 off)" : ""}
-                </Button>
-              </div>
-
-              {/* Minimum order warning */}
+              {/* Minimum order warning for delivery */}
               {isBelowDeliveryMinimum && (
                 <p className="text-xs text-center text-destructive font-montserrat font-medium bg-destructive/10 py-1.5 rounded-md">
-                  Minimum ₹149 required for delivery orders
+                  Delivery available above ₹149 — you can still choose Pickup
                 </p>
               )}
 
-              {/* PRIMARY CTA — big, clear */}
-              {paymentMethod === "cod" ? (
-                <Button
-                  className="w-full h-12 text-base" variant="brand"
-                  onClick={handleCODOrder}
-                  disabled={!canPlaceOrder() || isProcessing || isBelowDeliveryMinimum}
+              {/* Payment method — subtle toggle */}
+              <div className="flex gap-1.5 bg-muted/40 rounded-md p-1">
+                <button
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded text-xs font-montserrat font-medium transition-colors ${
+                    paymentMethod === "cod" 
+                      ? "bg-card text-foreground shadow-sm" 
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  onClick={() => setPaymentMethod("cod")}
                 >
-                  {isProcessing ? "Placing Order..." : `Place Order — ₹${grandTotal.toFixed(0)}`}
-                </Button>
-              ) : (
-                <Button
-                  className="w-full h-12 text-base"
-                  onClick={handleOnlinePayment}
-                  disabled={!canPlaceOrder() || isProcessing || isBelowDeliveryMinimum}
+                  <Banknote className="h-3 w-3" />
+                  {orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery"}
+                </button>
+                <button
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded text-xs font-montserrat font-medium transition-colors ${
+                    paymentMethod === "online" 
+                      ? "bg-card text-foreground shadow-sm" 
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  onClick={() => setPaymentMethod("online")}
                 >
-                  {isProcessing ? "Processing..." : `Pay ₹${grandTotal.toFixed(0)} Online`}
-                </Button>
-              )}
+                  <CreditCard className="h-3 w-3" />
+                  Pay Online {paymentMethod !== "online" && <span className="text-green-600">(₹10 off)</span>}
+                </button>
+              </div>
 
-              {/* Single reassurance */}
+              {/* PRIMARY CTA — dominant, unmistakable */}
+              <Button
+                className="w-full h-13 text-base font-bold shadow-lg" variant="brand"
+                onClick={paymentMethod === "cod" ? handleCODOrder : handleOnlinePayment}
+                disabled={!canPlaceOrder() || isProcessing || isBelowDeliveryMinimum}
+              >
+                {isProcessing 
+                  ? "Processing..." 
+                  : paymentMethod === "online"
+                    ? `Pay ₹${grandTotal.toFixed(0)} Online`
+                    : `Place Order — ₹${grandTotal.toFixed(0)}`
+                }
+              </Button>
+
+              {/* Single reassurance line */}
               <p className="text-[11px] text-center text-muted-foreground font-montserrat">
-                📲 WhatsApp confirmation · 🔒 Secure checkout · 🔥 Fresh batches daily
+                📲 WhatsApp confirmation within minutes · 🔒 Secure
               </p>
 
-              {/* Upsell — only if no wedges */}
+              {/* Upsell — subtle, below primary flow */}
               {!cartItems.some(i => i.item_name.toLowerCase().includes('wedges')) && (
-                <div className="flex items-center justify-between p-2 border border-border/40 rounded-md bg-muted/20">
-                  <p className="font-montserrat text-xs text-foreground">🥔 Add potato wedges</p>
-                  <Button size="sm" variant="outline" className="text-xs h-7 px-2" onClick={() => addToCart("Potato Wedges (Upsell)", 69)}>
+                <div className="flex items-center justify-between p-2 border border-dashed border-border/40 rounded-md">
+                  <p className="font-montserrat text-xs text-muted-foreground">🥔 Add crispy potato wedges</p>
+                  <Button size="sm" variant="ghost" className="text-xs h-7 px-2 text-primary hover:text-primary" onClick={() => addToCart("Potato Wedges (Upsell)", 69)}>
                     +₹69
                   </Button>
                 </div>
               )}
 
               <button
-                className="font-montserrat text-[11px] text-muted-foreground hover:text-foreground text-center py-1 transition-colors"
+                className="font-montserrat text-[11px] text-muted-foreground hover:text-foreground text-center py-0.5 transition-colors"
                 onClick={clearCart}
               >
                 Clear Cart

@@ -1,21 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import zingerHero from "@/assets/Zinger hero.webp";
 
 const Hero = () => {
   return (
     <section className="relative min-h-[65vh] sm:min-h-[70vh] flex items-end overflow-hidden bg-foreground" aria-labelledby="hero-heading">
-      {/* Background Image */}
+      {/* Background Image - uses public/ path for instant LCP discovery via preload */}
       <div className="absolute inset-0 z-0" aria-hidden="true">
         <img 
-          src={zingerHero}
+          src="/zinger-hero.webp"
           alt="" 
           className="w-full h-full object-cover object-[center_40%] sm:object-center opacity-40"
           width="800"
           height="600"
-          loading="eager"
           fetchPriority="high"
-          decoding="async"
+          decoding="sync"
         />
       </div>
 

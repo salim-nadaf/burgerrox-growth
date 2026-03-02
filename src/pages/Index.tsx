@@ -2,11 +2,11 @@ import { lazy, Suspense } from "react";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import TrustStrip from "@/components/TrustStrip";
-import FoodPhotoStrip from "@/components/FoodPhotoStrip";
-import GoogleReviews from "@/components/GoogleReviews";
 import Footer from "@/components/Footer";
 
-// Lazy load below-the-fold components
+// Lazy load ALL below-the-fold components
+const FoodPhotoStrip = lazy(() => import("@/components/FoodPhotoStrip"));
+const GoogleReviews = lazy(() => import("@/components/GoogleReviews"));
 const MenuHighlights = lazy(() => import("@/components/MenuHighlights"));
 const About = lazy(() => import("@/components/About"));
 const Contact = lazy(() => import("@/components/Contact"));
@@ -27,8 +27,12 @@ const Index = () => {
       <main id="main-content" role="main">
         <Hero />
         <TrustStrip />
-        <GoogleReviews />
-        <FoodPhotoStrip />
+        <Suspense fallback={<SectionLoader />}>
+          <GoogleReviews />
+        </Suspense>
+        <Suspense fallback={<SectionLoader />}>
+          <FoodPhotoStrip />
+        </Suspense>
         <Suspense fallback={<SectionLoader />}>
           <WelcomeMessage />
         </Suspense>

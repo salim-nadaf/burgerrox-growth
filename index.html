@@ -47,7 +47,11 @@
 <body>
     <noscript><img height="1" width="1" style="display:none"
         src="https://www.facebook.com/tr?id=1524642025268726" /></noscript>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Inline skeleton for instant FCP – replaced by React on mount -->
+      <style>#skeleton{position:relative;min-height:65vh;display:flex;align-items:flex-end;overflow:hidden;background:#1a1a1a}#skeleton .s-bar{height:14px;border-radius:4px;background:rgba(255,255,255,.12);margin-bottom:10px}#skeleton .s-inner{padding:0 16px 32px;padding-top:80px;max-width:480px}#skeleton .s-pill{width:260px;height:28px;border-radius:999px;background:rgba(255,255,255,.08);margin-bottom:14px}#skeleton .s-h1{width:320px;height:72px;border-radius:6px;background:rgba(255,255,255,.1);margin-bottom:12px}#skeleton .s-p{width:280px}#skeleton .s-btn{width:160px;height:48px;border-radius:8px;background:rgba(255,255,255,.1);margin-top:8px}</style>
+      <div id="skeleton" aria-hidden="true"><div class="s-inner"><div class="s-pill"></div><div class="s-h1"></div><div class="s-bar s-p"></div><div class="s-bar" style="width:200px"></div><div class="s-btn"></div></div></div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>

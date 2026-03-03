@@ -17,6 +17,7 @@ export default defineConfig(({ mode }) => ({
       jpeg: { quality: 45 },
       png: { quality: 50, compressionLevel: 9 },
       webp: { quality: 40, effort: 6 },
+      avif: { quality: 35, effort: 4 },
     }),
   ].filter(Boolean),
   resolve: {

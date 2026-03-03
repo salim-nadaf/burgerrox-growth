@@ -13,11 +13,7 @@ const Contact = lazy(() => import("@/components/Contact"));
 const WelcomeMessage = lazy(() => import("@/components/WelcomeMessage"));
 
 const SectionLoader = () => (
-  <div className="py-8 flex justify-center" aria-busy="true">
-    <div className="w-6 h-6 border-3 border-primary border-t-transparent rounded-full animate-spin" role="status">
-      <span className="sr-only">Loading...</span>
-    </div>
-  </div>
+  <div className="min-h-[1px]" aria-busy="true" aria-hidden="true" />
 );
 
 const Index = () => {

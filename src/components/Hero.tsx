@@ -6,15 +6,18 @@ const Hero = () => {
     <section className="relative min-h-[65vh] sm:min-h-[70vh] flex items-end overflow-hidden bg-foreground" aria-labelledby="hero-heading">
       {/* Background Image - uses public/ path for instant LCP discovery via preload */}
       <div className="absolute inset-0 z-0" aria-hidden="true">
-        <img 
-          src="/zinger-hero.webp"
-          alt="" 
-          className="w-full h-full object-cover object-[center_40%] sm:object-center opacity-40"
-          width="800"
-          height="600"
-          fetchPriority="high"
-          decoding="sync"
-        />
+        <picture>
+          <source media="(max-width: 640px)" srcSet="/hero-mobile.webp" type="image/webp" />
+          <img 
+            src="/zinger-hero.webp"
+            alt="" 
+            className="w-full h-full object-cover object-[center_40%] sm:object-center opacity-40"
+            width="800"
+            height="600"
+            fetchPriority="high"
+            decoding="sync"
+          />
+        </picture>
       </div>
 
       <div className="container mx-auto px-4 z-10 pb-8 sm:pb-12 pt-20">

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import brLogo from "@/assets/BR Logo Transparent BG.png";
+import brLogo from "@/assets/br-logo-optimized.webp";
 
 const Footer = () => {
   return (

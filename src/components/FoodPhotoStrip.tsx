@@ -1,9 +1,9 @@
 import { useRef } from "react";
-import fullMeal from "@/assets/Full meal.webp";
-import potatoWedges from "@/assets/potato wedges.jpg.webp";
-import lavaCake from "@/assets/Rich molten lava cake.webp";
-import vegCrispy from "@/assets/Veg crispy.webp";
-import variety from "@/assets/showcasing variety.webp";
+import fullMeal from "@/assets/full-meal-sm.webp";
+import potatoWedges from "@/assets/potato-wedges-sm.webp";
+import lavaCake from "@/assets/lava-cake-sm.webp";
+import vegCrispy from "@/assets/veg-crispy-sm.webp";
+import variety from "@/assets/variety-sm.webp";
 import zingerPacked from "@/assets/Zinger burgers are getting packed.jpg.webp";
 
 const PHOTOS = [

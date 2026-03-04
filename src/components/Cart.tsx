@@ -15,6 +15,7 @@ import OrderTypeSelector, { OrderType, RESTAURANT_ADDRESS } from "./OrderTypeSel
 import DeliveryAddressInput from "./DeliveryAddressInput";
 import { DetailedAddress, isAddressComplete, formatFullAddress } from "./DetailedAddressForm";
 import CheckoutInfoForm from "./CheckoutInfoForm";
+import LoginModal from "./LoginModal";
 
 declare global {
   interface Window {
@@ -62,6 +63,7 @@ const resolveCustomerInfo = (
 
 const Cart = () => {
   const [checkoutInfoOpen, setCheckoutInfoOpen] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [pendingPaymentMethod, setPendingPaymentMethod] = useState<"cod" | "online">("cod");
   const [guestInfo, setGuestInfo] = useState<{ name: string; whatsapp: string } | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -269,8 +271,15 @@ Please confirm order and expected time.`;
     }
   };
 
-  // Gate: if no customer info available, show checkout info form
+  // Gate: require login before placing order
   const handleCODOrder = () => {
+    if (!user) {
+      setPendingPaymentMethod("cod");
+      setIsOpen(false);
+      document.body.style.pointerEvents = "auto";
+      setTimeout(() => setLoginModalOpen(true), 300);
+      return;
+    }
     const info = resolveCustomerInfo(user, profile, guestInfo);
     if (!info.whatsapp) {
       setPendingPaymentMethod("cod");
@@ -325,6 +334,13 @@ Please confirm order and expected time.`;
   };
 
   const handleOnlinePayment = () => {
+    if (!user) {
+      setPendingPaymentMethod("online");
+      setIsOpen(false);
+      document.body.style.pointerEvents = "auto";
+      setTimeout(() => setLoginModalOpen(true), 300);
+      return;
+    }
     const info = resolveCustomerInfo(user, profile, guestInfo);
     if (!info.whatsapp) {
       setPendingPaymentMethod("online");
@@ -484,6 +500,16 @@ Please confirm order and expected time.`;
           proceedWithCODOrder(info);
         }
       }, 300);
+    }, 300);
+  };
+
+  const handleLoginSuccess = () => {
+    // After login, re-open cart and proceed with order
+    setLoginModalOpen(false);
+    setTimeout(() => {
+      setIsOpen(true);
+      // User is now authenticated, the order buttons will work on next click
+      toast({ title: "Logged in!", description: "You can now place your order." });
     }, 300);
   };
 
@@ -672,6 +698,13 @@ Please confirm order and expected time.`;
           <CheckoutInfoForm onSubmit={handleCheckoutInfoSubmit} />
         </DialogContent>
       </Dialog>
+
+      {/* Login Modal for unauthenticated users */}
+      <LoginModal
+        open={loginModalOpen}
+        onOpenChange={setLoginModalOpen}
+        onSuccess={handleLoginSuccess}
+      />
 
       {/* Confirm Your Order Modal */}
       <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>

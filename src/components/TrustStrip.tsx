@@ -14,11 +14,11 @@ const TrustStrip = () => {
           </span>
           <span className="text-primary-foreground/40 hidden sm:inline">·</span>
           <Link to="/delivery-area" className="inline-flex items-center gap-1 whitespace-nowrap hover:underline">
-            📍 Mamurdi · Kiwale · Ravet · Punawale
+            📍 Mamurdi • Kiwale • Ravet • Punawale
           </Link>
           <span className="text-primary-foreground/40 hidden sm:inline">·</span>
           <span className="inline-flex items-center gap-1 whitespace-nowrap">
-            🔥 Fresh batches daily
+            🚚 Free delivery within 3 km
           </span>
         </div>
       </div>

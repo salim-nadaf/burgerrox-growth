@@ -63,7 +63,7 @@ const Hero = () => {
           </div>
 
           <p className="font-montserrat text-xs text-card/50 pt-1">
-            🕖 Open daily 7 PM – 10 PM · 📍 Mamurdi · Kiwale · Ravet · Punawale
+            🕖 Open daily 7 PM – 10 PM
           </p>
         </div>
       </div>

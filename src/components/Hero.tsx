@@ -42,20 +42,18 @@ const Hero = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 pt-1">
-            <Link to="/menu">
+            <Link to="/menu" aria-label="Order now - view full menu">
               <Button 
                 variant="brand" 
                 className="w-full sm:w-auto h-12 sm:h-14 px-8 text-base sm:text-lg font-montserrat font-bold"
-                aria-label="Order now - view menu"
               >
                 Order Now
               </Button>
             </Link>
-            <a href="https://wa.me/919321389985" target="_blank" rel="noopener noreferrer">
+            <a href="https://wa.me/919321389985" target="_blank" rel="noopener noreferrer" aria-label="Order via WhatsApp">
               <Button 
                 variant="ghost" 
                 className="w-full sm:w-auto h-12 sm:h-14 px-6 text-sm font-montserrat text-card/70 hover:text-card hover:bg-card/10"
-                aria-label="Order via WhatsApp"
               >
                 📲 WhatsApp Order
               </Button>

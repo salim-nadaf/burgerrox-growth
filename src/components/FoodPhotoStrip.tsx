@@ -25,13 +25,14 @@ const FoodPhotoStrip = () => {
           FROM OUR KITCHEN 🔥
         </p>
 
-        {/* Desktop — single row auto-scroll feel */}
+        {/* Desktop — single row */}
         <div className="hidden sm:grid sm:grid-cols-6 gap-2 max-w-4xl mx-auto">
           {PHOTOS.map((p) => (
-            <div key={p.alt} className="overflow-hidden rounded-lg aspect-square group">
+            <div key={p.alt} className="overflow-hidden rounded-lg aspect-square group" style={{ contentVisibility: 'auto', containIntrinsicSize: '200px' }}>
               <img
                 src={p.src}
                 alt={p.alt}
+                sizes="(min-width: 640px) 150px, 112px"
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                 loading="lazy"
                 decoding="async"
@@ -53,6 +54,7 @@ const FoodPhotoStrip = () => {
               <img
                 src={p.src}
                 alt={p.alt}
+                sizes="112px"
                 className="w-full h-full object-cover"
                 loading="lazy"
                 decoding="async"

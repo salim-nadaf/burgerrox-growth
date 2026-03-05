@@ -32,8 +32,8 @@ const FoodTypeIndicator = ({ type }: { type: 'veg' | 'nonveg' | 'egg' }) => {
   const labels = { veg: 'Vegetarian', nonveg: 'Non-Vegetarian', egg: 'Contains Egg' };
   const { border, fill } = colors[type];
   return (
-    <span className={`inline-flex items-center justify-center w-4 h-4 border-2 ${border} rounded-sm flex-shrink-0`} aria-label={labels[type]} title={labels[type]}>
-      <span className={`w-2 h-2 rounded-full ${fill}`} />
+    <span className={`inline-flex items-center justify-center w-4 h-4 border-2 ${border} rounded-sm flex-shrink-0`} role="img" aria-label={labels[type]} title={labels[type]}>
+      <span className={`w-2 h-2 rounded-full ${fill}`} aria-hidden="true" />
     </span>
   );
 };
@@ -177,6 +177,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
           <img
             src={getItemImage(item.name)}
             alt={item.name}
+            sizes="72px"
             className="w-[72px] h-[72px] rounded-lg object-cover flex-shrink-0"
             width="72" height="72" loading="lazy" decoding="async"
           />
@@ -323,7 +324,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
 
           <nav className="pt-6 flex flex-col sm:flex-row gap-3 justify-center items-center" aria-label="Menu actions">
             {!showAll && (
-              <Link to="/menu">
+              <Link to="/menu" aria-label="View full menu">
                 <Button variant="outline" size="lg" className="w-full sm:w-auto">
                   View Full Menu
                 </Button>
@@ -334,6 +335,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
               size="lg"
               className="w-full sm:w-auto"
               onClick={() => window.open('https://wa.me/919321389985', '_blank')}
+              aria-label="Order on WhatsApp"
             >
               📲 Order on WhatsApp
             </Button>

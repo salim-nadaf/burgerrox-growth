@@ -32,8 +32,8 @@ const FoodTypeIndicator = ({ type }: { type: 'veg' | 'nonveg' | 'egg' }) => {
   const labels = { veg: 'Vegetarian', nonveg: 'Non-Vegetarian', egg: 'Contains Egg' };
   const { border, fill } = colors[type];
   return (
-    <span className={`inline-flex items-center justify-center w-4 h-4 border-2 ${border} rounded-sm flex-shrink-0`} role="img" aria-label={labels[type]} title={labels[type]}>
-      <span className={`w-2 h-2 rounded-full ${fill}`} aria-hidden="true" />
+    <span className={`inline-flex items-center justify-center w-4 h-4 border-2 ${border} rounded-sm flex-shrink-0`} title={labels[type]}>
+      <span className={`w-2 h-2 rounded-full ${fill}`} />
     </span>
   );
 };
@@ -314,30 +314,27 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
               <p className="font-montserrat text-xs text-muted-foreground mb-3">
                 Free within 3km · Max 12km radius · ₹149 minimum for delivery
               </p>
-              <Link to="/delivery-area">
-                <Button variant="outline" size="sm" className="text-xs">
-                  Check Delivery Area & Charges
-                </Button>
-              </Link>
+              <Button variant="outline" size="sm" className="text-xs" asChild>
+                <Link to="/delivery-area">Check Delivery Area & Charges</Link>
+              </Button>
             </div>
           )}
 
           <nav className="pt-6 flex flex-col sm:flex-row gap-3 justify-center items-center" aria-label="Menu actions">
             {!showAll && (
-              <Link to="/menu" aria-label="View full menu">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                  View Full Menu
-                </Button>
-              </Link>
+              <Button variant="outline" size="lg" className="w-full sm:w-auto" asChild>
+                <Link to="/menu">View Full Menu</Link>
+              </Button>
             )}
             <Button
               variant="brand"
               size="lg"
               className="w-full sm:w-auto"
-              onClick={() => window.open('https://wa.me/919321389985', '_blank')}
-              aria-label="Order on WhatsApp"
+              asChild
             >
-              📲 Order on WhatsApp
+              <a href="https://wa.me/919321389985" target="_blank" rel="noopener noreferrer" aria-label="Order on WhatsApp">
+                📲 Order on WhatsApp
+              </a>
             </Button>
           </nav>
         </div>

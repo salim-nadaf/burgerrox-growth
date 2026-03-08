@@ -55,16 +55,16 @@ function calculateHaversineDistance(lat1: number, lon1: number, lat2: number, lo
   return R * c;
 }
 
-function getDeliveryCharge(distanceKm: number): { charge: number; label: string } {
+function getDeliveryCharge(distanceKm: number): { charge: number; label: string; tooFar: boolean } {
+  if (distanceKm > MAX_DELIVERY_DISTANCE_KM) {
+    return { charge: 0, label: "Out of delivery range", tooFar: true };
+  }
   for (const tier of DELIVERY_TIERS) {
     if (distanceKm <= tier.maxDistance) {
-      return { charge: tier.charge, label: tier.label };
+      return { charge: tier.charge, label: tier.label, tooFar: false };
     }
   }
-  return { 
-    charge: DELIVERY_TIERS[DELIVERY_TIERS.length - 1].charge, 
-    label: DELIVERY_TIERS[DELIVERY_TIERS.length - 1].label
-  };
+  return { charge: 0, label: "Out of delivery range", tooFar: true };
 }
 
 function estimateDuration(distanceKm: number): string {
@@ -112,16 +112,19 @@ export function DeliveryProvider({ children }: { children: React.ReactNode }) {
 
       setDeliveryInfo(info);
       
-      if (info.charge === 0) {
-        toast({
-          title: "Free Delivery!",
-          description: `You're within 3km - delivery is FREE! (${info.distanceText})`,
-        });
-      } else {
-        toast({
-          title: "Delivery Calculated",
-          description: `Distance: ${info.distanceText} - Delivery charge: ₹${info.charge}`,
-        });
+      // Only show toast if within delivery range
+      if (info.distanceKm <= MAX_DELIVERY_DISTANCE_KM) {
+        if (info.charge === 0) {
+          toast({
+            title: "Free Delivery!",
+            description: `You're within 3km - delivery is FREE! (${info.distanceText})`,
+          });
+        } else {
+          toast({
+            title: "Delivery Calculated",
+            description: `Distance: ${info.distanceText} - Delivery charge: ₹${info.charge}`,
+          });
+        }
       }
 
       return info;
@@ -167,16 +170,19 @@ export function DeliveryProvider({ children }: { children: React.ReactNode }) {
 
         setDeliveryInfo(info);
         
-        if (info.charge === 0) {
-          toast({
-            title: "Free Delivery!",
-            description: `You're within 3km - delivery is FREE! (${info.distanceText})`,
-          });
-        } else {
-          toast({
-            title: "Delivery Calculated",
-            description: `Distance: ${info.distanceText} - Delivery charge: ₹${info.charge}`,
-          });
+        // Only show toast if within delivery range
+        if (info.distanceKm <= MAX_DELIVERY_DISTANCE_KM) {
+          if (info.charge === 0) {
+            toast({
+              title: "Free Delivery!",
+              description: `You're within 3km - delivery is FREE! (${info.distanceText})`,
+            });
+          } else {
+            toast({
+              title: "Delivery Calculated",
+              description: `Distance: ${info.distanceText} - Delivery charge: ₹${info.charge}`,
+            });
+          }
         }
 
         return info;
@@ -210,16 +216,19 @@ export function DeliveryProvider({ children }: { children: React.ReactNode }) {
 
       setDeliveryInfo(info);
       
-      if (info.charge === 0) {
-        toast({
-          title: "Free Delivery!",
-          description: `You're within 3km - delivery is FREE! (${info.distanceText})`,
-        });
-      } else {
-        toast({
-          title: "Delivery Calculated",
-          description: `Distance: ${info.distanceText} - Delivery charge: ₹${info.charge}`,
-        });
+      // Only show toast if within delivery range
+      if (info.distanceKm <= MAX_DELIVERY_DISTANCE_KM) {
+        if (info.charge === 0) {
+          toast({
+            title: "Free Delivery!",
+            description: `You're within 3km - delivery is FREE! (${info.distanceText})`,
+          });
+        } else {
+          toast({
+            title: "Delivery Calculated",
+            description: `Distance: ${info.distanceText} - Delivery charge: ₹${info.charge}`,
+          });
+        }
       }
 
       return info;

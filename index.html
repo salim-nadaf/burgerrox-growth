@@ -9,11 +9,22 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://scripts.clarity.ms" crossorigin>
-    <!-- Preload critical font files to prevent layout shift from FOUT -->
+    <!-- Inline critical font-face to avoid render-blocking Google Fonts CSS -->
+    <style>
+      @font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;font-display:optional;src:url(https://fonts.gstatic.com/s/bebasneue/v16/JTUSjIg69CK48gW7PXoo9WlhyyTh89Y.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+      @font-face{font-family:'Montserrat';font-style:normal;font-weight:400;font-display:optional;src:url(https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+      @font-face{font-family:'Montserrat';font-style:normal;font-weight:500;font-display:optional;src:url(https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2) format('woff2');unicode-range:U+0000-00FF}
+      @font-face{font-family:'Montserrat';font-style:normal;font-weight:600;font-display:optional;src:url(https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2) format('woff2');unicode-range:U+0000-00FF}
+      @font-face{font-family:'Montserrat';font-style:normal;font-weight:700;font-display:optional;src:url(https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2) format('woff2');unicode-range:U+0000-00FF}
+    </style>
+    <!-- Preload hero mobile image for fast LCP -->
+    <link rel="preload" as="image" type="image/webp" href="" id="hero-preload">
+    <!-- Preload critical font files -->
     <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/bebasneue/v16/JTUSjIg69CK48gW7PXoo9WlhyyTh89Y.woff2" crossorigin>
     <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2" crossorigin>
-    <!-- Use font-display=swap to show text immediately with fallback, preventing invisible text -->
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;600;700&family=Allura&display=swap" rel="stylesheet">
+    <!-- Load remaining font weights asynchronously (non-render-blocking) -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Allura&display=optional" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Allura&display=optional" rel="stylesheet"></noscript>
     <script>
         // Load third-party scripts after page is interactive
         function loadThirdParty() {

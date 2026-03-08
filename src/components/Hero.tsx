@@ -14,10 +14,11 @@ const Hero = () => {
             src={heroDesktop}
             alt="" 
             className="w-full h-full object-cover object-[center_40%] sm:object-center opacity-40"
-            width="800"
-            height="600"
+            width="700"
+            height="525"
             fetchPriority="high"
             decoding="sync"
+            style={{ contentVisibility: 'auto' }}
           />
         </picture>
       </div>

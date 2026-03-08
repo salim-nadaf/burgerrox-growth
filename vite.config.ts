@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => ({
         }
         // Hero images need larger size for full-width display
         if (pathname.includes('hero') || pathname.includes('zinger-hero')) {
-          return new URLSearchParams('w=640&format=webp&quality=65');
+          return new URLSearchParams('w=500&format=webp&quality=45');
         }
         // Brother-sister about photo displayed at ~350px
         if (pathname.includes('brother-sister')) {

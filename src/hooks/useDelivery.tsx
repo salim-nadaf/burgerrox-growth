@@ -167,16 +167,19 @@ export function DeliveryProvider({ children }: { children: React.ReactNode }) {
 
         setDeliveryInfo(info);
         
-        if (info.charge === 0) {
-          toast({
-            title: "Free Delivery!",
-            description: `You're within 3km - delivery is FREE! (${info.distanceText})`,
-          });
-        } else {
-          toast({
-            title: "Delivery Calculated",
-            description: `Distance: ${info.distanceText} - Delivery charge: ₹${info.charge}`,
-          });
+        // Only show toast if within delivery range
+        if (info.distanceKm <= MAX_DELIVERY_DISTANCE_KM) {
+          if (info.charge === 0) {
+            toast({
+              title: "Free Delivery!",
+              description: `You're within 3km - delivery is FREE! (${info.distanceText})`,
+            });
+          } else {
+            toast({
+              title: "Delivery Calculated",
+              description: `Distance: ${info.distanceText} - Delivery charge: ₹${info.charge}`,
+            });
+          }
         }
 
         return info;

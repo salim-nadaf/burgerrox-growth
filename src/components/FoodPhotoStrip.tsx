@@ -1,10 +1,10 @@
 import { useRef } from "react";
-import fullMeal from "@/assets/full-meal-sm.webp?w=200&format=webp&quality=60";
-import potatoWedges from "@/assets/potato-wedges-sm.webp?w=200&format=webp&quality=60";
-import lavaCake from "@/assets/lava-cake-sm.webp?w=200&format=webp&quality=60";
-import vegCrispy from "@/assets/veg-crispy-sm.webp?w=200&format=webp&quality=60";
-import variety from "@/assets/variety-sm.webp?w=200&format=webp&quality=60";
-import zingerPacked from "@/assets/Zinger burgers are getting packed.jpg.webp?w=200&format=webp&quality=60";
+import fullMeal from "@/assets/full-meal-sm.webp?w=150&format=webp&quality=50";
+import potatoWedges from "@/assets/potato-wedges-sm.webp?w=150&format=webp&quality=50";
+import lavaCake from "@/assets/lava-cake-sm.webp?w=150&format=webp&quality=50";
+import vegCrispy from "@/assets/veg-crispy-sm.webp?w=150&format=webp&quality=50";
+import variety from "@/assets/variety-sm.webp?w=150&format=webp&quality=50";
+import zingerPacked from "@/assets/Zinger burgers are getting packed.jpg.webp?w=150&format=webp&quality=50";
 
 const PHOTOS = [
   { src: fullMeal, alt: "Full meal combo with burger and fries" },

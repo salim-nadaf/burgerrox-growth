@@ -168,7 +168,6 @@ export default function OrdersSheet() {
               <div className="space-y-3 pr-2">
                 {guestOrders.map((order, index) => {
                   const status = statusConfig[order.status] || statusConfig.pending;
-                  const isLatest = index === 0;
                   return (
                     <Card key={order.id} className="overflow-hidden">
                       <CardHeader className="py-2 px-3 bg-muted/50">
@@ -199,18 +198,16 @@ export default function OrdersSheet() {
                           <span className="text-muted-foreground">Total</span>
                           <span className="font-semibold text-primary">₹{order.total_amount.toFixed(2)}</span>
                         </div>
-                        {/* Send to WhatsApp button — latest order only */}
-                        {isLatest && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full mt-2 text-xs"
-                            onClick={() => handleResendWhatsApp(order)}
-                          >
-                            <Send className="h-3 w-3 mr-1" />
-                            Send to WhatsApp
-                          </Button>
-                        )}
+                        {/* Send to WhatsApp button for this order */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full mt-2 text-xs"
+                          onClick={() => handleResendWhatsApp(order)}
+                        >
+                          <Send className="h-3 w-3 mr-1" />
+                          Send to WhatsApp
+                        </Button>
                       </CardContent>
                     </Card>
                   );

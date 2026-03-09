@@ -16,8 +16,8 @@ const Hero = () => {
             className="w-full h-full object-cover object-[center_40%] sm:object-center opacity-40"
             width="700"
             height="525"
-            loading="lazy"
-            decoding="async"
+            fetchPriority="high"
+            decoding="sync"
           />
         </picture>
       </div>

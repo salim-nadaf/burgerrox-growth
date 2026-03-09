@@ -62,11 +62,20 @@ const Header = () => {
                   <User className="h-4 w-4" />
                 </Button>
               )}
-              <Link to="/menu">
-                <Button variant="brand" size="sm" className="h-9 px-4 text-sm font-montserrat font-semibold">
-                  Order Now
-                </Button>
-              </Link>
+              <Button
+                variant="brand"
+                size="sm"
+                className="h-9 px-4 text-sm font-montserrat font-semibold"
+                onClick={() => {
+                  if (location.pathname === "/menu") {
+                    document.getElementById("menu")?.scrollIntoView({ behavior: "smooth" });
+                  } else {
+                    navigate("/menu");
+                  }
+                }}
+              >
+                Order Now
+              </Button>
             </div>
 
             {/* Mobile: cart + menu */}
@@ -121,7 +130,20 @@ const Header = () => {
                     </div>
                   </div>
 
-                  <Button variant="brand" className="w-full mt-4 h-10" onClick={() => { setMobileMenuOpen(false); navigate('/menu'); }}>
+                  <Button
+                    variant="brand"
+                    className="w-full mt-4 h-10"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      if (location.pathname === "/menu") {
+                        setTimeout(() => {
+                          document.getElementById("menu")?.scrollIntoView({ behavior: "smooth" });
+                        }, 100);
+                      } else {
+                        navigate("/menu");
+                      }
+                    }}
+                  >
                     Order Now
                   </Button>
 

@@ -10,14 +10,14 @@ const Hero = () => {
       <div className="absolute inset-0 z-0" aria-hidden="true">
         <picture>
           <source media="(max-width: 640px)" srcSet={heroMobile} type="image/webp" />
-          <img 
+          <img
             src={heroDesktop}
-            alt="" 
+            alt=""
             className="w-full h-full object-cover object-[center_40%] sm:object-center opacity-40"
             width="700"
             height="525"
-            fetchPriority="high"
-            decoding="sync"
+            loading="lazy"
+            decoding="async"
           />
         </picture>
       </div>

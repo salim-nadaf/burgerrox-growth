@@ -11,11 +11,11 @@
     <link rel="preconnect" href="https://scripts.clarity.ms" crossorigin>
     <!-- Inline critical font-face to avoid render-blocking Google Fonts CSS -->
     <style>
-      @font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;font-display:optional;src:url(https://fonts.gstatic.com/s/bebasneue/v16/JTUSjIg69CK48gW7PXoo9WlhyyTh89Y.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-      @font-face{font-family:'Montserrat';font-style:normal;font-weight:400;font-display:optional;src:url(https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-      @font-face{font-family:'Montserrat';font-style:normal;font-weight:500;font-display:optional;src:url(https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2) format('woff2');unicode-range:U+0000-00FF}
-      @font-face{font-family:'Montserrat';font-style:normal;font-weight:600;font-display:optional;src:url(https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2) format('woff2');unicode-range:U+0000-00FF}
-      @font-face{font-family:'Montserrat';font-style:normal;font-weight:700;font-display:optional;src:url(https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2) format('woff2');unicode-range:U+0000-00FF}
+      @font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/bebasneue/v16/JTUSjIg69CK48gW7PXoo9WlhyyTh89Y.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+      @font-face{font-family:'Montserrat';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+      @font-face{font-family:'Montserrat';font-style:normal;font-weight:500;font-display:swap;src:url(https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2) format('woff2');unicode-range:U+0000-00FF}
+      @font-face{font-family:'Montserrat';font-style:normal;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2) format('woff2');unicode-range:U+0000-00FF}
+      @font-face{font-family:'Montserrat';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2) format('woff2');unicode-range:U+0000-00FF}
     </style>
     <!-- Preload critical font files -->
     <!-- Preload critical font files -->
@@ -57,11 +57,7 @@
 <body>
     <noscript><img height="1" width="1" style="display:none"
         src="https://www.facebook.com/tr?id=1524642025268726" /></noscript>
-    <div id="root">
-      <!-- Inline skeleton for instant FCP – replaced by React on mount -->
-      <style>#skeleton{position:relative;min-height:65vh;display:flex;align-items:flex-end;overflow:hidden;background:#1a1a1a}#skeleton .s-bar{height:14px;border-radius:4px;background:rgba(255,255,255,.12);margin-bottom:10px}#skeleton .s-inner{padding:0 16px 32px;padding-top:80px;max-width:480px}#skeleton .s-pill{width:260px;height:28px;border-radius:999px;background:rgba(255,255,255,.08);margin-bottom:14px}#skeleton .s-h1{width:320px;height:72px;border-radius:6px;background:rgba(255,255,255,.1);margin-bottom:12px}#skeleton .s-p{width:280px}#skeleton .s-btn{width:160px;height:48px;border-radius:8px;background:rgba(255,255,255,.1);margin-top:8px}</style>
-      <div id="skeleton" aria-hidden="true"><div class="s-inner"><div class="s-pill"></div><div class="s-h1"></div><div class="s-bar s-p"></div><div class="s-bar" style="width:200px"></div><div class="s-btn"></div></div></div>
-    </div>
+    <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>

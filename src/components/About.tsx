@@ -1,6 +1,6 @@
 import React from 'react';
 import './About.css';
-import brotherSisterImage from '@/assets/brother-sister-duo.jpg?w=400&format=webp&quality=60';
+import brotherSisterImage from '@/assets/brother-sister-duo.jpg';
 import { Flame, Heart, Leaf } from 'lucide-react';
 
 const About = () => {

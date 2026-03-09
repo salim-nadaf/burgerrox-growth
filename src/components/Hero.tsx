@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import heroMobile from "@/assets/hero-mobile.webp?w=360&format=webp&quality=40";
-import heroDesktop from "@/assets/zinger-hero.webp?w=700&format=webp&quality=45";
+import heroMobile from "@/assets/hero-mobile.webp";
+import heroDesktop from "@/assets/zinger-hero.webp";
 
 const Hero = () => {
   return (

@@ -6,21 +6,21 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 // Menu item images with explicit resize directives
-import blazeChickenImg from "@/assets/Blaze Chicken Burger.jpg?w=150&format=webp&quality=65";
-import blazeVegImg from "@/assets/Blaze Veg Burger.jpg?w=150&format=webp&quality=65";
-import alooRockImg from "@/assets/Aloo Rock Burger.jpg?w=150&format=webp&quality=65";
-import eggBurgerImage from "@/assets/egg-burger.jpg?w=150&format=webp&quality=65";
-import doubleChickenImg from "@/assets/double-blaze-chicken-sm.webp?w=150&format=webp&quality=65";
-import doubleVegImg from "@/assets/Double Blaze Veg.jpg?w=150&format=webp&quality=65";
-import zingerImg from "@/assets/Burger Rox Zinger.jpg?w=150&format=webp&quality=65";
-import blazeComboImg from "@/assets/blaze-combo-sm.webp?w=150&format=webp&quality=65";
-import zingerComboImg from "@/assets/zinger-combo-sm.webp?w=150&format=webp&quality=65";
-import saltedFriesImg from "@/assets/Salted Fries.jpg?w=150&format=webp&quality=65";
-import periPeriFriesImg from "@/assets/Peri Peri Fries.jpg?w=150&format=webp&quality=65";
-import potatoWedgesImg from "@/assets/potato-wedges-menu.webp?w=150&format=webp&quality=65";
-import chickenPopcornImg from "@/assets/chicken-popcorn-sm.webp?w=150&format=webp&quality=65";
-import lavaCakeImage from "@/assets/lava-cake.jpg?w=150&format=webp&quality=65";
-import chickenBurgerImage from "@/assets/chicken-burger.jpg?w=150&format=webp&quality=65";
+import blazeChickenImg from "@/assets/Blaze Chicken Burger.jpg";
+import blazeVegImg from "@/assets/Blaze Veg Burger.jpg";
+import alooRockImg from "@/assets/Aloo Rock Burger.jpg";
+import eggBurgerImage from "@/assets/egg-burger.jpg";
+import doubleChickenImg from "@/assets/double-blaze-chicken-sm.webp";
+import doubleVegImg from "@/assets/Double Blaze Veg.jpg";
+import zingerImg from "@/assets/Burger Rox Zinger.jpg";
+import blazeComboImg from "@/assets/blaze-combo-sm.webp";
+import zingerComboImg from "@/assets/zinger-combo-sm.webp";
+import saltedFriesImg from "@/assets/Salted Fries.jpg";
+import periPeriFriesImg from "@/assets/Peri Peri Fries.jpg";
+import potatoWedgesImg from "@/assets/potato-wedges-menu.webp";
+import chickenPopcornImg from "@/assets/chicken-popcorn-sm.webp";
+import lavaCakeImage from "@/assets/lava-cake.jpg";
+import chickenBurgerImage from "@/assets/chicken-burger.jpg";
 import { useCart } from "@/hooks/useCart";
 
 interface FoodTypeIndicatorProps {

@@ -48,7 +48,7 @@ export default function GooglePlacesSearch({
   const [error, setError] = useState<string | null>(null);
   
   const containerRef = useRef<HTMLDivElement>(null);
-  const debounceRef = useRef<NodeJS.Timeout>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
    
    // Memoize session token - changes only when a place is selected
    const sessionTokenRef = useRef<string>(generateSessionToken());

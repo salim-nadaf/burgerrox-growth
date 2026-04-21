@@ -40,7 +40,7 @@ export default function LocationSearch({
   const [results, setResults] = useState<LocationResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const debounceRef = useRef<NodeJS.Timeout>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside

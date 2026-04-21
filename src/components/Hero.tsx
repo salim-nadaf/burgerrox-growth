@@ -13,13 +13,15 @@ const Hero = () => {
           <img
             src={heroDesktop}
             alt=""
-            className="w-full h-full object-cover object-[center_40%] sm:object-center opacity-40"
+            className="w-full h-full object-cover object-[center_40%] sm:object-center"
             width="700"
             height="525"
             fetchPriority="high"
             decoding="sync"
           />
         </picture>
+        {/* Dark overlay for text contrast (separate layer keeps img fully opaque for LCP) */}
+        <div className="absolute inset-0 bg-foreground/60" />
       </div>
 
       <div className="container mx-auto px-4 z-10 pb-8 sm:pb-12 pt-20">

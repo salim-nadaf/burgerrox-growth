@@ -21,6 +21,7 @@ const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
 const Terms = lazy(() => import("./pages/Terms"));
 const DeliveryArea = lazy(() => import("./pages/DeliveryArea"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const BlogBestBurgersMamurdiRavet = lazy(() => import("./pages/BlogBestBurgersMamurdiRavet"));
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ function AppContent() {
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/delivery-area" element={<DeliveryArea />} />
+          <Route path="/blog/best-burgers-mamurdi-ravet" element={<BlogBestBurgersMamurdiRavet />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

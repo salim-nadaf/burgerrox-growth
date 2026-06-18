@@ -13,6 +13,10 @@ Burger Rox is a Pune-based burger restaurant run by a brother-sister duo. We del
 - [Refund Policy](/refund-policy): Cancellation window and refund process via Razorpay.
 - [Terms & Conditions](/terms): Ordering, delivery, and payment terms.
 
+## Blog
+
+- [Best Burgers in Mamurdi & Ravet](/blog/best-burgers-mamurdi-ravet): Local guide to the best burgers in Mamurdi, Ravet, Punawale & Kiwale, and why Burger Rox leads.
+
 ## Contact
 
 - WhatsApp / Phone: +91 9321389985

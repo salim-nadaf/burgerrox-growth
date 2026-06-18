@@ -7,6 +7,10 @@ import { Button } from "@/components/ui/button";
 const RefundPolicy = () => {
   useEffect(() => {
     document.title = "Refund Policy - Burger Rox";
+    document.querySelector('meta[name="description"]')?.setAttribute(
+      "content",
+      "Burger Rox refund & cancellation policy. Cancel within 1 minute, secure refunds via Razorpay for prepaid orders. Read full terms."
+    );
   }, []);
 
   return (

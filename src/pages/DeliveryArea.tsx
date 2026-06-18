@@ -23,6 +23,10 @@ const DELIVERY_TIERS = [
 const DeliveryArea = () => {
   useEffect(() => {
     document.title = "Delivery Area & Charges - Burger Rox";
+    document.querySelector('meta[name="description"]')?.setAttribute(
+      "content",
+      "Burger Rox delivers to Mamurdi, Kiwale, Punawale & Ravet within 12 km. Free delivery up to 3 km. See distance-based delivery charges."
+    );
   }, []);
 
   return (

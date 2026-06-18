@@ -55,6 +55,21 @@ export default function Admin() {
   const [loading, setLoading] = useState(false);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
+  useEffect(() => {
+    document.title = "Admin Dashboard - Burger Rox";
+    document.querySelector('meta[name="description"]')?.setAttribute(
+      "content",
+      "Burger Rox admin dashboard — internal order management. Authorized staff only."
+    );
+    let robots = document.querySelector('meta[name="robots"]');
+    if (!robots) {
+      robots = document.createElement('meta');
+      robots.setAttribute('name', 'robots');
+      document.head.appendChild(robots);
+    }
+    robots.setAttribute('content', 'noindex, nofollow');
+  }, []);
+
   const handleLogin = async () => {
     if (!token.trim()) {
       toast({ title: 'Error', description: 'Please enter admin token', variant: 'destructive' });

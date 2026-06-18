@@ -7,6 +7,10 @@ import { Button } from "@/components/ui/button";
 const Terms = () => {
   useEffect(() => {
     document.title = "Terms & Conditions - Burger Rox";
+    document.querySelector('meta[name="description"]')?.setAttribute(
+      "content",
+      "Terms & conditions for ordering at Burger Rox: order acceptance, payment, delivery, pickup, refunds and user responsibilities."
+    );
   }, []);
 
   return (

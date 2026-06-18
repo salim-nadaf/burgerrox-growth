@@ -7,6 +7,10 @@ import { Button } from "@/components/ui/button";
 const Privacy = () => {
   useEffect(() => {
     document.title = "Privacy Policy - Burger Rox";
+    document.querySelector('meta[name="description"]')?.setAttribute(
+      "content",
+      "How Burger Rox collects, uses, and protects your personal information when you order online. Read our privacy commitments and contact details."
+    );
   }, []);
 
   return (

@@ -560,12 +560,17 @@ Please confirm order and expected time.`;
                     <div className="flex items-center gap-1.5">
                       <Button
                         variant="outline" size="icon" className="h-6 w-6"
+                        aria-label={item.quantity <= 1 ? `Remove ${item.item_name} from cart` : `Decrease quantity of ${item.item_name}`}
                         onClick={() => item.quantity <= 1 ? removeFromCart(item.id) : updateQuantity(item.id, item.quantity - 1)}
                       >
                         {item.quantity <= 1 ? <Trash2 className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
                       </Button>
-                      <span className="w-5 text-center text-sm font-medium">{item.quantity}</span>
-                      <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.id, item.quantity + 1)}>
+                      <span className="w-5 text-center text-sm font-medium" aria-label={`Quantity: ${item.quantity}`}>{item.quantity}</span>
+                      <Button
+                        variant="outline" size="icon" className="h-6 w-6"
+                        aria-label={`Increase quantity of ${item.item_name}`}
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      >
                         <Plus className="h-3 w-3" />
                       </Button>
                     </div>

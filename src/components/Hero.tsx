@@ -34,7 +34,7 @@ const Hero = () => {
           </div>
 
           <h1 id="hero-heading" className="font-bebas text-5xl sm:text-6xl md:text-8xl text-card leading-[0.9] tracking-wider">
-            CRAVE-WORTHY<br />BURGERS
+            BURGER ROX<br />CRAVE-WORTHY BURGERS<br /><span className="text-3xl sm:text-4xl md:text-5xl">IN MAMURDI</span>
           </h1>
           
           <p className="font-montserrat text-sm sm:text-base text-card/80 max-w-sm">

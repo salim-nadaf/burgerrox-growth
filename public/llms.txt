@@ -1,0 +1,19 @@
+# Burger Rox
+
+> Crave-worthy homemade burgers with our signature blaze sauce. Order online for delivery in Mamurdi, Kiwale, Punawale & Ravet (Pune). Open daily 7 PM – 10 PM.
+
+Burger Rox is a Pune-based burger restaurant run by a brother-sister duo. We deliver within a 12 km radius of Urban Forest, Kiwale. Minimum order ₹149 for delivery. Free delivery within 3 km. Payments via Razorpay (UPI/cards) and Cash on Delivery.
+
+## Pages
+
+- [Home](/): Brand intro, hero, social proof, featured menu, contact.
+- [Menu](/menu): Full menu — burgers, fries, combos, desserts. Prices from ₹79.
+- [Delivery Area](/delivery-area): Coverage zones and distance-based delivery charges.
+- [Privacy Policy](/privacy): How we collect and use customer data.
+- [Refund Policy](/refund-policy): Cancellation window and refund process via Razorpay.
+- [Terms & Conditions](/terms): Ordering, delivery, and payment terms.
+
+## Contact
+
+- WhatsApp / Phone: +91 9321389985
+- Address: Urban Forest, Mamurdi, Kiwale, Pune 412101

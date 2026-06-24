@@ -176,6 +176,10 @@ const Cart = () => {
       .join("\n");
 
     const paymentLabel = getPaymentLabel(paymentMethod);
+    const totalDiscount = onlineDiscount + couponDiscount;
+    const discountLine = totalDiscount > 0
+      ? `-₹${totalDiscount}${appliedCoupon ? ` (incl. ${appliedCoupon.code})` : ""}`
+      : "₹0";
 
     let msg = `--- BURGER ROX ORDER ---
 
@@ -190,7 +194,7 @@ ${itemsList}
 
 Subtotal: ₹${totalAmount.toFixed(2)}
 Delivery: ${deliveryCharge === 0 ? "₹0" : `₹${deliveryCharge}`}
-Discount: ${onlineDiscount > 0 ? `-₹${onlineDiscount}` : "₹0"}
+Discount: ${discountLine}
 TOTAL: ₹${grandTotal.toFixed(2)}
 
 Payment: ${paymentLabel}`;
@@ -254,7 +258,8 @@ Please confirm order and expected time.`;
       items: itemsSummary,
       subtotal: totalAmount,
       delivery: deliveryCharge,
-      discount: pMethod === "online" ? onlineDiscount : 0,
+      discount: (pMethod === "online" ? onlineDiscount : 0) + couponDiscount,
+      coupon_code: appliedCoupon?.code || "",
       total: grandTotal,
       payment: pMethod === "online" ? "Paid Online" : orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery",
       status: "NEW",

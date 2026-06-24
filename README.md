@@ -1,75 +1,73 @@
-# Welcome to your Lovable project
+# Burger Rox – Customer Acquisition & Growth Website
 
-## Project info
+## Overview
 
-**URL**: https://lovable.dev/projects/f5bec463-ebc7-4ff4-a6e4-20eccbf18748
+Burger Rox is a customer acquisition and lead generation website developed to support a cloud kitchen business focused on increasing customer engagement and driving direct inquiries.
 
-## How can I edit this code?
+The project was designed to reduce friction between customer discovery and conversion by creating a simple, mobile-first experience integrated with WhatsApp communication.
 
-There are several ways of editing your application.
+## Project Objectives
 
-**Use Lovable**
+* Improve online visibility
+* Generate qualified customer inquiries
+* Create a seamless lead capture experience
+* Reduce dependency on third-party food delivery platforms
+* Build a scalable digital presence
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f5bec463-ebc7-4ff4-a6e4-20eccbf18748) and start prompting.
+## Key Features
 
-Changes made via Lovable will be committed automatically to this repo.
+* Mobile-first responsive design
+* Direct WhatsApp integration
+* Conversion-focused landing pages
+* Customer inquiry funnel
+* Location and contact integration
+* Fast loading and optimized user experience
 
-**Use your preferred IDE**
+## My Role
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+I managed the project end-to-end, including:
 
-**Workflow:** After making any code changes, commit and push to GitHub so the repo stays in sync and deployments pick up updates: `git add . && git commit -m "Your message" && git push origin main`
+* Business planning
+* Customer journey mapping
+* Content creation
+* Website design and deployment
+* Lead generation strategy
+* Funnel optimization
+* Performance analysis
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Technologies Used
 
-Follow these steps:
+* HTML
+* CSS
+* JavaScript
+* GitHub
+* AI-assisted development tools
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## Business Outcomes
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+* Created a dedicated digital acquisition channel
+* Improved customer accessibility
+* Enabled direct customer communication
+* Established a foundation for future marketing campaigns
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Key Learnings
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+This project helped me gain practical experience in:
 
-**Edit a file directly in GitHub**
+* Customer acquisition
+* Digital marketing
+* Conversion optimization
+* Business operations
+* User experience design
+* AI-assisted website development
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Future Improvements
 
-**Use GitHub Codespaces**
+* CRM integration
+* Analytics dashboard
+* Automated lead nurturing
+* Advanced conversion tracking
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/f5bec463-ebc7-4ff4-a6e4-20eccbf18748) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Created and managed by Salim Nadaf

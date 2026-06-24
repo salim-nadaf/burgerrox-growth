@@ -61,6 +61,30 @@ const ITEM_IMAGE_MAP: Record<string, string> = {
 
 const getItemImage = (name: string) => ITEM_IMAGE_MAP[name] || chickenBurgerImage;
 
+// Styled badge variants inspired by Shopify product label apps
+const badgeStyles: Record<string, string> = {
+  "Most Ordered": "bg-primary text-primary-foreground",
+  "Best Seller": "bg-primary text-primary-foreground",
+  "Student Favorite": "bg-accent text-accent-foreground",
+  "Premium Pick": "bg-foreground text-background",
+  "Chef's Pick": "bg-foreground text-background",
+  "New": "bg-emerald-600 text-white",
+  "Spicy": "bg-red-600 text-white",
+  "Shareable": "bg-blue-600 text-white",
+  "Combo Deal": "bg-amber-500 text-black",
+};
+const badgeIcons: Record<string, string> = {
+  "Spicy": "🌶 ",
+  "New": "✨ ",
+  "Best Seller": "🏆 ",
+  "Most Ordered": "🔥 ",
+  "Shareable": "👥 ",
+  "Combo Deal": "🎁 ",
+};
+const getBadgeClass = (tag: string) =>
+  badgeStyles[tag] || "bg-primary text-primary-foreground";
+const getBadgeLabel = (tag: string) => `${badgeIcons[tag] || ""}${tag.toUpperCase()}`;
+
 interface AddOn { name: string; price: number; }
 
 const BURGER_ADDONS: AddOn[] = [
@@ -81,29 +105,30 @@ interface MenuItem {
   hasAddons?: boolean;
   comboChoice?: boolean;
   customTag?: string;
+  extraTags?: string[];
 }
 
 const allMenuItems: MenuItem[] = [
-  { name: "Blaze Chicken Burger", description: "Crispy chicken patty with fresh veggies and our rockin' homemade blaze sauce.", price: 129, popular: true, category: "Burgers", foodType: "nonveg", section: ["Most Popular", "All Burgers"], hasAddons: true, customTag: "Most Ordered" },
+  { name: "Blaze Chicken Burger", description: "Crispy chicken patty with fresh veggies and our rockin' homemade blaze sauce.", price: 129, popular: true, category: "Burgers", foodType: "nonveg", section: ["Most Popular", "All Burgers"], hasAddons: true, customTag: "Most Ordered", extraTags: ["Best Seller"] },
   { name: "Blaze Veg Burger", description: "Golden veg patty, crunchy lettuce, and signature blaze sauce in a soft bun.", price: 89, popular: true, category: "Burgers", foodType: "veg", section: ["Most Popular", "All Burgers"], hasAddons: true, customTag: "Student Favorite" },
   { name: "Aloo Rock Burger", description: "Classic aloo tikki with onions, lettuce, and our homemade signature sauce.", price: 99, popular: false, category: "Burgers", foodType: "veg", section: ["All Burgers"], hasAddons: true },
   { name: "Egg Blaze Smash", description: "Crispy aloo tikki topped with scrambled egg and loaded with blaze sauce.", price: 169, popular: false, category: "Burgers", foodType: "egg", section: ["All Burgers"], hasAddons: true },
   { name: "Double Blaze Chicken", description: "Two crispy chicken patties stacked with fresh veggies and double blaze flavor.", price: 199, popular: false, category: "Burgers", foodType: "nonveg", section: ["All Burgers"], hasAddons: true },
   { name: "Double Blaze Veg", description: "Double veg patties with crunchy lettuce and extra signature sauce.", price: 149, popular: false, category: "Burgers", foodType: "veg", section: ["All Burgers"], hasAddons: true },
-  { name: "Burger Rox Zinger", description: "Our premium zinger-style chicken burger with bold spices and signature sauce.", price: 259, popular: true, category: "Burgers", foodType: "nonveg", section: ["All Burgers"], hasAddons: true, customTag: "Premium Pick" },
-  { name: "Blaze Combo", description: "Blaze Chicken Burger with fries and your choice of drink or lava cake.", price: 229, popular: true, category: "Combos", foodType: "nonveg", section: ["Combos"], comboChoice: true },
-  { name: "Zinger Combo", description: "Burger Rox Zinger with fries and your choice of drink or lava cake.", price: 349, popular: true, category: "Combos", foodType: "nonveg", section: ["Combos"], comboChoice: true },
-  { name: "Salted Fries", description: "Hot, crunchy and irresistibly delicious.", price: 79, popular: true, category: "Sides", foodType: "veg", section: ["Sides"], variants: [
+  { name: "Burger Rox Zinger", description: "Our premium zinger-style chicken burger with bold spices and signature sauce.", price: 259, popular: true, category: "Burgers", foodType: "nonveg", section: ["All Burgers"], hasAddons: true, customTag: "Premium Pick", extraTags: ["Spicy"] },
+  { name: "Blaze Combo", description: "Blaze Chicken Burger with fries and your choice of drink or lava cake.", price: 229, popular: true, category: "Combos", foodType: "nonveg", section: ["Combos"], comboChoice: true, customTag: "Combo Deal" },
+  { name: "Zinger Combo", description: "Burger Rox Zinger with fries and your choice of drink or lava cake.", price: 349, popular: true, category: "Combos", foodType: "nonveg", section: ["Combos"], comboChoice: true, customTag: "Combo Deal", extraTags: ["Spicy"] },
+  { name: "Salted Fries", description: "Hot, crunchy and irresistibly delicious.", price: 79, popular: true, category: "Sides", foodType: "veg", section: ["Sides"], customTag: "Best Seller", variants: [
     { size: "Small", price: 79 },
     { size: "Regular", price: 109 },
   ]},
-  { name: "Peri Peri Fries", description: "Golden crisp fries tossed in a flavorful blend of herbs and spices.", price: 89, popular: true, category: "Sides", foodType: "veg", section: ["Sides"], variants: [
+  { name: "Peri Peri Fries", description: "Golden crisp fries tossed in a flavorful blend of herbs and spices.", price: 89, popular: true, category: "Sides", foodType: "veg", section: ["Sides"], customTag: "Spicy", variants: [
     { size: "Small", price: 89 },
     { size: "Regular", price: 119 },
   ]},
   { name: "Potato Wedges", description: "Crispy golden potato wedges seasoned to perfection.", price: 99, popular: false, category: "Sides", foodType: "veg", section: ["Sides"] },
-  { name: "Chicken Popcorn", description: "Bite-sized crispy chicken pieces, perfect for sharing.", price: 119, popular: false, category: "Sides", foodType: "nonveg", section: ["Sides"] },
-  { name: "Choco Lava Cake", description: "Rich, decadent cake oozing with warm, velvety chocolate center.", price: 79, popular: true, category: "Sides", foodType: "veg", section: ["Sides"] },
+  { name: "Chicken Popcorn", description: "Bite-sized crispy chicken pieces, perfect for sharing.", price: 119, popular: false, category: "Sides", foodType: "nonveg", section: ["Sides"], customTag: "Shareable" },
+  { name: "Choco Lava Cake", description: "Rich, decadent cake oozing with warm, velvety chocolate center.", price: 79, popular: true, category: "Sides", foodType: "veg", section: ["Sides"], customTag: "New" },
 ];
 
 const MENU_SECTIONS = ["Most Popular", "Combos", "All Burgers", "Sides"];
@@ -193,10 +218,19 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                     {item.name}
                   </h3>
                 </div>
-                {item.customTag && (
-                  <Badge variant="default" className="bg-primary text-primary-foreground text-[9px] px-1.5 py-0 mt-0.5">
-                    {item.customTag.toUpperCase()}
-                  </Badge>
+                {(item.customTag || item.extraTags?.length) && (
+                  <div className="flex flex-wrap gap-1 mt-0.5">
+                    {item.customTag && (
+                      <Badge className={`${getBadgeClass(item.customTag)} text-[9px] px-1.5 py-0 border-0`}>
+                        {getBadgeLabel(item.customTag)}
+                      </Badge>
+                    )}
+                    {item.extraTags?.map((tag) => (
+                      <Badge key={tag} className={`${getBadgeClass(tag)} text-[9px] px-1.5 py-0 border-0`}>
+                        {getBadgeLabel(tag)}
+                      </Badge>
+                    ))}
+                  </div>
                 )}
               </div>
               {!item.variants && (

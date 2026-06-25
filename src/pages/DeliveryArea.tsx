@@ -37,7 +37,7 @@ const DeliveryArea = () => {
           <h1 className="font-bebas text-4xl sm:text-5xl tracking-wider text-foreground mb-2">
             DELIVERY AREA
           </h1>
-          <p className="font-allura text-xl text-primary mb-8">From Urban Forest, Kiwale – Pune</p>
+          <p className="font-montserrat italic font-medium text-xl text-primary mb-8">From Urban Forest, Kiwale – Pune</p>
 
           <div className="font-montserrat text-sm sm:text-base text-muted-foreground space-y-6">
             <p>

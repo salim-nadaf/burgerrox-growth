@@ -8,24 +8,25 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Burger Rox Brand Colors - Premium Gourmet Palette */
-    --background: 34 30% 98%; /* #FAF9F6 - Soft Gourmet Cream */
-    --foreground: 24 35% 15%; /* #321F17 - Rich Dark Chocolate */
+    /* Burger Rox Brand Colors - 60/30/10 Premium Palette
+       60% Yellow #FFD939 (background) · 30% Brown #53362D (foreground/secondary) · 10% Orange #FF5D05 (accent) */
+    --background: 48 100% 61%; /* #FFD939 - Signature Brand Yellow */
+    --foreground: 13 30% 25%; /* #53362D - Warm Cocoa Brown */
 
     --card: 0 0% 100%;
-    --card-foreground: 24 35% 15%;
+    --card-foreground: 13 30% 25%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 24 35% 15%;
+    --popover-foreground: 13 30% 25%;
 
-    --primary: 21 100% 51%; /* #FF5D05 - Signature Orange Accent */
+    --primary: 21 100% 51%; /* #FF5D05 - Signature Orange Accent (10%) */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 48 100% 62%; /* #FFD939 - Brand Yellow Accent */
-    --secondary-foreground: 24 35% 15%;
+    --secondary: 13 30% 25%; /* #53362D - Warm Cocoa Brown (30%) */
+    --secondary-foreground: 34 30% 98%;
 
-    --muted: 34 20% 93%; /* Soft gray-cream border/background */
-    --muted-foreground: 24 15% 45%;
+    --muted: 48 60% 88%; /* Soft warm yellow-cream */
+    --muted-foreground: 13 25% 35%;
 
     --accent: 21 100% 51%;
     --accent-foreground: 0 0% 100%;
@@ -33,25 +34,25 @@ All colors MUST be HSL.
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 34 20% 88%; /* Elegant warm border */
+    --border: 13 25% 78%; /* Warm cocoa-tinted border */
     --input: 0 0% 100%;
     --ring: 21 100% 51%;
 
     /* Custom brand gradients & shadows */
-    --gradient-brand: linear-gradient(135deg, hsl(48 100% 62%), hsl(48 95% 75%));
+    --gradient-brand: linear-gradient(135deg, hsl(48 100% 61%), hsl(48 95% 75%));
     --gradient-accent: linear-gradient(135deg, hsl(21 100% 51%), hsl(18 100% 44%));
     --shadow-brand: 0 10px 30px -10px hsl(21 100% 51% / 0.35);
-    --shadow-warm: 0 4px 20px hsl(24 35% 15% / 0.06);
+    --shadow-warm: 0 4px 20px hsl(13 30% 25% / 0.10);
 
     --radius: 0.75rem; /* Smoother premium rounded corners */
 
-    --sidebar-background: 34 30% 98%;
-    --sidebar-foreground: 24 35% 15%;
+    --sidebar-background: 48 100% 61%;
+    --sidebar-foreground: 13 30% 25%;
     --sidebar-primary: 21 100% 51%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 34 20% 93%;
-    --sidebar-accent-foreground: 24 35% 15%;
-    --sidebar-border: 34 20% 88%;
+    --sidebar-accent: 48 60% 88%;
+    --sidebar-accent-foreground: 13 30% 25%;
+    --sidebar-border: 13 25% 78%;
     --sidebar-ring: 21 100% 51%;
   }
 

@@ -5,24 +5,24 @@ import heroDesktop from "@/assets/zinger-hero.webp";
 
 const Hero = () => {
   return (
-    <section className="relative min-h-[65vh] sm:min-h-[70vh] flex items-end overflow-hidden bg-foreground" aria-labelledby="hero-heading">
-      {/* Background Image (subdued for premium feel) */}
+    <section className="relative min-h-[65vh] sm:min-h-[70vh] flex items-end overflow-hidden bg-background" aria-labelledby="hero-heading">
+      {/* Background Image — bold and inviting on signature yellow */}
       <div className="absolute inset-0 z-0" aria-hidden="true">
         <picture>
           <source media="(max-width: 640px)" srcSet={heroMobile} type="image/webp" />
           <img
             src={heroDesktop}
             alt=""
-            className="w-full h-full object-cover object-[center_40%] sm:object-center opacity-40"
+            className="w-full h-full object-cover object-[center_40%] sm:object-center opacity-90"
             width="700"
             height="525"
             fetchPriority="high"
             decoding="sync"
           />
         </picture>
-        {/* Premium layered overlay: solid brand-dark base + warm gradient accent */}
-        <div className="absolute inset-0 bg-foreground/80" />
-        <div className="absolute inset-0 bg-gradient-to-tr from-foreground via-foreground/70 to-primary/20" />
+        {/* Soft yellow wash + bottom-left cocoa gradient for content legibility */}
+        <div className="absolute inset-0 bg-background/25" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-foreground/85 via-foreground/40 to-transparent" />
       </div>
 
       <div className="container mx-auto px-4 z-10 pb-8 sm:pb-12 pt-20">

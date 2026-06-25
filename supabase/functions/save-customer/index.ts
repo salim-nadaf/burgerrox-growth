@@ -47,16 +47,17 @@ serve(async (req) => {
       let isNew = false;
 
       if (existing) {
-        // Update existing
-        const { data, error } = await supabase
-          .from("customers")
-          .update({ name: name.trim(), address: address?.trim() || null })
-          .eq("id", existing.id)
-          .select("id, name, whatsapp, address")
-          .single();
-
-        if (error) throw error;
-        customer = data;
+        // SECURITY: do not allow this endpoint to overwrite an existing
+        // customer's name/address purely by knowing the phone number.
+        // Return the existing record unchanged. Updates to customer profile
+        // happen via authenticated flows (place-order links via auth user
+        // and the profiles table is updated through RLS-protected paths).
+        customer = {
+          id: existing.id,
+          name: existing.name,
+          whatsapp: existing.whatsapp,
+          address: existing.address,
+        };
       } else {
         // Create new
         const { data, error } = await supabase

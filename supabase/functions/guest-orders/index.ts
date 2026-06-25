@@ -19,6 +19,8 @@ serve(async (req) => {
 
     const url = new URL(req.url);
     const customerId = url.searchParams.get("customer_id");
+    const whatsappRaw = url.searchParams.get("whatsapp") || "";
+    const whatsapp = whatsappRaw.replace(/\D/g, "").slice(-10);
 
     if (!customerId) {
       return new Response(
@@ -32,6 +34,30 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ error: "Invalid customer_id format" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Require the caller to prove ownership by also supplying the WhatsApp
+    // number associated with this customer. This prevents enumeration of
+    // other customers' order history just by knowing a UUID.
+    if (!/^[6-9]\d{9}$/.test(whatsapp)) {
+      return new Response(
+        JSON.stringify({ error: "whatsapp is required to verify ownership" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { data: customer, error: custErr } = await supabase
+      .from("customers")
+      .select("id, whatsapp")
+      .eq("id", customerId)
+      .maybeSingle();
+
+    if (custErr) throw custErr;
+    if (!customer || customer.whatsapp !== whatsapp) {
+      return new Response(
+        JSON.stringify({ error: "Not authorized for this customer" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 

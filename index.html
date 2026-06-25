@@ -63,9 +63,7 @@
     <!-- Preload critical font files -->
     <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/bebasneue/v16/JTUSjIg69CK48gW7PXoo9WlhyyTh89Y.woff2" crossorigin>
     <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2" crossorigin>
-    <!-- Load remaining font weights asynchronously (non-render-blocking) -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Allura&display=optional" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Allura&display=optional" rel="stylesheet"></noscript>
+    <!-- Only Bebas Neue + Montserrat are used site-wide -->
     <script>
         // Load third-party scripts after page is interactive
         function loadThirdParty() {

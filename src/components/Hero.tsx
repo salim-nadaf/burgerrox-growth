@@ -20,8 +20,9 @@ const Hero = () => {
             decoding="sync"
           />
         </picture>
-        {/* Dark overlay for text contrast (separate layer keeps img fully opaque for LCP) */}
-        <div className="absolute inset-0 bg-foreground/60" />
+        {/* Brand-yellow overlay for stronger background presence (image less prominent) */}
+        <div className="absolute inset-0 bg-background/70 mix-blend-multiply" />
+        <div className="absolute inset-0 bg-foreground/40" />
       </div>
 
       <div className="container mx-auto px-4 z-10 pb-8 sm:pb-12 pt-20">

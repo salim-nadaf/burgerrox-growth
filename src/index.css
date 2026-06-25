@@ -9,7 +9,7 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Burger Rox Brand Colors - Premium Gourmet Palette */
-    --background: 34 30% 98%; /* #FAF9F6 - Soft Gourmet Cream */
+    --background: 48 100% 62%; /* #FFD939 - Brand Yellow */
     --foreground: 24 35% 15%; /* #321F17 - Rich Dark Chocolate */
 
     --card: 0 0% 100%;
@@ -45,7 +45,7 @@ All colors MUST be HSL.
 
     --radius: 0.75rem; /* Smoother premium rounded corners */
 
-    --sidebar-background: 34 30% 98%;
+    --sidebar-background: 48 100% 62%;
     --sidebar-foreground: 24 35% 15%;
     --sidebar-primary: 21 100% 51%;
     --sidebar-primary-foreground: 0 0% 98%;

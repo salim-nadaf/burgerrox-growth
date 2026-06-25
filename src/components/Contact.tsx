@@ -10,7 +10,7 @@ const Contact = () => {
             FIND US
           </h2>
           <div className="w-16 h-1 bg-primary mx-auto mb-3" aria-hidden="true" />
-          <p className="font-allura text-2xl md:text-3xl text-primary mb-6" role="doc-subtitle">
+          <p className="font-montserrat italic font-medium text-2xl md:text-3xl text-primary mb-6" role="doc-subtitle">
             We're right where you need us to be
           </p>
         </header>

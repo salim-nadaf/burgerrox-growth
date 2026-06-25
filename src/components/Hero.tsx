@@ -6,22 +6,23 @@ import heroDesktop from "@/assets/zinger-hero.webp";
 const Hero = () => {
   return (
     <section className="relative min-h-[65vh] sm:min-h-[70vh] flex items-end overflow-hidden bg-foreground" aria-labelledby="hero-heading">
-      {/* Background Image */}
+      {/* Background Image (subdued for premium feel) */}
       <div className="absolute inset-0 z-0" aria-hidden="true">
         <picture>
           <source media="(max-width: 640px)" srcSet={heroMobile} type="image/webp" />
           <img
             src={heroDesktop}
             alt=""
-            className="w-full h-full object-cover object-[center_40%] sm:object-center"
+            className="w-full h-full object-cover object-[center_40%] sm:object-center opacity-40"
             width="700"
             height="525"
             fetchPriority="high"
             decoding="sync"
           />
         </picture>
-        {/* Dark overlay for text contrast (separate layer keeps img fully opaque for LCP) */}
-        <div className="absolute inset-0 bg-foreground/60" />
+        {/* Premium layered overlay: solid brand-dark base + warm gradient accent */}
+        <div className="absolute inset-0 bg-foreground/80" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-foreground via-foreground/70 to-primary/20" />
       </div>
 
       <div className="container mx-auto px-4 z-10 pb-8 sm:pb-12 pt-20">

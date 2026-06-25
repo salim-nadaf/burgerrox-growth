@@ -39,11 +39,20 @@ const Header = () => {
                 <Link to="/menu" className="font-montserrat text-sm font-medium text-foreground hover:text-primary transition-colors">Menu</Link>
               )}
               <Link to="/delivery-area" className="font-montserrat text-sm font-medium text-foreground hover:text-primary transition-colors">Delivery Areas</Link>
-              {location.pathname === '/menu' ? (
-                <Link to="/#about" className="font-montserrat text-sm font-medium text-foreground hover:text-primary transition-colors">About</Link>
-              ) : (
-                <a href="#about" className="font-montserrat text-sm font-medium text-foreground hover:text-primary transition-colors">About</a>
-              )}
+              <button
+                type="button"
+                className="font-montserrat text-sm font-medium text-foreground hover:text-primary transition-colors"
+                onClick={() => {
+                  if (location.pathname !== '/') {
+                    navigate('/');
+                    setTimeout(() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }), 150);
+                  } else {
+                    document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
+                About
+              </button>
             </nav>
             
             {/* Desktop actions */}

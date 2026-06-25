@@ -271,20 +271,22 @@ Please confirm order and expected time.`;
   const placeOrderViaAPI = async (
     pMethod: "cod" | "online",
     custInfo: { name: string; whatsapp: string },
-    paymentId?: string
+    razorpay?: { order_id: string; payment_id: string; signature: string }
   ): Promise<{ orderNumber: string; customerId: string } | null> => {
     try {
       const fullAddr = orderType === "delivery"
         ? formatFullAddress(detailedAddress, deliveryInfo?.destinationAddress)
         : "";
 
+      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/place-order`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            apikey: anonKey,
+            Authorization: `Bearer ${anonKey}`,
           },
           body: JSON.stringify({
             customer_name: custInfo.name,
@@ -293,8 +295,11 @@ Please confirm order and expected time.`;
             items: cartItems.map(i => ({ item_name: i.item_name, item_price: i.item_price, quantity: i.quantity })),
             total_amount: grandTotal,
             payment_method: pMethod === "online" ? "online" : "cod",
-            payment_status: pMethod === "online" ? "paid" : "pending",
-            payment_id: paymentId || null,
+            delivery_charge: deliveryCharge,
+            coupon_code: appliedCoupon?.code || null,
+            razorpay_order_id: razorpay?.order_id || null,
+            razorpay_payment_id: razorpay?.payment_id || null,
+            razorpay_signature: razorpay?.signature || null,
             user_id: user?.id || null,
           }),
         }
@@ -427,11 +432,12 @@ Please confirm order and expected time.`;
 
       // Step 2: Create Razorpay order via edge function
       console.log('[Payment] Creating Razorpay order...');
+      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-razorpay-order`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+          headers: { 'Content-Type': 'application/json', apikey: anonKey, Authorization: `Bearer ${anonKey}` },
           body: JSON.stringify({ amount: grandTotal, currency: 'INR' }),
         }
       );
@@ -468,8 +474,12 @@ Please confirm order and expected time.`;
         handler: async (rzpResponse: any) => {
           console.log('[Payment] Payment successful, payment_id:', rzpResponse.razorpay_payment_id);
 
-          // Place order with payment_id
-          const result = await placeOrderViaAPI("online", info, rzpResponse.razorpay_payment_id);
+          // Place order with full Razorpay verification payload
+          const result = await placeOrderViaAPI("online", info, {
+            order_id: rzpResponse.razorpay_order_id,
+            payment_id: rzpResponse.razorpay_payment_id,
+            signature: rzpResponse.razorpay_signature,
+          });
           if (!result) {
             toast({ title: "Error", description: "Payment received but failed to save order. Please contact support.", variant: "destructive" });
             setIsProcessing(false);

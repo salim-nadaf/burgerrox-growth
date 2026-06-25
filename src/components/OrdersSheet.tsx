@@ -74,19 +74,22 @@ export default function OrdersSheet() {
   const [loading, setLoading] = useState(false);
 
   const customerId = typeof window !== 'undefined' ? localStorage.getItem('brx_customer_id') : null;
+  const guestWhatsapp = typeof window !== 'undefined' ? localStorage.getItem('brx_customer_whatsapp') : null;
 
   useEffect(() => {
     if (open && !user && customerId) {
-      fetchGuestOrders(customerId);
+      fetchGuestOrders(customerId, guestWhatsapp || "");
     }
-  }, [open, user, customerId]);
+  }, [open, user, customerId, guestWhatsapp]);
 
-  const fetchGuestOrders = async (cid: string) => {
+  const fetchGuestOrders = async (cid: string, whatsapp: string) => {
     setLoading(true);
     try {
+      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const wp = (whatsapp || "").replace(/\D/g, "").slice(-10);
       const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/guest-orders?customer_id=${cid}`,
-        { headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } }
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/guest-orders?customer_id=${encodeURIComponent(cid)}&whatsapp=${encodeURIComponent(wp)}`,
+        { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } }
       );
       const data = await res.json();
       if (data.orders) {

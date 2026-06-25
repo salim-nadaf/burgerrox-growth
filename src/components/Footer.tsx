@@ -16,7 +16,7 @@ const Footer = () => {
             loading="lazy"
             decoding="async"
           />
-          <p className="font-allura text-xl tracking-wide text-background text-center">
+          <p className="font-montserrat italic font-medium text-xl tracking-wide text-background text-center">
             Rockin' homemade flavor
           </p>
         </div>

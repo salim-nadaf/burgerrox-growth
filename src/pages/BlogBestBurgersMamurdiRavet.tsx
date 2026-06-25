@@ -86,7 +86,7 @@ const BlogBestBurgersMamurdiRavet = () => {
           <h1 className="font-bebas text-4xl sm:text-5xl md:text-6xl tracking-wider text-foreground mb-3 leading-tight">
             THE BEST BURGERS IN MAMURDI & RAVET: WHY BURGER ROX LEADS THE PACK
           </h1>
-          <p className="font-allura text-2xl text-primary mb-8">A local guide for Pune burger fans</p>
+          <p className="font-montserrat italic font-medium text-2xl text-primary mb-8">A local guide for Pune burger fans</p>
 
           <div className="font-montserrat text-sm sm:text-base text-muted-foreground space-y-6 leading-relaxed">
             <p>

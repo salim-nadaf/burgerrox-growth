@@ -8,24 +8,24 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Burger Rox Brand Colors */
-    --background: 48 100% 62%; /* #FFD939 */
-    --foreground: 24 32% 26%; /* #53362D */
+    /* Burger Rox Brand Colors - Premium Gourmet Palette */
+    --background: 34 30% 98%; /* #FAF9F6 - Soft Gourmet Cream */
+    --foreground: 24 35% 15%; /* #321F17 - Rich Dark Chocolate */
 
     --card: 0 0% 100%;
-    --card-foreground: 24 32% 26%;
+    --card-foreground: 24 35% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 24 32% 26%;
+    --popover-foreground: 24 35% 15%;
 
-    --primary: 21 100% 51%; /* #FF5D05 - Brand orange accent */
+    --primary: 21 100% 51%; /* #FF5D05 - Signature Orange Accent */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 48 95% 85%; /* Lighter yellow */
-    --secondary-foreground: 24 32% 26%;
+    --secondary: 48 100% 62%; /* #FFD939 - Brand Yellow Accent */
+    --secondary-foreground: 24 35% 15%;
 
-    --muted: 48 80% 90%;
-    --muted-foreground: 24 30% 28%;
+    --muted: 34 20% 93%; /* Soft gray-cream border/background */
+    --muted-foreground: 24 15% 45%;
 
     --accent: 21 100% 51%;
     --accent-foreground: 0 0% 100%;
@@ -33,46 +33,46 @@ All colors MUST be HSL.
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 48 50% 80%;
+    --border: 34 20% 88%; /* Elegant warm border */
     --input: 0 0% 100%;
     --ring: 21 100% 51%;
 
-    /* Custom brand gradients */
+    /* Custom brand gradients & shadows */
     --gradient-brand: linear-gradient(135deg, hsl(48 100% 62%), hsl(48 95% 75%));
     --gradient-accent: linear-gradient(135deg, hsl(21 100% 51%), hsl(18 100% 44%));
-    --shadow-brand: 0 10px 30px -10px hsl(21 100% 51% / 0.3);
-    --shadow-warm: 0 4px 20px hsl(48 80% 40% / 0.2);
+    --shadow-brand: 0 10px 30px -10px hsl(21 100% 51% / 0.35);
+    --shadow-warm: 0 4px 20px hsl(24 35% 15% / 0.06);
 
-    --radius: 0.5rem;
+    --radius: 0.75rem; /* Smoother premium rounded corners */
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-background: 34 30% 98%;
+    --sidebar-foreground: 24 35% 15%;
+    --sidebar-primary: 21 100% 51%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 34 20% 93%;
+    --sidebar-accent-foreground: 24 35% 15%;
+    --sidebar-border: 34 20% 88%;
+    --sidebar-ring: 21 100% 51%;
   }
 
   .dark {
-    --background: 24 35% 15%; /* Dark brown */
-    --foreground: 48 90% 85%;
+    --background: 24 35% 10%; /* #221612 - Extra Rich Dark Chocolate */
+    --foreground: 34 30% 90%;
 
-    --card: 24 30% 20%;
-    --card-foreground: 48 90% 85%;
+    --card: 24 30% 14%;
+    --card-foreground: 34 30% 90%;
 
-    --popover: 24 30% 20%;
-    --popover-foreground: 48 90% 85%;
+    --popover: 24 30% 14%;
+    --popover-foreground: 34 30% 90%;
 
     --primary: 21 100% 51%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 24 25% 25%;
-    --secondary-foreground: 48 90% 85%;
+    --secondary: 24 25% 20%;
+    --secondary-foreground: 34 30% 90%;
 
-    --muted: 24 20% 30%;
-    --muted-foreground: 48 50% 65%;
+    --muted: 24 20% 20%;
+    --muted-foreground: 34 15% 65%;
 
     --accent: 21 100% 51%;
     --accent-foreground: 0 0% 100%;
@@ -80,17 +80,17 @@ All colors MUST be HSL.
     --destructive: 0 62.8% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 24 20% 35%;
-    --input: 24 20% 35%;
+    --border: 24 20% 24%;
+    --input: 24 20% 24%;
     --ring: 21 100% 51%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-background: 24 35% 10%;
+    --sidebar-foreground: 34 30% 90%;
+    --sidebar-primary: 21 100% 51%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 24 20% 20%;
+    --sidebar-accent-foreground: 34 30% 90%;
+    --sidebar-border: 24 20% 24%;
+    --sidebar-ring: 21 100% 51%;
   }
 }
 

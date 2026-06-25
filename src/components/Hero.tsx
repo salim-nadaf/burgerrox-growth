@@ -25,37 +25,37 @@ const Hero = () => {
       </div>
 
       <div className="container mx-auto px-4 z-10 pb-8 sm:pb-12 pt-20">
-        <div className="max-w-xl space-y-4">
+        <div className="max-w-xl space-y-5 bg-foreground/45 backdrop-blur-md border border-white/10 p-6 sm:p-8 rounded-2xl shadow-2xl">
           {/* Price anchor */}
-          <div className="inline-flex items-center gap-2 bg-primary px-3 py-1.5 rounded-full">
+          <div className="inline-flex items-center gap-2 bg-primary px-3.5 py-1.5 rounded-full shadow-brand">
             <span className="font-montserrat text-xs sm:text-sm font-bold text-primary-foreground">
               Burgers from ₹89 · Free delivery within 3km
             </span>
           </div>
 
-          <h1 id="hero-heading" className="font-bebas text-5xl sm:text-6xl md:text-8xl text-card leading-[0.9] tracking-wider">
-            BURGER ROX<br />CRAVE-WORTHY BURGERS<br /><span className="text-3xl sm:text-4xl md:text-5xl">IN MAMURDI</span>
+          <h1 id="hero-heading" className="font-bebas text-5xl sm:text-6xl md:text-7xl text-card leading-[0.95] tracking-wider">
+            BURGER ROX<br />CRAVE-WORTHY BURGERS<br /><span className="text-2xl sm:text-3xl md:text-4xl text-secondary">IN MAMURDI - RAVET</span>
           </h1>
           
-          <p className="font-montserrat text-sm sm:text-base text-card/80 max-w-sm">
-            Fresh homemade burgers with our signature blaze sauce. Order now, get WhatsApp confirmation in minutes.
+          <p className="font-montserrat text-sm sm:text-base text-card/85 max-w-sm leading-relaxed">
+            Fresh homemade patties with our signature blaze sauce. Flame-grilled daily. WhatsApp confirmation in minutes.
           </p>
 
-          <p className="font-montserrat text-xs text-card/70">
-            ⭐ Loved by burger fans in Mamurdi–Ravet
+          <p className="font-montserrat text-xs text-card/70 flex items-center gap-1.5">
+            <span className="text-secondary">★</span> Loved by burger fans in Mamurdi–Ravet
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 pt-1">
             <Button 
               variant="brand" 
-              className="w-full sm:w-auto h-12 sm:h-14 px-8 text-base sm:text-lg font-montserrat font-bold"
+              className="w-full sm:w-auto h-12 sm:h-14 px-8 text-base sm:text-lg font-montserrat font-bold hover:scale-[1.02] transition-transform shadow-brand"
               asChild
             >
               <Link to="/menu">Order Now</Link>
             </Button>
             <Button 
               variant="ghost" 
-              className="w-full sm:w-auto h-12 sm:h-14 px-6 text-sm font-montserrat text-card/70 hover:text-card hover:bg-card/10"
+              className="w-full sm:w-auto h-12 sm:h-14 px-6 text-sm font-montserrat text-card/85 hover:text-card hover:bg-card/10 border border-white/20"
               asChild
             >
               <a href="https://wa.me/919321389985" target="_blank" rel="noopener noreferrer">

@@ -207,7 +207,10 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
             src={getItemImage(item.name)}
             alt={item.name}
             className="w-[72px] h-[72px] rounded-lg object-cover flex-shrink-0"
-            width="72" height="72" loading="lazy" decoding="async"
+            width="72" height="72"
+            loading={item.section.includes("Most Popular") ? "eager" : "lazy"}
+            decoding="async"
+            fetchpriority={item.section.includes("Most Popular") ? "high" : "low"}
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-1">

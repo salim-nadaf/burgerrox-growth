@@ -19,7 +19,7 @@ const FoodPhotoStrip = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
-    <section className="py-4 sm:py-6 bg-background border-b border-foreground/10" aria-label="Food gallery">
+    <section className="py-4 sm:py-6 bg-background border-b border-foreground/10 min-h-[220px] sm:min-h-[190px]" aria-label="Food gallery">
       <div className="container mx-auto px-4">
         <p className="font-bebas text-lg sm:text-xl text-foreground tracking-wider text-center mb-3">
           FROM OUR KITCHEN 🔥

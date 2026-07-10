@@ -3,7 +3,7 @@ import { Star, CheckCircle2, MapPin, Truck } from "lucide-react";
 
 const TrustStrip = () => {
   return (
-    <section className="bg-card border-b border-border py-3 px-4 shadow-sm" aria-label="Trust indicators" role="region">
+    <section className="bg-card border-b border-border py-3 px-4 shadow-sm min-h-[48px] flex items-center" aria-label="Trust indicators" role="region">
       <div className="container mx-auto">
         <div className="grid grid-cols-2 gap-y-3 gap-x-2 md:flex md:flex-row md:items-center md:justify-center md:gap-6 font-montserrat text-[11px] sm:text-xs md:text-sm font-semibold text-foreground">
           <span className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap py-0.5">

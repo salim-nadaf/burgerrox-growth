@@ -48,7 +48,7 @@ const GoogleReviews = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
-    <section className="py-6 sm:py-8 bg-background border-b border-foreground/10" aria-labelledby="reviews-heading">
+    <section className="py-6 sm:py-8 bg-background border-b border-foreground/10 min-h-[220px] sm:min-h-[200px]" aria-labelledby="reviews-heading">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-4">
           <h2 id="reviews-heading" className="font-bebas text-xl sm:text-2xl text-foreground tracking-wider">

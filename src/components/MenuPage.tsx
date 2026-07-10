@@ -6,21 +6,21 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 // Menu item images with explicit resize directives
-import blazeChickenImg from "@/assets/Blaze Chicken Burger.jpg";
-import blazeVegImg from "@/assets/Blaze Veg Burger.jpg";
-import alooRockImg from "@/assets/Aloo Rock Burger.jpg";
-import eggBurgerImage from "@/assets/egg-burger.jpg";
+import blazeChickenImg from "@/assets/Blaze Chicken Burger.webp";
+import blazeVegImg from "@/assets/Blaze Veg Burger.webp";
+import alooRockImg from "@/assets/Aloo Rock Burger.webp";
+import eggBurgerImage from "@/assets/egg-burger.webp";
 import doubleChickenImg from "@/assets/double-blaze-chicken-sm.webp";
-import doubleVegImg from "@/assets/Double Blaze Veg.jpg";
-import zingerImg from "@/assets/Burger Rox Zinger.jpg";
+import doubleVegImg from "@/assets/Double Blaze Veg.webp";
+import zingerImg from "@/assets/Burger Rox Zinger.webp";
 import blazeComboImg from "@/assets/blaze-combo-sm.webp";
 import zingerComboImg from "@/assets/zinger-combo-sm.webp";
-import saltedFriesImg from "@/assets/Salted Fries.jpg";
-import periPeriFriesImg from "@/assets/Peri Peri Fries.jpg";
+import saltedFriesImg from "@/assets/Salted Fries.webp";
+import periPeriFriesImg from "@/assets/Peri Peri Fries.webp";
 import potatoWedgesImg from "@/assets/potato-wedges-menu.webp";
 import chickenPopcornImg from "@/assets/chicken-popcorn-sm.webp";
-import lavaCakeImage from "@/assets/lava-cake.jpg";
-import chickenBurgerImage from "@/assets/chicken-burger.jpg";
+import lavaCakeImage from "@/assets/lava-cake.webp";
+import chickenBurgerImage from "@/assets/chicken-burger.webp";
 import { useCart } from "@/hooks/useCart";
 
 interface FoodTypeIndicatorProps {
@@ -63,15 +63,15 @@ const getItemImage = (name: string) => ITEM_IMAGE_MAP[name] || chickenBurgerImag
 
 // Styled badge variants inspired by Shopify product label apps
 const badgeStyles: Record<string, string> = {
-  "Most Ordered": "bg-primary text-primary-foreground",
-  "Best Seller": "bg-primary text-primary-foreground",
-  "Student Favorite": "bg-accent text-accent-foreground",
-  "Premium Pick": "bg-foreground text-background",
-  "Chef's Pick": "bg-foreground text-background",
-  "New": "bg-emerald-600 text-white",
-  "Spicy": "bg-red-600 text-white",
-  "Shareable": "bg-blue-600 text-white",
-  "Combo Deal": "bg-amber-500 text-black",
+  "Most Ordered": "bg-secondary text-secondary-foreground",
+  "Best Seller": "bg-secondary text-secondary-foreground",
+  "Student Favorite": "bg-secondary text-secondary-foreground",
+  "Premium Pick": "bg-secondary text-secondary-foreground",
+  "Chef's Pick": "bg-secondary text-secondary-foreground",
+  "New": "bg-emerald-700 text-white",
+  "Spicy": "bg-red-700 text-white",
+  "Shareable": "bg-blue-800 text-white",
+  "Combo Deal": "bg-amber-600 text-white",
 };
 const badgeIcons: Record<string, string> = {
   "Spicy": "🌶 ",
@@ -234,7 +234,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                 )}
               </div>
               {!item.variants && (
-                <span className="font-bebas text-lg text-primary flex-shrink-0">₹{item.price}</span>
+                <span className="font-bebas text-lg text-secondary flex-shrink-0">₹{item.price}</span>
               )}
             </div>
             <p className="font-montserrat text-xs text-muted-foreground leading-relaxed mt-1 line-clamp-2">
@@ -278,7 +278,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                     </div>
                     <Label htmlFor={`${item.name}-${addon.name}`} className="text-xs font-montserrat cursor-pointer py-1">{addon.name}</Label>
                   </div>
-                  <span className="font-bebas text-xs text-primary">+₹{addon.price}</span>
+                  <span className="font-bebas text-xs text-secondary">+₹{addon.price}</span>
                 </div>
               ))}
             </div>
@@ -293,7 +293,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                 <div key={i} className="flex justify-between items-center p-2 border border-border/30 rounded-md">
                   <span className="font-montserrat text-xs text-foreground">{variant.size}</span>
                   <div className="flex items-center gap-2">
-                    <span className="font-bebas text-sm text-primary">₹{variant.price}</span>
+                    <span className="font-bebas text-sm text-secondary">₹{variant.price}</span>
                     <Button onClick={() => handleAddToCart(item, variant.size, variant.price)} size="sm" className="text-xs px-3 h-7" aria-label={`Add ${item.name} (${variant.size}) to cart`}>
                       Add
                     </Button>
@@ -317,7 +317,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
   };
 
   return (
-    <section id="menu" className="py-8 sm:py-12 bg-secondary/20" aria-labelledby="menu-heading">
+    <section id="menu" className="py-8 sm:py-12 bg-background min-h-[800px]" aria-labelledby="menu-heading">
       <div className="container mx-auto px-4">
         <header className="text-center mb-8">
           <h2 id="menu-heading" className="font-bebas text-4xl sm:text-5xl md:text-6xl text-foreground tracking-wider mb-1">

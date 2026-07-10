@@ -37,18 +37,18 @@ const AnnouncementBar = () => {
   if (dismissed) return null;
 
   return (
-    <div className="bg-primary text-white" role="region" aria-label="Site announcements">
-      <div className="container mx-auto px-4 py-1.5 flex items-center justify-center gap-3 relative">
+    <div className="bg-secondary text-secondary-foreground font-semibold border-b border-foreground/10 min-h-[32px] flex items-center justify-center" role="region" aria-label="Site announcements">
+      <div className="container mx-auto px-4 py-1.5 flex items-center justify-center gap-3 relative min-h-[32px]">
         <p
           key={index}
-          className="font-montserrat text-[11px] sm:text-xs font-medium tracking-wide text-center animate-fade-in"
+          className="font-montserrat text-[11px] sm:text-xs font-semibold tracking-wide text-center animate-fade-in"
         >
           {messages[index]}
         </p>
         <button
           onClick={handleDismiss}
           aria-label="Dismiss announcement"
-          className="absolute right-2 sm:right-4 p-1 rounded-full hover:bg-white/15 transition-colors"
+          className="absolute right-2 sm:right-4 p-1 rounded-full hover:bg-foreground/15 transition-colors"
         >
           <X className="h-3 w-3" />
         </button>
